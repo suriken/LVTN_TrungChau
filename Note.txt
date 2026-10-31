@@ -1,0 +1,15 @@
+Google sheet:
+ - ID Trien khai: AKfycbyCLhzWQmxWIbU2USx2L5rbD1T2TLllvHIXpAqFlLG0b9r6nj-qqlDMu-7oazUAg03sPA
+ - Ung dung web (Web App URL): https://script.google.com/macros/s/AKfycbyCLhzWQmxWIbU2USx2L5rbD1T2TLllvHIXpAqFlLG0b9r6nj-qqlDMu-7oazUAg03sPA/exec
+
+KIẾN TRÚC TÁCH BIỆT FRONTEND & BACKEND:
+ 1. Frontend (index.html):
+    - Khong chua bat ky mat khau hoac thong tin xac thuc nao o ma nguon.
+    - Moi thao tac dang nhap, lay du lieu, xoa du lieu deu gui request len Backend qua API.
+ 2. Backend (Code.gs):
+    - Luu tru va xu ly toan bo tren Google Apps Script & Google Sheets.
+    - Tai khoan quan tri cau hinh trong ADMIN_CONFIG tren Google Apps Script:
+        + User: trungchau (hoac admin)
+        + Password: trungchau@123 (hoac admin123)
+
+Logo Trung Châu: https://i.postimg.cc/jdZBPB5c/IMG-3726.jpg
