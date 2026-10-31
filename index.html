@@ -1759,23 +1759,7 @@
                     </div>
                 </div>
 
-                <!-- THÔNG TIN KIẾN TRÚC BACKEND ĐỘC LẬP -->
-                <div class="bg-emerald-50/70 p-3.5 sm:p-4 rounded-xl border border-emerald-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
-                    <div class="flex items-center gap-2.5">
-                        <span class="w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center text-sm shadow flex-shrink-0">
-                            <i class="fa-solid fa-server"></i>
-                        </span>
-                        <div>
-                            <div class="font-bold text-emerald-950">Kiến Trúc Backend Google Apps Script Độc Lập</div>
-                            <div class="text-slate-600 leading-relaxed">Toàn bộ logic ghi nhận phiếu, cập nhật ghi đè theo mã duy nhất, xác thực quản trị và lưu trữ được xử lý an toàn tại tệp <code class="font-mono font-bold text-emerald-900 bg-white px-1.5 py-0.5 rounded border border-emerald-200">Code.gs</code>.</div>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-2 flex-shrink-0">
-                        <span class="px-2.5 py-1 bg-white text-emerald-800 rounded-lg border border-emerald-300 font-bold flex items-center gap-1.5 shadow-2xs">
-                            <i class="fa-solid fa-shield-halved text-emerald-600"></i> Backend Độc Lập
-                        </span>
-                    </div>
-                </div>
+                
             </div>
 
             <!-- CHARTS GRID -->
@@ -2074,7 +2058,7 @@
                     <i class="fa-solid fa-shield-halved"></i>
                 </div>
                 <h3 class="font-black text-[#3b4982] text-lg sm:text-xl">Xác Thực Quyền Quản Trị</h3>
-                <p class="text-xs sm:text-sm text-slate-600">Đăng nhập máy chủ Quản trị để phân tích số liệu & đồng bộ Google Sheets</p>
+                <p class="text-xs sm:text-sm text-slate-600">Đăng nhập để xem báo cáo thống kê và quản lý dữ liệu khảo sát</p>
             </div>
             <form onsubmit="handleAdminLogin(event)" class="space-y-3.5 text-xs sm:text-sm">
                 <div>
@@ -2090,10 +2074,7 @@
                         </button>
                     </div>
                 </div>
-                <div class="text-[11px] sm:text-xs text-emerald-800 bg-emerald-50/90 p-2.5 rounded-xl border border-emerald-200 leading-relaxed flex items-center gap-2">
-                    <i class="fa-solid fa-lock text-emerald-600 text-sm flex-shrink-0"></i>
-                    <span>Bảo mật máy chủ: Mật khẩu được đối soát trực tiếp qua Backend Google Apps Script (không lưu ở mã HTML).</span>
-                </div>
+
                 <div id="loginError" class="text-rose-600 text-xs hidden font-bold bg-rose-50 p-2.5 rounded-xl border border-rose-300">
                     <i class="fa-solid fa-triangle-exclamation mr-1"></i> Tài khoản hoặc mật khẩu không chính xác!
                 </div>
@@ -2401,7 +2382,7 @@
         }
 
         function switchTab(tabId) {
-            // Tự động lưu bản nháp phiếu khảo sát trước khi đổi tab
+            // Auto-save draft before switching tab
             if (typeof saveSurveyDraft === 'function') {
                 saveSurveyDraft();
             }
@@ -3177,7 +3158,7 @@
         }
 
         // SUBMIT FORM HANDLER
-                // --- IN-PAGE TOAST NOTIFICATION (WORKS 100% IN GOOGLE SITES IFRAME SANDBOX) ---
+                // Toast notifications
         function showToast(message, type = 'warning') {
             let toast = document.getElementById('surveyToast');
             if (!toast) {
@@ -3211,18 +3192,14 @@
             }
         }
 
-        // Quản lý mã phiếu khảo sát duy nhất của phiên khảo sát hiện tại
         let currentSurveyId = localStorage.getItem("ptv_current_survey_id") || null;
 
-        // --- CỔNG GIAO TIẾP MÁY CHỦ PROXY / BACKEND API ---
-        // Hỗ trợ Cloudflare Worker Reverse Proxy để che giấu 100% URL Google Apps Script
+        // API Gateway & Backend Configuration
         const CLOUDFLARE_WORKER_URL = "https://lvtn-trungchau.dinhthaonguyen1992.workers.dev";
-        // Chuỗi giải mã động trong RAM (Bảo vệ bí mật, không lưu chuỗi máy chủ)
         const DEFAULT_GOOGLE_SHEET_URL = atob("aHR0cHM6Ly9zY3JpcHQuZ29vZ2xlLmNvbS9tYWNyb3Mvcy9BS2Z5Y2J3dmluNlhHb3RjcU93cXlOb3dIeWhXNmVGNjZ5TEJ1VDQ0UTdtNWdfaXZTbC1PYlJDTE8tR2ZZSkFxc0pqa1EwS0IxUS9leGVj");
         
         function getEffectiveBackendUrl() {
             let url = localStorage.getItem("ptv_google_sheet_url");
-            // Tự động dọn sạch cache URL cũ nếu có
             if (url && (url.includes("AKfycbyCDNnEs7") || url.includes("workers.dev/"))) {
                 try { localStorage.removeItem("ptv_google_sheet_url"); } catch(e){}
                 url = null;
@@ -3461,7 +3438,7 @@
 
                 const avgScore = count > 0 ? (total / count).toFixed(2) : "5.00";
 
-                // ĐẢM BẢO MÃ PHIẾU DUY NHẤT & CƠ CHẾ GHI ĐÈ KHI SỬA LẠI
+                // Generate unique survey response ID
                 if (!currentSurveyId) {
                     currentSurveyId = "PTV-" + Math.floor(100000 + Math.random() * 900000);
                     try { localStorage.setItem("ptv_current_survey_id", currentSurveyId); } catch(e){}
@@ -3507,10 +3484,10 @@
                     console.warn("LocalStorage save warning:", e);
                 }
 
-                // Tự động đồng bộ lên Google Sheets trong nền (nếu có Web App URL)
+                // Sync survey response to backend
                 syncToGoogleSheets(newResponse);
 
-                // QUAN TRỌNG: Chuyển Tab hiển thị trước để element canvas & summary không bị display: none
+                // Switch tab before rendering charts
                 switchTab('personal');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
 
@@ -3740,7 +3717,7 @@
             if (errEl) errEl.classList.add('hidden');
 
             try {
-                // Xác thực 100% qua Backend (tự động thử Proxy, nếu Proxy chưa sẵn sàng sẽ dự phòng trực tiếp tới Google Apps Script)
+                // User authentication with fallback
                 let response;
                 try {
                     response = await fetch(targetUrl, {
@@ -3878,21 +3855,37 @@
             if (modal) modal.classList.add('hidden');
         }
 
-        function executeClearAllData() {
+        async function executeClearAllData() {
             surveyResponses = [];
             try { localStorage.removeItem("ptv_survey_responses"); } catch(e){}
             closeConfirmClearModal();
             renderGlobalDashboard();
-            showToast("Đã xóa sạch toàn bộ dữ liệu khảo sát!", "success");
+            showToast("Đang đồng bộ dọn dẹp dữ liệu trên Google Sheets...", "info");
 
-            // Đồng bộ xóa toàn bộ trên máy chủ Google Sheet
             const targetUrl = getEffectiveBackendUrl();
-            if (targetUrl) {
-                fetch(targetUrl, {
-                    method: "POST",
-                    headers: { "Content-Type": "text/plain;charset=utf-8" },
-                    body: JSON.stringify({ action: "clearAll" })
-                }).catch(e => console.warn("Lỗi đồng bộ xóa toàn bộ sheet:", e));
+            try {
+                let res;
+                try {
+                    res = await fetch(targetUrl, {
+                        method: "POST",
+                        headers: { "Content-Type": "text/plain;charset=utf-8" },
+                        body: JSON.stringify({ action: "clearAll" })
+                    });
+                    if (!res.ok && targetUrl !== DEFAULT_GOOGLE_SHEET_URL) throw new Error("Proxy error");
+                } catch(proxyErr) {
+                    res = await fetch(DEFAULT_GOOGLE_SHEET_URL, {
+                        method: "POST",
+                        headers: { "Content-Type": "text/plain;charset=utf-8" },
+                        body: JSON.stringify({ action: "clearAll" })
+                    });
+                }
+
+                const json = await res.json();
+                if (json && json.success) {
+                    showToast("Đã xóa sạch toàn bộ dữ liệu trên Google Sheets!", "success");
+                }
+            } catch(err) {
+                console.error("Lỗi dọn dẹp Google Sheets:", err);
             }
         }
 
@@ -4182,11 +4175,44 @@
             if (modal) modal.classList.add('hidden');
         }
 
-        function deleteSingleResponse(respId) {
+        async function deleteSingleResponse(respId) {
+            if (!confirm(`Quý vị có chắc chắn muốn xóa vĩnh viễn phiếu ${respId} không?`)) {
+                return;
+            }
+
             surveyResponses = surveyResponses.filter(r => r.id !== respId);
             try { localStorage.setItem("ptv_survey_responses", JSON.stringify(surveyResponses)); } catch(e){}
             renderGlobalDashboard();
-            showToast("Đã xóa phiếu khảo sát thành công!", "success");
+            showToast(`Đang đồng bộ xóa phiếu ${respId} trên Google Sheets...`, "info");
+
+            const targetUrl = getEffectiveBackendUrl();
+            try {
+                let res;
+                try {
+                    res = await fetch(targetUrl, {
+                        method: "POST",
+                        headers: { "Content-Type": "text/plain;charset=utf-8" },
+                        body: JSON.stringify({ action: "deleteResponse", id: respId })
+                    });
+                    if (!res.ok && targetUrl !== DEFAULT_GOOGLE_SHEET_URL) throw new Error("Proxy error");
+                } catch(proxyErr) {
+                    res = await fetch(DEFAULT_GOOGLE_SHEET_URL, {
+                        method: "POST",
+                        headers: { "Content-Type": "text/plain;charset=utf-8" },
+                        body: JSON.stringify({ action: "deleteResponse", id: respId })
+                    });
+                }
+
+                const json = await res.json();
+                if (json && json.success) {
+                    showToast(`Đã xóa thành công phiếu ${respId} trên Google Sheets!`, "success");
+                } else {
+                    showToast(json.message || `Đã xóa cục bộ (phiếu ${respId})!`, "warning");
+                }
+            } catch(err) {
+                console.error("Lỗi xóa trên Google Sheets:", err);
+                showToast(`Đã xóa cục bộ (phiếu ${respId})`, "warning");
+            }
         }
 
         // RENDER ADMIN FEEDBACK CARDS (CHIA THEO 4 NHÓM Ý KIẾN)
