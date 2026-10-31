@@ -20,7 +20,7 @@
  */
 
 // ĐƯỜNG DẪN BÍ MẬT CỦA GOOGLE APPS SCRIPT (CHỈ NẰM TRÊN MÁY CHỦ CLOUDFLARE)
-const GOOGLE_SCRIPT_BACKEND = "https://script.google.com/macros/s/AKfycbyCDNnEs7ULm5NiNBpHs6RNn5uivyWF_iO1pGeoymhe-nLHQ4nddrUVZCLe4gAyY3Nyqw/exec";
+const GOOGLE_SCRIPT_BACKEND = "https://script.google.com/macros/s/AKfycbwvin6XGotcqOwqyNowHyhW6eF66yLBuT44Q7m5g_ivSl-ObRCLO-GfYJAqsJjkQ0KB1Q/exec";
 
 // Cấu hình CORS cho phép trang web gọi an toàn
 const corsHeaders = {

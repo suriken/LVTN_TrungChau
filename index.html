@@ -3218,13 +3218,21 @@
         // Hỗ trợ Cloudflare Worker Reverse Proxy để che giấu 100% URL Google Apps Script
         const CLOUDFLARE_WORKER_URL = "https://lvtn-trungchau.dinhthaonguyen1992.workers.dev";
         // Chuỗi giải mã động trong RAM (Bảo vệ bí mật, không lưu chuỗi máy chủ)
-        const DEFAULT_GOOGLE_SHEET_URL = atob("aHR0cHM6Ly9zY3JpcHQuZ29vZ2xlLmNvbS9tYWNyb3Mvcy9BS2Z5Y2J5Q0RObkVzN1VMbTVOaU5CcEhzNlJObjV1aXZ5V0ZfaU8xcEdlb3ltaGUtbkxIUTRuZGRyVVZaQ0xlNGdBeVkzTnlxdy9leGVj");
+        const DEFAULT_GOOGLE_SHEET_URL = atob("aHR0cHM6Ly9zY3JpcHQuZ29vZ2xlLmNvbS9tYWNyb3Mvcy9BS2Z5Y2J3dmluNlhHb3RjcU93cXlOb3dIeWhXNmVGNjZ5TEJ1VDQ0UTdtNWdfaXZTbC1PYlJDTE8tR2ZZSkFxc0pqa1EwS0IxUS9leGVj");
         
         function getEffectiveBackendUrl() {
-            let url = localStorage.getItem("ptv_google_sheet_url") || CLOUDFLARE_WORKER_URL || DEFAULT_GOOGLE_SHEET_URL;
+            let url = localStorage.getItem("ptv_google_sheet_url");
+            // Tự động dọn sạch cache URL cũ nếu có
+            if (url && (url.includes("AKfycbyCDNnEs7") || url.includes("workers.dev/"))) {
+                try { localStorage.removeItem("ptv_google_sheet_url"); } catch(e){}
+                url = null;
+            }
+            if (!url) {
+                url = CLOUDFLARE_WORKER_URL || DEFAULT_GOOGLE_SHEET_URL;
+            }
             if (url && typeof url === "string") {
                 url = url.trim();
-                if (url && !url.startsWith("http://") && !url.startsWith("https://")) {
+                if (!url.startsWith("http://") && !url.startsWith("https://")) {
                     url = "https://" + url;
                 }
                 if (url.endsWith("/")) {
@@ -3246,11 +3254,24 @@
             const payload = Object.assign({ action: "submit" }, responseObj);
 
             try {
-                const res = await fetch(targetUrl, {
-                    method: "POST",
-                    headers: { "Content-Type": "text/plain;charset=utf-8" },
-                    body: JSON.stringify(payload)
-                });
+                let res;
+                try {
+                    res = await fetch(targetUrl, {
+                        method: "POST",
+                        headers: { "Content-Type": "text/plain;charset=utf-8" },
+                        body: JSON.stringify(payload)
+                    });
+                    if (!res.ok && targetUrl !== DEFAULT_GOOGLE_SHEET_URL) {
+                        throw new Error("Proxy status " + res.status);
+                    }
+                } catch(proxyErr) {
+                    console.warn("Đồng bộ qua Proxy chưa được, thử kênh trực tiếp Google Sheets:", proxyErr);
+                    res = await fetch(DEFAULT_GOOGLE_SHEET_URL, {
+                        method: "POST",
+                        headers: { "Content-Type": "text/plain;charset=utf-8" },
+                        body: JSON.stringify(payload)
+                    });
+                }
                 const json = await res.json();
                 console.log("Kết quả đồng bộ Google Sheets:", json);
                 if (json && json.success) {
@@ -3719,16 +3740,33 @@
             if (errEl) errEl.classList.add('hidden');
 
             try {
-                // Xác thực 100% qua Backend Google Apps Script (HTML hoàn toàn không chứa bất kỳ tài khoản hay mật khẩu nào)
-                const response = await fetch(targetUrl, {
-                    method: "POST",
-                    headers: { "Content-Type": "text/plain;charset=utf-8" },
-                    body: JSON.stringify({
-                        action: "login",
-                        username: u,
-                        password: p
-                    })
-                });
+                // Xác thực 100% qua Backend (tự động thử Proxy, nếu Proxy chưa sẵn sàng sẽ dự phòng trực tiếp tới Google Apps Script)
+                let response;
+                try {
+                    response = await fetch(targetUrl, {
+                        method: "POST",
+                        headers: { "Content-Type": "text/plain;charset=utf-8" },
+                        body: JSON.stringify({
+                            action: "login",
+                            username: u,
+                            password: p
+                        })
+                    });
+                    if (!response.ok && targetUrl !== DEFAULT_GOOGLE_SHEET_URL) {
+                        throw new Error("Proxy status " + response.status);
+                    }
+                } catch(proxyErr) {
+                    console.warn("Proxy chưa sẵn sàng hoặc gặp lỗi, chuyển sang kết nối trực tiếp Google Apps Script:", proxyErr);
+                    response = await fetch(DEFAULT_GOOGLE_SHEET_URL, {
+                        method: "POST",
+                        headers: { "Content-Type": "text/plain;charset=utf-8" },
+                        body: JSON.stringify({
+                            action: "login",
+                            username: u,
+                            password: p
+                        })
+                    });
+                }
 
                 const result = await response.json();
 
