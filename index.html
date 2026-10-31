@@ -3216,13 +3216,28 @@
 
         // --- CỔNG GIAO TIẾP MÁY CHỦ PROXY / BACKEND API ---
         // Hỗ trợ Cloudflare Worker Reverse Proxy để che giấu 100% URL Google Apps Script
-        const CLOUDFLARE_WORKER_URL = ""; // Điền link Cloudflare Worker của Quý vị vào đây (ví dụ: https://ptv-survey-api.xxx.workers.dev)
+        const CLOUDFLARE_WORKER_URL = "https://lvtn-trungchau.dinhthaonguyen1992.workers.dev";
         // Chuỗi giải mã động trong RAM (Bảo vệ bí mật, không lưu chuỗi máy chủ)
         const DEFAULT_GOOGLE_SHEET_URL = atob("aHR0cHM6Ly9zY3JpcHQuZ29vZ2xlLmNvbS9tYWNyb3Mvcy9BS2Z5Y2J5Q0RObkVzN1VMbTVOaU5CcEhzNlJObjV1aXZ5V0ZfaU8xcEdlb3ltaGUtbkxIUTRuZGRyVVZaQ0xlNGdBeVkzTnlxdy9leGVj");
-        let GOOGLE_SHEET_WEBAPP_URL = localStorage.getItem("ptv_google_sheet_url") || CLOUDFLARE_WORKER_URL || DEFAULT_GOOGLE_SHEET_URL;
+        
+        function getEffectiveBackendUrl() {
+            let url = localStorage.getItem("ptv_google_sheet_url") || CLOUDFLARE_WORKER_URL || DEFAULT_GOOGLE_SHEET_URL;
+            if (url && typeof url === "string") {
+                url = url.trim();
+                if (url && !url.startsWith("http://") && !url.startsWith("https://")) {
+                    url = "https://" + url;
+                }
+                if (url.endsWith("/")) {
+                    url = url.slice(0, -1);
+                }
+            }
+            return url;
+        }
+
+        let GOOGLE_SHEET_WEBAPP_URL = getEffectiveBackendUrl();
 
         async function syncToGoogleSheets(responseObj) {
-            const targetUrl = GOOGLE_SHEET_WEBAPP_URL || DEFAULT_GOOGLE_SHEET_URL;
+            const targetUrl = getEffectiveBackendUrl();
             if (!targetUrl || targetUrl.trim() === "") {
                 console.log("Chưa cấu hình Google Sheet URL, dữ liệu được bảo lưu an toàn trong trình duyệt.");
                 return;
@@ -3695,7 +3710,7 @@
                 return;
             }
 
-            const targetUrl = GOOGLE_SHEET_WEBAPP_URL || DEFAULT_GOOGLE_SHEET_URL;
+            const targetUrl = getEffectiveBackendUrl();
 
             if (submitBtn) {
                 submitBtn.disabled = true;
@@ -3786,7 +3801,7 @@
         }
 
         async function fetchResponsesFromBackend() {
-            const targetUrl = GOOGLE_SHEET_WEBAPP_URL || DEFAULT_GOOGLE_SHEET_URL;
+            const targetUrl = getEffectiveBackendUrl();
             if (!targetUrl || targetUrl.trim() === '') {
                 showToast("Chưa cấu hình URL Google Apps Script!", "warning");
                 return;
@@ -3833,7 +3848,7 @@
             showToast("Đã xóa sạch toàn bộ dữ liệu khảo sát!", "success");
 
             // Đồng bộ xóa toàn bộ trên máy chủ Google Sheet
-            const targetUrl = GOOGLE_SHEET_WEBAPP_URL || DEFAULT_GOOGLE_SHEET_URL;
+            const targetUrl = getEffectiveBackendUrl();
             if (targetUrl) {
                 fetch(targetUrl, {
                     method: "POST",
@@ -3848,7 +3863,7 @@
             // Update Google Sheet URL input & badge
             const gInput = document.getElementById('googleSheetUrlInput');
             const gBadge = document.getElementById('googleSheetStatusBadge');
-            const effectiveUrl = GOOGLE_SHEET_WEBAPP_URL || DEFAULT_GOOGLE_SHEET_URL;
+            const effectiveUrl = getEffectiveBackendUrl();
 
             if (gInput) {
                 gInput.value = effectiveUrl;
@@ -4224,7 +4239,7 @@
                 return;
             }
 
-            const targetUrl = GOOGLE_SHEET_WEBAPP_URL || DEFAULT_GOOGLE_SHEET_URL;
+            const targetUrl = getEffectiveBackendUrl();
             if (!targetUrl || targetUrl.trim() === "") {
                 showToast("Chưa cấu hình URL Web App Google Sheet!", "error");
                 return;
@@ -4254,7 +4269,7 @@
 
         // TEST GOOGLE SHEET CONNECTION (PING)
         async function testGoogleSheetConnection() {
-            const targetUrl = GOOGLE_SHEET_WEBAPP_URL || DEFAULT_GOOGLE_SHEET_URL;
+            const targetUrl = getEffectiveBackendUrl();
             if (!targetUrl || targetUrl.trim() === "") {
                 showToast("Vui lòng cấu hình URL Web App Google Sheet trước khi kiểm tra!", "warning");
                 return;

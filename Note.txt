@@ -1,6 +1,7 @@
 Google sheet:
- - ID Trien khai: AKfycbyCLhzWQmxWIbU2USx2L5rbD1T2TLllvHIXpAqFlLG0b9r6nj-qqlDMu-7oazUAg03sPA
- - Ung dung web (Web App URL): https://script.google.com/macros/s/AKfycbyCLhzWQmxWIbU2USx2L5rbD1T2TLllvHIXpAqFlLG0b9r6nj-qqlDMu-7oazUAg03sPA/exec
+ - ID Trien khai: AKfycbyCDNnEs7ULm5NiNBpHs6RNn5uivyWF_iO1pGeoymhe-nLHQ4nddrUVZCLe4gAyY3Nyqw
+ - Ung dung web (Web App URL): https://script.google.com/macros/s/AKfycbyCDNnEs7ULm5NiNBpHs6RNn5uivyWF_iO1pGeoymhe-nLHQ4nddrUVZCLe4gAyY3Nyqw/exec
+ - Library: https://script.google.com/macros/library/d/11M4mIQu1cRD9-GOdLItqCgBmL0xMG9Nplxa4q_DFyZgDGTOYXu0fRPKx/1
 
 KIẾN TRÚC TÁCH BIỆT FRONTEND & BACKEND:
  1. Frontend (index.html):
@@ -13,3 +14,4 @@ KIẾN TRÚC TÁCH BIỆT FRONTEND & BACKEND:
         + Password: trungchau@123 (hoac admin123)
 
 Logo Trung Châu: https://i.postimg.cc/jdZBPB5c/IMG-3726.jpg
+worker: lvtn-trungchau.dinhthaonguyen1992.workers.dev/
