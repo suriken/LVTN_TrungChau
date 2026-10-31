@@ -11,12 +11,29 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Google Fonts: Be Vietnam Pro (Chuẩn ngữ điệu tiếng Việt) & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f7f5f0; font-size: 15px; }
+        body {
+            font-family: 'Be Vietnam Pro', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f7f5f0;
+            font-size: 15px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            text-rendering: optimizeLegibility;
+        }
+
+        /* Tối ưu căn chỉnh dòng & chống chữ rớt lẻ (Text balance & pretty) */
+        h1, h2, h3, h4, h5, .text-balance {
+            text-wrap: balance;
+        }
+        p, .text-pretty {
+            text-wrap: pretty;
+        }
 
         @media (max-width: 1023px) {
             /* Tối ưu cỡ chữ và chống tự động zoom trên iOS Safari / Google Sites */
@@ -178,7 +195,7 @@
                     <span>2. Bảng Khảo Sát</span>
                 </button>
 
-                <button onclick="switchTab('personal'); onNavClickMobile();" id="tabPersonalDashBtn" class="w-full px-3 py-2.5 rounded-xl transition flex items-center gap-3 text-slate-700 hover:bg-[#ede7da] text-xs sm:text-sm font-medium hidden">
+                <button onclick="switchTab('personal'); onNavClickMobile();" id="tabPersonalDashBtn" class="w-full px-3 py-2.5 rounded-xl transition flex items-center gap-3 text-slate-700 hover:bg-[#ede7da] text-xs sm:text-sm font-medium">
                     <i class="fa-solid fa-user-check w-5 text-center text-emerald-600 text-sm"></i>
                     <span>3. Kết Quả Của Tôi</span>
                 </button>
@@ -1567,13 +1584,13 @@
         <!-- ==================== TAB 3: DASHBOARD CÁ NHÂN ==================== -->
         <section id="personalDashboardSection" class="space-y-5 sm:space-y-6 hidden">
             <!-- BANNER CẢM ƠN & GHI NHẬN -->
-            <div class="bg-white p-4 sm:p-6 rounded-2xl border border-[#e2d8c7] shadow-sm text-center space-y-2 sm:space-y-3">
+            <div class="bg-white p-5 sm:p-7 rounded-2xl border border-[#e2d8c7] shadow-sm text-center space-y-3">
                 <div class="w-12 h-12 sm:w-14 sm:h-14 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-xl sm:text-2xl mx-auto shadow-inner">
                     <i class="fa-solid fa-circle-check"></i>
                 </div>
-                <h2 class="text-base sm:text-xl font-black text-[#3b4982]">Cảm Ơn Quý Huynh Trưởng Đã Hoàn Thành Khảo Sát!</h2>
-                <p class="text-xs sm:text-sm text-slate-600 max-w-xl mx-auto leading-relaxed">
-                    Ý kiến đóng góp quý báu của Quý vị đã được ghi nhận và lưu trữ an toàn. Dữ liệu này là cơ sở thực tiễn quan trọng giúp tác giả hoàn thiện đề tài luận văn tốt nghiệp PTV Cấp III.
+                <h2 id="personalThankYouTitle" class="text-base sm:text-xl font-black text-[#3b4982] text-center tracking-tight">Cảm Ơn Quý Vị Đã Hoàn Thành Khảo Sát!</h2>
+                <p id="personalThankYouDesc" class="text-xs sm:text-sm text-slate-600 max-w-2xl mx-auto text-center leading-relaxed" style="text-wrap: balance;">
+                    Ý kiến đóng góp quý báu của Quý vị đã được ghi nhận và lưu trữ an toàn.<br class="hidden sm:inline"> Dữ liệu này là cơ sở thực tiễn quan trọng giúp tác giả hoàn thiện đề tài luận văn tốt nghiệp PTV Cấp III.
                 </p>
                 <div class="flex flex-wrap items-center justify-center gap-2.5 pt-1">
                     <button type="button" onclick="switchTab('docs')" class="px-3.5 py-1.5 sm:px-4 sm:py-2 bg-[#fbf9f5] hover:bg-[#ede7da] text-[#3b4982] text-xs sm:text-sm font-bold rounded-xl border border-[#e2d8c7] transition flex items-center gap-1.5 cursor-pointer">
@@ -1643,7 +1660,6 @@
         </section>
 
         <!-- ==================== TAB 4: DASHBOARD TỔNG QUAN (ADMIN) ==================== -->
-                <!-- ==================== TAB 4: DASHBOARD TỔNG QUAN (ADMIN) ==================== -->
         <section id="dashboardSection" class="space-y-5 sm:space-y-6 hidden">
             <!-- TOP BAR ADMIN HEADER -->
             <div class="bg-white p-4 sm:p-6 rounded-2xl border border-[#e2d8c7] shadow-sm flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
@@ -2036,8 +2052,8 @@
                 <i class="fa-solid fa-triangle-exclamation"></i>
             </div>
             <h3 class="font-black text-rose-900 text-lg">Xóa Toàn Bộ Dữ Liệu?</h3>
-            <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                Hành động này sẽ xóa toàn bộ các phiếu khảo sát lưu trên trình duyệt của thiết bị này. Các dữ liệu đã gửi lên Google Sheets vẫn được an toàn.
+            <p class="text-xs sm:text-sm text-slate-600 leading-relaxed text-pretty">
+                Hành động này sẽ xóa sạch toàn bộ các phiếu khảo sát trên cả hệ thống và Google Sheets. Quý vị có chắc chắn muốn tiếp tục không?
             </p>
             <div class="flex items-center gap-2 pt-2">
                 <button type="button" onclick="closeConfirmClearModal()" class="w-1/2 py-2.5 rounded-xl border border-slate-300 text-slate-700 font-bold hover:bg-slate-100 cursor-pointer transition">
@@ -2451,6 +2467,18 @@
 
             if (tabId === 'form') {
                 ensureFormRenderedAndRestored();
+            }
+            if (tabId === 'personal') {
+                let targetResp = null;
+                if (currentSurveyId) {
+                    targetResp = surveyResponses.find(r => r.id === currentSurveyId);
+                }
+                if (!targetResp && surveyResponses.length > 0) {
+                    targetResp = surveyResponses[surveyResponses.length - 1];
+                }
+                if (targetResp) {
+                    renderPersonalDashboard(targetResp);
+                }
             }
             if (tabId === 'dashboard') {
                 renderGlobalDashboard();
@@ -3525,8 +3553,47 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
+        function getRespondentGreeting(res) {
+            const rawName = (res.name || '').trim();
+            const isAnon = (!rawName || rawName.toLowerCase() === 'ẩn danh');
+
+            if (!isAnon) {
+                return {
+                    title: `Cảm Ơn ${rawName} Đã Hoàn Thành Khảo Sát!`,
+                    salutation: rawName
+                };
+            }
+
+            const role = (res.role || '').toLowerCase();
+            let salutation = "Quý Vị";
+            if (role.includes("ptv") || role.includes("phổ tế viên")) {
+                salutation = "Quý PTV";
+            } else if (role.includes("huynh trưởng")) {
+                salutation = "Quý Huynh Trưởng";
+            } else if (role.includes("chức sắc") || role.includes("chức việc")) {
+                salutation = "Quý Chức Sắc / Chức Việc";
+            } else {
+                salutation = "Quý Vị";
+            }
+
+            return {
+                title: `Cảm Ơn ${salutation} Đã Hoàn Thành Khảo Sát!`,
+                salutation: salutation
+            };
+        }
+
         function renderPersonalDashboard(res) {
             try {
+                // Cập nhật lời cảm ơn động căn giữa & đều chữ
+                const greeting = getRespondentGreeting(res);
+                const thankTitleEl = document.getElementById('personalThankYouTitle');
+                if (thankTitleEl) thankTitleEl.innerText = greeting.title;
+
+                const thankDescEl = document.getElementById('personalThankYouDesc');
+                if (thankDescEl) {
+                    thankDescEl.innerHTML = `Ý kiến đóng góp quý báu của ${greeting.salutation} đã được ghi nhận và lưu trữ an toàn.<br class="hidden sm:inline"> Dữ liệu này là cơ sở thực tiễn quan trọng giúp tác giả hoàn thiện đề tài luận văn tốt nghiệp PTV Cấp III.`;
+                }
+
                 const idEl = document.getElementById('personalResponseId');
                 if (idEl) idEl.innerText = `Mã phiếu: ${res.id}`;
 
