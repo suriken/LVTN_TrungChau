@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bộ Công Cụ Stress Test - Giả Lập 100 Người Dùng Đồng Thời | PTV Trung Châu 1</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+    </style>
+</head>
+<body class="p-4 sm:p-8 max-w-7xl mx-auto space-y-6">
+
+    <!-- HEADER -->
+    <header class="bg-gradient-to-r from-[#2c3765] via-[#3b4982] to-[#25325c] p-6 rounded-2xl text-white shadow-lg flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div>
+            <div class="flex items-center gap-2.5 text-amber-300 text-xs sm:text-sm font-bold uppercase tracking-wider mb-1">
+                <i class="fa-solid fa-bolt text-amber-400"></i>
+                <span>Stress Test & Concurrency Benchmark Engine</span>
+            </div>
+            <h1 class="text-xl sm:text-2xl md:text-3xl font-black">Giả Lập 100 Người Dùng Thao Tác Khảo Sát Đồng Thời</h1>
+            <p class="text-slate-200 text-xs sm:text-sm mt-1">Kiểm thử tải trọng, độ trễ và tính toàn vẹn 54 cột dữ liệu trên hệ thống Luận Văn PTV</p>
+        </div>
+        <div class="flex items-center gap-2 bg-white/10 px-4 py-2.5 rounded-xl border border-white/20 text-xs sm:text-sm">
+            <i class="fa-solid fa-server text-emerald-400"></i>
+            <span>Cổng kết nối: <strong class="text-emerald-300">Google Apps Script / Proxy</strong></span>
+        </div>
+    </header>
+
+    <!-- CONFIGURATION & CONTROLS -->
+    <div class="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-sm space-y-5">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Địa chỉ API Endpoint:</label>
+                <input type="text" id="apiEndpoint" class="w-full text-xs sm:text-sm p-3 rounded-xl border border-slate-300 focus:outline-none focus:border-[#3b4982] bg-slate-50 font-mono" value="https://script.google.com/macros/s/AKfycbwvin6XGotcqOwqyNowHyhW6eF66yLBuT44Q7m5g_ivSl-ObRCLO-GfYJAqsJjkQ0KB1Q/exec">
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Số lượng Người Dùng (Test Cases):</label>
+                <input type="number" id="numTestCases" class="w-full text-xs sm:text-sm p-3 rounded-xl border border-slate-300 focus:outline-none focus:border-[#3b4982] bg-slate-50 font-bold text-slate-800" value="100" min="1" max="200">
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Số Luồng Đồng Thời (Concurrency):</label>
+                <select id="concurrencyLevel" class="w-full text-xs sm:text-sm p-3 rounded-xl border border-slate-300 focus:outline-none focus:border-[#3b4982] bg-slate-50 font-bold text-slate-800">
+                    <option value="100">100 Yêu Cầu Cùng Một Lúc (Full Stress)</option>
+                    <option value="50">50 Yêu Cầu Đồng Thời (Batch 50)</option>
+                    <option value="25">25 Yêu Cầu Đồng Thời (Batch 25)</option>
+                    <option value="10">10 Yêu Cầu Đồng Thời (Tuần tự nhẹ)</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- ACTION BUTTONS -->
+        <div class="flex flex-wrap items-center gap-3 pt-2">
+            <button type="button" onclick="generate100TestCases()" class="px-5 py-3 rounded-xl bg-slate-800 hover:bg-slate-900 text-white font-bold text-sm transition flex items-center gap-2 shadow cursor-pointer active:scale-98">
+                <i class="fa-solid fa-wand-magic-sparkles text-amber-400"></i>
+                <span>Tự Động Sinh 100 Test Cases</span>
+            </button>
+            <button type="button" id="startStressBtn" onclick="startStressTest()" class="px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm transition flex items-center gap-2 shadow-md cursor-pointer active:scale-98">
+                <i class="fa-solid fa-play"></i>
+                <span>Chạy Stress Test (100 Người Dùng Đồng Thời)</span>
+            </button>
+            <button type="button" onclick="exportTestCasesCSV()" class="px-4 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm transition flex items-center gap-2 shadow cursor-pointer active:scale-98">
+                <i class="fa-solid fa-file-excel"></i>
+                <span>Xuất 100 TC ra Excel (CSV)</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- METRICS LIVE DASHBOARD -->
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-3 sm:gap-4">
+        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
+            <div class="text-xs font-bold text-slate-500 uppercase">Tổng Test Cases</div>
+            <div id="metricTotal" class="text-2xl font-black text-slate-800 mt-1">100</div>
+        </div>
+        <div class="bg-white p-4 rounded-2xl border border-emerald-200 shadow-xs bg-emerald-50/40">
+            <div class="text-xs font-bold text-emerald-700 uppercase">Thành Công</div>
+            <div id="metricSuccess" class="text-2xl font-black text-emerald-600 mt-1">0</div>
+        </div>
+        <div class="bg-white p-4 rounded-2xl border border-rose-200 shadow-xs bg-rose-50/40">
+            <div class="text-xs font-bold text-rose-700 uppercase">Thất Bại / Lỗi</div>
+            <div id="metricFailed" class="text-2xl font-black text-rose-600 mt-1">0</div>
+        </div>
+        <div class="bg-white p-4 rounded-2xl border border-blue-200 shadow-xs">
+            <div class="text-xs font-bold text-blue-700 uppercase">Độ Trễ Trung Bình</div>
+            <div id="metricAvgDuration" class="text-2xl font-black text-blue-600 mt-1">0.0s</div>
+        </div>
+        <div class="bg-white p-4 rounded-2xl border border-amber-200 shadow-xs col-span-2 md:col-span-1">
+            <div class="text-xs font-bold text-amber-700 uppercase">Tốc Độ Xử Lý</div>
+            <div id="metricRPS" class="text-2xl font-black text-amber-600 mt-1">0 req/s</div>
+        </div>
+    </div>
+
+    <!-- PROGRESS BAR -->
+    <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-xs space-y-2">
+        <div class="flex items-center justify-between text-xs sm:text-sm font-bold text-slate-700">
+            <span id="progressStatusText">Trạng thái: Sẵn sàng thực thi</span>
+            <span id="progressPercentText" class="text-indigo-600 font-black">0% (0 / 100)</span>
+        </div>
+        <div class="w-full bg-slate-100 rounded-full h-3 overflow-hidden border border-slate-200">
+            <div id="progressBar" class="bg-gradient-to-r from-indigo-500 to-emerald-500 h-full w-0 transition-all duration-300"></div>
+        </div>
+    </div>
+
+    <!-- LIVE DATA & RESULTS TABLE -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="p-4 sm:p-5 border-b border-slate-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-slate-50">
+            <div>
+                <h3 class="font-black text-slate-900 text-base sm:text-lg flex items-center gap-2">
+                    <i class="fa-solid fa-list-check text-indigo-600"></i>
+                    <span>Danh Sách 100 Test Cases & Nhật Ký Thao Tác</span>
+                </h3>
+                <p class="text-xs text-slate-500 mt-0.5">Mỗi yêu cầu mang dữ liệu riêng biệt: Họ tên, SĐT, Đơn vị, 18 câu Likert và các trường thực tiễn</p>
+            </div>
+            <div class="flex items-center gap-2">
+                <input type="text" id="searchTableInput" oninput="filterTableRows()" placeholder="Tìm kiếm họ tên, mã..." class="text-xs px-3 py-1.5 rounded-lg border border-slate-300 focus:outline-none bg-white">
+            </div>
+        </div>
+
+        <div class="overflow-x-auto max-h-[500px]">
+            <table class="w-full text-left text-xs sm:text-sm border-collapse">
+                <thead class="bg-[#3b4982] text-white text-[11px] uppercase tracking-wider sticky top-0 z-10">
+                    <tr>
+                        <th class="p-3">#</th>
+                        <th class="p-3">Mã Phiếu</th>
+                        <th class="p-3">Họ Và Tên</th>
+                        <th class="p-3">Số Điện Thoại</th>
+                        <th class="p-3">Đơn Vị & Vai Trò</th>
+                        <th class="p-3 text-center">Điểm TB</th>
+                        <th class="p-3 text-center">Số Câu < 3</th>
+                        <th class="p-3 text-center">Thời Gian</th>
+                        <th class="p-3 text-center">Trạng Thái</th>
+                        <th class="p-3">Phản Hồi Máy Chủ</th>
+                    </tr>
+                </thead>
+                <tbody id="testCasesTableBody" class="divide-y divide-slate-100">
+                    <!-- Populated dynamically via JS -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        const Q_KEYS = [
+            "q1_levels", "q2_entry", "q3_duration", "q4_method", "q5_motto", "q6_grad",
+            "q7_doctrine", "q8_tradition", "q9_skills_guide", "q10_skills_ceremony", "q11_cultivation", "q12_digital_safety",
+            "q13_competence", "q14_application", "q15_commitment",
+            "q16_psychology", "q17_church_needs", "q18_social_context"
+        ];
+
+        const FIRST_NAMES = ["Nguyễn", "Trần", "Lê", "Phạm", "Huỳnh", "Hoàng", "Phan", "Vũ", "Võ", "Đặng", "Bùi", "Đỗ", "Hồ", "Ngô", "Dương", "Lý"];
+        const MID_NAMES = ["Văn", "Thị", "Hữu", "Đức", "Minh", "Thanh", "Ngọc", "Quốc", "Kim", "Anh", "Xuân", "Tấn", "Bảo", "Đình"];
+        const LAST_NAMES = ["Thảo", "Hải", "Tuấn", "Nam", "Dũng", "Châu", "Phương", "Trúc", "Mai", "Cường", "Trí", "Phúc", "Tâm", "Hạnh", "Quân", "Hiếu", "Vinh", "Khoa"];
+
+        const ROLES = [
+            "Chức sắc / Chức việc tại Họ đạo",
+            "Huynh trưởng Phổ Tế Viên",
+            "Phổ Tế Viên đang sinh hoạt cơ sở",
+            "Cựu học viên các khóa PTV",
+            "Đoàn sinh Gia Đình Hưng Đạo"
+        ];
+
+        const UNITS = [
+            "Họ đạo Bến Tre (Bến Tre)",
+            "Họ đạo Chợ Gạo (Tiền Giang)",
+            "Họ đạo Cai Lậy (Tiền Giang)",
+            "Họ đạo Vĩnh Long (Vĩnh Long)",
+            "Họ đạo Củ Chi (TP. HCM)",
+            "Ban Hướng Dẫn Gia Định (TP. HCM)",
+            "Họ đạo Tân An (Long An)",
+            "Họ đạo Tây Ninh (Tây Ninh)",
+            "Họ đạo Long Thành (Đồng Nai)",
+            "Họ đạo Cần Thơ (Cần Thơ)"
+        ];
+
+        const GRAD_LEVELS = ["Khóa Dương Đông (Dự bị)", "Khóa Gò Kén (Cấp I)", "Khóa Cửu Long (Cấp II)", "Khóa Trung Châu (Cấp III)"];
+        const TENURES = ["Dưới 1 năm", "Từ 1 - 3 năm", "Từ 3 - 5 năm", "Từ 5 - 10 năm", "Trên 10 năm"];
+        const REGIONS = ["Miền Tây", "TP. Hồ Chí Minh", "Miền Đông", "Miền Trung"];
+        const DIETS = ["Thuần chay trường", "Ăn chay từ 10 ngày trở lên / tháng", "Ăn chay 6 ngày / tháng", "Ăn chay 4 ngày / tháng"];
+        const PRACTICES = ["Đầy đủ 4 thời (Tý, Ngọ, Mẹo, Dậu)", "Từ 2 - 3 thời / ngày", "1 thời cúng chính / ngày", "Chỉ cúng ngày mùng 1 và rằm"];
+        const SERVICE_STATUS = ["Tham gia phụng sự thường xuyên hàng tuần", "Tham gia vào các ngày lễ vía, đàn sóc vọng", "Thỉnh thoảng tham gia khi cơ sở cần", "Tạm ngưng do công việc bận rộn"];
+        const CHALLENGES = ["Thời gian bận rộn giữa việc mưu sinh và việc Đạo", "Thiếu tài liệu và học cụ trực quan", "Khó khăn trong việc thu hút thanh thiếu niên", "Khoảng cách địa lý từ nhà đến Thánh thất xa"];
+        const REASON_TEMPLATES = [
+            "Nội dung còn nặng lý thuyết, cần tăng giờ thực hành.",
+            "Thời lượng các kỳ trại tập trung hơi dồn dập.",
+            "Cần bổ sung thêm tài liệu và kỹ năng số thời đại mới.",
+            "Cần đổi mới phương pháp sinh hoạt cho phù hợp thanh thiếu niên hiện nay."
+        ];
+
+        let generatedTestCases = [];
+        let testResults = [];
+        let isRunning = false;
+
+        function pickRandom(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        function generate100TestCases() {
+            const count = parseInt(document.getElementById('numTestCases').value) || 100;
+            generatedTestCases = [];
+
+            for (let i = 1; i <= count; i++) {
+                const name = `${pickRandom(FIRST_NAMES)} ${pickRandom(MID_NAMES)} ${pickRandom(LAST_NAMES)}`;
+                const phone = `09${Math.floor(10000000 + Math.random() * 90000000)}`;
+                const ptvId = `PTV-STRESS-${String(i).padStart(3, '0')}-${Math.floor(1000 + Math.random() * 9000)}`;
+
+                const scores = {};
+                const reasons = {};
+                let total = 0;
+                let lowCount = 0;
+
+                Q_KEYS.forEach(q => {
+                    const rnd = Math.random();
+                    let val = 4;
+                    if (rnd < 0.08) val = 1;
+                    else if (rnd < 0.20) val = 2;
+                    else if (rnd < 0.45) val = 3;
+                    else if (rnd < 0.80) val = 4;
+                    else val = 5;
+
+                    scores[q] = val;
+                    total += val;
+                    if (val < 3) {
+                        lowCount++;
+                        reasons[q] = pickRandom(REASON_TEMPLATES);
+                    }
+                });
+
+                const avg = (total / Q_KEYS.length).toFixed(2);
+
+                generatedTestCases.push({
+                    tc_id: `TC-${String(i).padStart(3, '0')}`,
+                    action: "submit",
+                    id: ptvId,
+                    name: name,
+                    phone: phone,
+                    role: pickRandom(ROLES),
+                    unit: pickRandom(UNITS),
+                    gradLevel: pickRandom(GRAD_LEVELS),
+                    tenure: pickRandom(TENURES),
+                    region: pickRandom(REGIONS),
+                    avgScore: parseFloat(avg),
+                    scores: scores,
+                    reasons: reasons,
+                    lowCount: lowCount,
+                    diet: pickRandom(DIETS),
+                    practice: pickRandom(PRACTICES),
+                    serviceStatus: pickRandom(SERVICE_STATUS),
+                    challenge: pickRandom(CHALLENGES),
+                    advantages: "Chương trình đào tạo rất khoa học, bồi đắp đức tin và kỷ luật vững vàng.",
+                    disadvantages: "Cần tăng cường thực hành công nghệ và đổi mới phương pháp giảng dạy.",
+                    reality: "Học viên sau tốt nghiệp gắn bó phục vụ tốt tại cơ sở Họ đạo.",
+                    suggestions: "Nên mở thêm các khóa cập nhật chuyên đề kỹ năng hàng năm.",
+                    timestamp: new Date().toLocaleString("vi-VN")
+                });
+            }
+
+            testResults = [];
+            document.getElementById('metricTotal').innerText = generatedTestCases.length;
+            document.getElementById('metricSuccess').innerText = 0;
+            document.getElementById('metricFailed').innerText = 0;
+            document.getElementById('metricAvgDuration').innerText = "0.0s";
+            document.getElementById('metricRPS').innerText = "0 req/s";
+            document.getElementById('progressBar').style.width = "0%";
+            document.getElementById('progressPercentText').innerText = `0% (0 / ${generatedTestCases.length})`;
+            document.getElementById('progressStatusText').innerText = `Đã sinh thành công ${generatedTestCases.length} Test Cases thực tế!`;
+
+            renderTable();
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('testCasesTableBody');
+            if (!tbody) return;
+
+            tbody.innerHTML = generatedTestCases.map((tc, idx) => {
+                const res = testResults[idx] || null;
+                let statusBadge = `<span class="px-2 py-0.5 rounded-full text-xs bg-slate-100 text-slate-600 font-bold border border-slate-200">Chờ chạy</span>`;
+                let durationText = "--";
+                let serverMsg = "--";
+
+                if (res) {
+                    durationText = `${res.duration}s`;
+                    serverMsg = res.message || "--";
+                    if (res.success) {
+                        statusBadge = `<span class="px-2 py-0.5 rounded-full text-xs bg-emerald-100 text-emerald-800 font-bold border border-emerald-300"><i class="fa-solid fa-check mr-1"></i>Thành công</span>`;
+                    } else {
+                        statusBadge = `<span class="px-2 py-0.5 rounded-full text-xs bg-rose-100 text-rose-800 font-bold border border-rose-300"><i class="fa-solid fa-xmark mr-1"></i>Thất bại</span>`;
+                    }
+                }
+
+                return `
+                    <tr class="hover:bg-slate-50 transition">
+                        <td class="p-3 text-slate-400 font-mono">${idx + 1}</td>
+                        <td class="p-3 font-mono font-bold text-slate-700">${tc.id}</td>
+                        <td class="p-3 font-bold text-[#3b4982]">${tc.name}</td>
+                        <td class="p-3 font-mono text-slate-600">${tc.phone}</td>
+                        <td class="p-3 text-slate-700 text-xs">${tc.unit}<br><span class="text-slate-400">${tc.role}</span></td>
+                        <td class="p-3 text-center font-bold text-slate-800">${tc.avgScore}</td>
+                        <td class="p-3 text-center"><span class="px-1.5 py-0.5 rounded ${tc.lowCount > 0 ? 'bg-amber-100 text-amber-800 font-bold' : 'text-slate-400'}">${tc.lowCount}</span></td>
+                        <td class="p-3 text-center font-mono text-slate-600">${durationText}</td>
+                        <td class="p-3 text-center">${statusBadge}</td>
+                        <td class="p-3 text-xs text-slate-600 max-w-[200px] truncate" title="${serverMsg}">${serverMsg}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        async function startStressTest() {
+            if (isRunning) return;
+            if (generatedTestCases.length === 0) {
+                generate100TestCases();
+            }
+
+            const targetUrl = document.getElementById('apiEndpoint').value.trim();
+            if (!targetUrl) {
+                alert("Vui lòng nhập địa chỉ API Endpoint!");
+                return;
+            }
+
+            isRunning = true;
+            testResults = [];
+            const startBtn = document.getElementById('startStressBtn');
+            startBtn.disabled = true;
+            startBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang Chạy Stress Test (100 Users)...';
+
+            const total = generatedTestCases.length;
+            const startTime = performance.now();
+            let completed = 0;
+            let successCount = 0;
+            let failedCount = 0;
+            let totalDur = 0;
+
+            document.getElementById('progressStatusText').innerText = "Đang kích hoạt 100 luồng đồng thời...";
+
+            const promises = generatedTestCases.map(async (tc, index) => {
+                const reqStart = performance.now();
+                const resItem = {
+                    tc_id: tc.tc_id,
+                    id: tc.id,
+                    success: false,
+                    duration: 0,
+                    message: ""
+                };
+
+                try {
+                    const response = await fetch(targetUrl, {
+                        method: "POST",
+                        headers: { "Content-Type": "text/plain;charset=utf-8" },
+                        body: JSON.stringify(tc)
+                    });
+
+                    const reqEnd = performance.now();
+                    resItem.duration = ((reqEnd - reqStart) / 1000).toFixed(2);
+                    totalDur += parseFloat(resItem.duration);
+
+                    try {
+                        const json = await response.json();
+                        if (json.success === true || json.result === "success") {
+                            resItem.success = true;
+                            resItem.message = json.message || "Lưu thành công";
+                            successCount++;
+                        } else {
+                            resItem.message = json.message || json.error || "Lỗi xử lý";
+                            failedCount++;
+                        }
+                    } catch(pe) {
+                        resItem.message = `HTTP ${response.status} (Non-JSON)`;
+                        if (response.ok) {
+                            resItem.success = true;
+                            successCount++;
+                        } else {
+                            failedCount++;
+                        }
+                    }
+                } catch(err) {
+                    const reqEnd = performance.now();
+                    resItem.duration = ((reqEnd - reqStart) / 1000).toFixed(2);
+                    totalDur += parseFloat(resItem.duration);
+                    resItem.message = err.message || "Lỗi kết nối";
+                    failedCount++;
+                }
+
+                completed++;
+                testResults[index] = resItem;
+
+                // Cập nhật giao diện trực tiếp
+                const percent = Math.round((completed / total) * 100);
+                document.getElementById('progressBar').style.width = `${percent}%`;
+                document.getElementById('progressPercentText').innerText = `${percent}% (${completed} / ${total})`;
+                document.getElementById('metricSuccess').innerText = successCount;
+                document.getElementById('metricFailed').innerText = failedCount;
+                document.getElementById('metricAvgDuration').innerText = (totalDur / completed).toFixed(2) + "s";
+                
+                const elapsedSec = (performance.now() - startTime) / 1000;
+                document.getElementById('metricRPS').innerText = (completed / elapsedSec).toFixed(1) + " req/s";
+
+                return resItem;
+            });
+
+            await Promise.all(promises);
+
+            const totalTime = ((performance.now() - startTime) / 1000).toFixed(2);
+            isRunning = false;
+            startBtn.disabled = false;
+            startBtn.innerHTML = '<i class="fa-solid fa-rotate-right"></i> Chạy Lại Stress Test (100 Users)';
+            document.getElementById('progressStatusText').innerText = `Hoàn tất kiểm thử 100 người dùng đồng thời trong ${totalTime}s!`;
+
+            renderTable();
+        }
+
+        function exportTestCasesCSV() {
+            if (generatedTestCases.length === 0) {
+                alert("Vui lòng bấm 'Tự Động Sinh 100 Test Cases' trước!");
+                return;
+            }
+
+            let csv = "\ufeffMã TC,Mã Phiếu,Họ và Tên,Số Điện Thoại,Vai Trò,Đơn Vị,Cấp PTV,Thâm Niên,Khu Vực,Điểm TB,Kết Quả Test,Độ Trễ,Thông Điệp\r\n";
+            generatedTestCases.forEach((tc, idx) => {
+                const res = testResults[idx];
+                const status = res ? (res.success ? "Thành công" : "Thất bại") : "Chưa test";
+                const dur = res ? `${res.duration}s` : "";
+                const msg = res ? (res.message || "").replace(/"/g, '""') : "";
+                csv += `"${tc.tc_id}","${tc.id}","${tc.name}","${tc.phone}","${tc.role}","${tc.unit}","${tc.gradLevel}","${tc.tenure}","${tc.region}","${tc.avgScore}","${status}","${dur}","${msg}"\r\n`;
+            });
+
+            const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = `Ket_Qua_Stress_Test_100_Users_${Date.now()}.csv`;
+            link.click();
+        }
+
+        function filterTableRows() {
+            const query = (document.getElementById('searchTableInput').value || "").toLowerCase();
+            const rows = document.querySelectorAll('#testCasesTableBody tr');
+            rows.forEach(r => {
+                const text = r.innerText.toLowerCase();
+                r.style.display = text.includes(query) ? "" : "none";
+            });
+        }
+
+        // Tự động sinh dữ liệu khi tải trang
+        window.onload = function() {
+            generate100TestCases();
+        };
+    </script>
+</body>
+</html>
