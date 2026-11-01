@@ -4130,47 +4130,50 @@
             const totalCountEl = document.getElementById('totalResponsesCount');
             if (totalCountEl) totalCountEl.innerText = surveyResponses.length;
 
-            if (surveyResponses.length === 0) {
-                const avgEl = document.getElementById('overallAvgScore');
-                const fitEl = document.getElementById('overallFitRatio');
-                if (avgEl) avgEl.innerText = "0.0 / 5.0";
-                if (fitEl) fitEl.innerText = "0%";
-                renderAdminResponsesTable();
-                renderAdminFeedbackCards();
-                return;
-            }
-
             let totalSum = 0;
             let totalCount = 0;
             const pillarSums = {};
             surveyPillars.forEach(p => { pillarSums[p.id] = { sum: 0, count: 0 }; });
+            const rolesCount = {};
 
-            surveyResponses.forEach(r => {
-                surveyPillars.forEach(p => {
-                    p.questions.forEach(q => {
-                        const score = (r.scores && r.scores[q.id]) ? r.scores[q.id] : 0;
-                        if (score > 0) {
-                            pillarSums[p.id].sum += score;
-                            pillarSums[p.id].count += 1;
-                            totalSum += score;
-                            totalCount += 1;
-                        }
+            if (surveyResponses.length > 0) {
+                surveyResponses.forEach(r => {
+                    const role = r.role || 'Chưa xác định';
+                    rolesCount[role] = (rolesCount[role] || 0) + 1;
+
+                    surveyPillars.forEach(p => {
+                        p.questions.forEach(q => {
+                            const score = (r.scores && r.scores[q.id]) ? r.scores[q.id] : 0;
+                            if (score > 0) {
+                                pillarSums[p.id].sum += score;
+                                pillarSums[p.id].count += 1;
+                                totalSum += score;
+                                totalCount += 1;
+                            }
+                        });
                     });
                 });
-            });
+            }
 
-            const avgOverall = totalCount > 0 ? (totalSum / totalCount).toFixed(2) : '0.00';
+            const avgOverall = totalCount > 0 ? (totalSum / totalCount).toFixed(2) : '0.0';
+            const fitRatioPercent = totalCount > 0 ? Math.round((parseFloat(avgOverall) / 5) * 100) : 0;
             const avgEl = document.getElementById('overallAvgScore');
             const fitEl = document.getElementById('overallFitRatio');
             if (avgEl) avgEl.innerText = `${avgOverall} / 5.0`;
-            if (fitEl) fitEl.innerText = `${Math.round((parseFloat(avgOverall) / 5) * 100)}%`;
+            if (fitEl) fitEl.innerText = `${fitRatioPercent}%`;
 
-            // Bar Chart - Trụ cột điểm trung bình
+            // Bar Chart - Trụ cột điểm trung bình (Tự động reset về 0 khi xóa dữ liệu)
             const ctxBar = document.getElementById('avgScoreBarChart');
             if (ctxBar) {
                 if (avgChartObj) {
                     try { avgChartObj.destroy(); } catch(e){}
+                    avgChartObj = null;
                 }
+                const barDataValues = surveyPillars.map(p => {
+                    const d = pillarSums[p.id];
+                    return (d && d.count > 0) ? parseFloat((d.sum / d.count).toFixed(2)) : 0;
+                });
+
                 avgChartObj = new Chart(ctxBar, {
                     type: 'bar',
                     data: {
@@ -4182,10 +4185,7 @@
                         ],
                         datasets: [{
                             label: 'Điểm Trung Bình (Thang 1 - 5)',
-                            data: surveyPillars.map(p => {
-                                const d = pillarSums[p.id];
-                                return d.count > 0 ? parseFloat((d.sum / d.count).toFixed(2)) : 0;
-                            }),
+                            data: barDataValues,
                             backgroundColor: ['#3b4982', '#0284c7', '#10b981', '#f59e0b'],
                             borderRadius: 10,
                             barPercentage: 0.55
@@ -4213,25 +4213,28 @@
                 });
             }
 
-            // Pie Chart - Cơ cấu vai trò người tham gia
+            // Pie/Doughnut Chart - Cơ cấu vai trò người tham gia (Tự động reset khi xóa dữ liệu)
             const ctxPie = document.getElementById('rolePieChart');
             if (ctxPie) {
                 if (roleChartObj) {
                     try { roleChartObj.destroy(); } catch(e){}
+                    roleChartObj = null;
                 }
-                const rolesCount = {};
-                surveyResponses.forEach(r => {
-                    const role = r.role || 'Chưa xác định';
-                    rolesCount[role] = (rolesCount[role] || 0) + 1;
-                });
+
+                const hasData = surveyResponses.length > 0 && Object.keys(rolesCount).length > 0;
+                const roleLabels = hasData ? Object.keys(rolesCount) : ['Chưa có dữ liệu'];
+                const roleDataValues = hasData ? Object.values(rolesCount) : [1];
+                const roleColors = hasData 
+                    ? ['#3b4982', '#0284c7', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#64748b']
+                    : ['#e2e8f0'];
 
                 roleChartObj = new Chart(ctxPie, {
                     type: 'doughnut',
                     data: {
-                        labels: Object.keys(rolesCount),
+                        labels: roleLabels,
                         datasets: [{
-                            data: Object.values(rolesCount),
-                            backgroundColor: ['#3b4982', '#0284c7', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#64748b'],
+                            data: roleDataValues,
+                            backgroundColor: roleColors,
                             borderWidth: 2,
                             borderColor: '#ffffff'
                         }]
@@ -4243,6 +4246,16 @@
                             legend: {
                                 position: 'bottom',
                                 labels: { font: { size: 10, weight: 'bold' }, boxWidth: 12 }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        if (!hasData) return ' Chưa có phản hồi';
+                                        const val = context.raw || 0;
+                                        const pct = surveyResponses.length > 0 ? Math.round((val / surveyResponses.length) * 100) : 0;
+                                        return ` ${val} người (${pct}%)`;
+                                    }
+                                }
                             }
                         }
                     }
