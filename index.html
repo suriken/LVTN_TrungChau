@@ -35,6 +35,21 @@
             text-wrap: pretty;
         }
 
+        /* Tối ưu căn đều văn bản chống giãn cách từ bất thường trên thiết bị hẹp */
+        .text-justify {
+            text-align: justify;
+            text-justify: inter-word;
+            text-align-last: left;
+            word-spacing: normal;
+            letter-spacing: normal;
+        }
+        @media (max-width: 640px) {
+            .mobile-align-clean {
+                text-align: left !important;
+                text-align-last: left !important;
+            }
+        }
+
         @media (max-width: 1023px) {
             /* Tối ưu cỡ chữ và chống tự động zoom trên iOS Safari / Google Sites */
             input[type="text"],
@@ -317,8 +332,8 @@
                         <span class="inline-flex items-center px-3 py-1 bg-[#3b4982] text-white rounded-lg text-xs font-bold uppercase tracking-wider shadow-xs">
                             <i class="fa-solid fa-clipboard-list mr-1.5"></i> PHIẾU KHẢO SÁT
                         </span>
-                        <span class="inline-block px-2.5 py-0.5 bg-[#e8f0fe] text-[#3b4982] rounded-lg text-[11px] sm:text-xs font-semibold border border-[#d2def5]">
-                            <img src="https://i.postimg.cc/jdZBPB5c/IMG-3726.jpg" onerror="this.onerror=null;this.src='logo.png';" alt="Logo" class="w-3.5 h-3.5 inline-block object-contain rounded-full mr-1 align-middle"> Đề tài Luận văn tốt nghiệp Khóa PTV Cấp III - Trung Châu 1
+                        <span class="inline-flex items-center px-3 py-1 bg-[#e8f0fe] text-[#3b4982] rounded-xl text-xs sm:text-sm font-bold border border-[#d2def5] shadow-2xs">
+                            <img src="https://i.postimg.cc/jdZBPB5c/IMG-3726.jpg" onerror="this.onerror=null;this.src='logo.png';" alt="Logo" class="w-4 h-4 sm:w-4.5 sm:h-4.5 inline-block object-contain rounded-full mr-1.5 align-middle"> Đề tài Luận văn tốt nghiệp Khóa PTV Cấp III - Trung Châu 1
                         </span>
                     </div>
 
@@ -331,14 +346,48 @@
                     </div>
                 </div>
 
-                <div class="prose max-w-none text-slate-700 leading-relaxed text-sm sm:text-base md:text-[17px] space-y-3 sm:space-y-4">
-                    <p class="font-bold text-[#3b4982] text-base sm:text-lg">Kính gửi Quý Chức sắc, Chức việc, Quý Huynh Trưởng và Phổ Tế Viên!</p>
+                <div class="prose max-w-none text-slate-800 leading-relaxed text-[15px] sm:text-base md:text-[17px] space-y-3.5 sm:space-y-4">
+                    <p class="font-extrabold text-[#3b4982] text-base sm:text-lg">Kính gửi Quý Chức sắc, Chức việc, Quý Huynh Trưởng và Phổ Tế Viên!</p>
                     <p class="text-justify leading-relaxed">
                         Chương trình đào tạo Phổ Tế Viên là nền tảng cốt lõi trong công tác huấn luyện và phát triển lực lượng nhân sự giáo hóa con em nhà Đạo cũng như phụng sự Giáo hội. Để có cơ sở khoa học và thực tiễn cho đề tài nghiên cứu luận văn, khảo sát này được thực hiện nhằm thu thập ý kiến đánh giá khách quan về tính phù hợp, tính thiết thực và những điểm cần cải tiến trong khung chương trình hiện hành.
                     </p>
                     <p class="text-justify leading-relaxed">
                         Sự đóng góp chân thành và quý báu của Quý vị sẽ giúp tác giả có thêm dữ liệu thực tiễn đề xuất giải pháp nâng cao chất lượng đào tạo Phổ Tế Viên đáp ứng tốt nhất yêu cầu phát triển của Giáo Hội và Xã Hội trong giai đoạn mới.
                     </p>
+
+                    <!-- KHỐI ĐỊNH HƯỚNG ĐỐI SÁNH ĐỀ TÀI (ĐỘ TUỔI, TÂM SINH LÝ, NHU CẦU GIÁO HỘI, BỐI CẢNH XÃ HỘI) -->
+                    <div class="bg-gradient-to-r from-blue-50/70 via-white to-amber-50/70 p-4 sm:p-5 rounded-2xl border-l-4 border-[#3b4982] border-y border-r border-[#e2d8c7] shadow-xs space-y-2.5 not-prose my-3">
+                        <div class="flex items-center gap-2 text-xs sm:text-sm font-black text-[#3b4982] uppercase tracking-wide">
+                            <i class="fa-solid fa-compass-drafting text-[#3b4982]"></i>
+                            <span>Định Hướng Đánh Giá & Đối Sánh Đề Tài:</span>
+                        </div>
+                        <p class="text-sm sm:text-base text-slate-800 leading-relaxed text-justify sm:text-left">
+                            Đặc biệt, kính mong Quý vị trong quá trình thực hiện khảo sát dành sự quan tâm và đối chiếu thực tế giữa <strong>Chương trình đào tạo Phổ Tế Viên</strong> với các phương diện sau:
+                        </p>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-2.5 pt-1 text-xs sm:text-sm text-slate-700">
+                            <div class="flex items-start gap-2 bg-white/95 p-3 rounded-xl border border-slate-200 shadow-2xs">
+                                <i class="fa-solid fa-child-reaching text-indigo-600 mt-0.5 text-base flex-shrink-0"></i>
+                                <div>
+                                    <strong class="text-slate-900 block mb-0.5">1. Độ tuổi & Tâm sinh lý:</strong>
+                                    <span>Sự tương thích với tâm sinh lý lứa tuổi thanh thiếu niên, tạo động lực tu học tự nhiên và hào hứng.</span>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-2 bg-white/95 p-3 rounded-xl border border-slate-200 shadow-2xs">
+                                <i class="fa-solid fa-place-of-worship text-amber-600 mt-0.5 text-base flex-shrink-0"></i>
+                                <div>
+                                    <strong class="text-slate-900 block mb-0.5">2. Nhu cầu Giáo Hội:</strong>
+                                    <span>Đáp ứng yêu cầu củng cố, kế thừa và phát triển nguồn nhân lực giáo hóa tại các Họ đạo cơ sở.</span>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-2 bg-white/95 p-3 rounded-xl border border-slate-200 shadow-2xs">
+                                <i class="fa-solid fa-earth-asia text-emerald-600 mt-0.5 text-base flex-shrink-0"></i>
+                                <div>
+                                    <strong class="text-slate-900 block mb-0.5">3. Bối cảnh Xã Hội:</strong>
+                                    <span>Thích ứng trước sự biến đổi nhanh chóng của thời đại số và xu thế tương lai của xã hội.</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- THÔNG TIN LIÊN HỆ & LỜI CẢM ƠN TÁC GIẢ (XUỐNG HÀNG, ICON EMAIL & ZALO) -->
@@ -1320,7 +1369,7 @@
                         <div class="flex-grow sm:flex-grow-0 min-w-0">
                             <div class="text-xs sm:text-sm font-bold text-slate-800 flex items-center justify-between sm:justify-start gap-2">
                                 <span>Tiến độ khảo sát:</span>
-                                <span id="surveyTopProgressText" class="text-[#3b4982] font-black truncate">0 / 15 câu (0%)</span>
+                                <span id="surveyTopProgressText" class="text-[#3b4982] font-black truncate">0 / 18 câu (0%)</span>
                             </div>
                             <div class="w-full sm:w-56 bg-slate-100 rounded-full h-2 mt-1 overflow-hidden border border-[#e2d8c7]/50">
                                 <div id="surveyTopProgressBar" class="bg-[#3b4982] h-full rounded-full transition-all duration-300" style="width: 0%"></div>
@@ -1455,7 +1504,7 @@
                     </div>
                 </div>
 
-                <!-- PHẦN 2: ĐÁNH GIÁ 3 TRỤ CỘT CHƯƠNG TRÌNH ĐÀO TẠO (15 CÂU HỎI LIKERT) -->
+                <!-- PHẦN 2: ĐÁNH GIÁ 4 TRỤ CỘT CHƯƠNG TRÌNH ĐÀO TẠO (18 CÂU HỎI LIKERT) -->
                 <div id="surveyQuestionsContainer" class="space-y-4 sm:space-y-6">
                     <!-- Questions dynamically rendered via JS with 5 distinct colors & auto-expand reason on score < 3 -->
                 </div>
@@ -1663,7 +1712,7 @@
                         <!-- RADAR CHART -->
                         <div class="bg-[#fbf9f5] p-4 sm:p-5 rounded-2xl border border-[#e2d8c7] flex flex-col items-center justify-center min-h-[280px]">
                             <h4 class="text-xs sm:text-sm font-bold text-[#3b4982] mb-2 self-start flex items-center gap-1.5">
-                                <i class="fa-solid fa-chart-radar text-[#3b4982]"></i> Biểu Đồ 3 Trụ Cột Đào Tạo
+                                <i class="fa-solid fa-chart-radar text-[#3b4982]"></i> Biểu Đồ 4 Trụ Cột Đào Tạo
                             </h4>
                             <div class="w-full h-64 sm:h-72 relative">
                                 <canvas id="personalRadarChart"></canvas>
@@ -1802,7 +1851,7 @@
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                 <div class="bg-white p-4 sm:p-5 rounded-2xl border border-[#e2d8c7] shadow-sm space-y-3 sm:space-y-4">
                     <h4 class="font-black text-[#3b4982] text-sm sm:text-base border-b border-[#e2d8c7] pb-2 flex items-center gap-2">
-                        <i class="fa-solid fa-chart-column text-[#3b4982]"></i> Điểm Trung Bình Theo 3 Trụ Cột Đào Tạo
+                        <i class="fa-solid fa-chart-column text-[#3b4982]"></i> Điểm Trung Bình Theo 4 Trụ Cột Đào Tạo
                     </h4>
                     <div class="h-60 sm:h-72 relative">
                         <canvas id="avgScoreBarChart"></canvas>
@@ -2030,7 +2079,7 @@
             </span>
         </div>
         <span class="text-xs sm:text-sm font-black whitespace-nowrap tracking-wide">Gửi Khảo Sát</span>
-        <span id="floatingSubmitProgressBadge" class="text-[10px] sm:text-xs font-black bg-white/25 px-2 py-0.5 rounded-full border border-white/30 hidden sm:inline-block">0/15</span>
+        <span id="floatingSubmitProgressBadge" class="text-[10px] sm:text-xs font-black bg-white/25 px-2 py-0.5 rounded-full border border-white/30 hidden sm:inline-block">0/18</span>
     </button>
 
     <!-- FLOATING PROGRAM BUTTON (XEM KHUNG CHƯƠNG TRÌNH KHI Ở TRANG KHẢO SÁT) -->
@@ -2967,6 +3016,18 @@
                     { id: "q14_application", label: "14. Khả năng vận dụng vào thực tế cơ sở Họ đạo", desc: "Kiến thức và kỹ năng được đào tạo có tính khả thi cao, áp dụng thuận lợi vào các sinh hoạt tu học thực tế tại địa phương." },
                     { id: "q15_commitment", label: "15. Tinh thần dấn thân & Gắn bó phụng sự lâu dài", desc: "Chương trình đào tạo hun đúc được ngọn lửa nhiệt huyết, lòng trung kiên và tinh thần dấn thân phụng sự Giáo hội một cách bền bỉ." }
                 ]
+            },
+            {
+                id: "pillar_4",
+                code: "IV",
+                title: "TRỤ CỘT IV: ĐỐI SÁNH TÂM SINH LÝ, NHU CẦU GIÁO HỘI & XÃ HỘI TƯƠNG LAI",
+                desc: "Đánh giá sự phù hợp của chương trình đào tạo PTV với độ tuổi, tâm sinh lý tự nhiên của thanh thiếu niên, nhu cầu nhân lực của Giáo hội và xu thế bối cảnh xã hội hiện tại cùng tương lai",
+                icon: "fa-scale-balanced",
+                questions: [
+                    { id: "q16_psychology", label: "16. Phù hợp độ tuổi & Quy luật tâm sinh lý tự nhiên", desc: "Nội dung đào tạo và phương pháp huấn luyện sát hợp với tâm sinh lý lứa tuổi thanh thiếu niên, tạo sự hứng thú và phát triển tự nhiên không gượng ép." },
+                    { id: "q17_church_needs", label: "17. Đáp ứng nhu cầu phát triển nhân lực thực tế của Giáo hội", desc: "Chương trình đáp ứng kịp thời và thiết thực yêu cầu củng cố, kế thừa và phát triển đội ngũ nhân sự giáo hóa con em nhà Đạo tại các Họ đạo cơ sở." },
+                    { id: "q18_social_context", label: "18. Khả năng thích ứng với bối cảnh xã hội hiện tại & Xu thế tương lai", desc: "Chương trình trang bị đủ bản lĩnh đạo đức và năng lực để người Phổ Tế Viên tự tin hòa nhập, thích ứng tốt trước sự biến đổi nhanh chóng của thời đại và công nghệ tương lai." }
+                ]
             }
         ];
 
@@ -2977,31 +3038,31 @@
         const likertColorMap = {
             1: {
                 label: "1. Rất không phù hợp",
-                short: "Rất k.hợp",
+                labelHtml: '<span class="block text-center">Rất không</span><span class="block text-center">phù hợp</span>',
                 cardClass: "peer-checked:bg-rose-600 peer-checked:text-white peer-checked:border-rose-600 border-rose-200 text-rose-700 bg-rose-50/50 hover:border-rose-400 hover:bg-rose-100",
                 badgeClass: "bg-rose-100 text-rose-800 border-rose-300"
             },
             2: {
                 label: "2. Không phù hợp",
-                short: "K.phù hợp",
+                labelHtml: '<span class="block text-center">Không</span><span class="block text-center">phù hợp</span>',
                 cardClass: "peer-checked:bg-amber-600 peer-checked:text-white peer-checked:border-amber-600 border-amber-200 text-amber-800 bg-amber-50/50 hover:border-amber-400 hover:bg-amber-100",
                 badgeClass: "bg-amber-100 text-amber-800 border-amber-300"
             },
             3: {
                 label: "3. Phân vân",
-                short: "Phân vân",
+                labelHtml: '<span class="block text-center">Phân vân</span>',
                 cardClass: "peer-checked:bg-yellow-500 peer-checked:text-slate-900 peer-checked:border-yellow-500 border-yellow-200 text-yellow-800 bg-yellow-50/50 hover:border-yellow-400 hover:bg-yellow-100",
                 badgeClass: "bg-yellow-100 text-yellow-800 border-yellow-300"
             },
             4: {
                 label: "4. Phù hợp",
-                short: "Phù hợp",
+                labelHtml: '<span class="block text-center">Phù hợp</span>',
                 cardClass: "peer-checked:bg-emerald-600 peer-checked:text-white peer-checked:border-emerald-600 border-emerald-200 text-emerald-800 bg-emerald-50/50 hover:border-emerald-400 hover:bg-emerald-100",
                 badgeClass: "bg-emerald-100 text-emerald-800 border-emerald-300"
             },
             5: {
                 label: "5. Rất phù hợp",
-                short: "Rất phù hợp",
+                labelHtml: '<span class="block text-center">Rất</span><span class="block text-center">phù hợp</span>',
                 cardClass: "peer-checked:bg-[#3b4982] peer-checked:text-white peer-checked:border-[#3b4982] border-blue-200 text-[#3b4982] bg-blue-50/50 hover:border-blue-400 hover:bg-blue-100",
                 badgeClass: "bg-blue-100 text-blue-800 border-blue-300"
             }
@@ -3022,7 +3083,7 @@
                             <span>Trụ Cột ${pillar.code}</span>
                         </div>
                         <h4 class="font-black text-[#222b4f] text-lg sm:text-xl md:text-2xl mt-1.5 leading-snug">${pillar.title}</h4>
-                        <p class="text-sm sm:text-base text-slate-700 mt-1 leading-relaxed text-justify">${pillar.desc}</p>
+                        <p class="text-[15px] sm:text-base text-slate-700 mt-1.5 leading-relaxed text-justify sm:text-left">${pillar.desc}</p>
                     </div>
 
                     <div class="space-y-4 sm:space-y-6">
@@ -3030,24 +3091,24 @@
                             <div class="bg-[#fbf9f5] p-4 sm:p-5 rounded-2xl border border-[#e8e2d4] space-y-3.5 hover:border-[#3b4982]/40 transition shadow-2xs" id="q_card_${q.id}">
                                 <div class="flex items-start justify-between gap-3">
                                     <div class="space-y-1.5 flex-grow">
-                                        <div class="font-black text-[#2e3a68] text-base sm:text-lg md:text-xl leading-snug">${q.label}</div>
-                                        <div class="text-sm sm:text-base md:text-[17px] text-slate-800 font-normal leading-relaxed text-justify">${q.desc}</div>
+                                        <div class="font-black text-[#2e3a68] text-[16px] sm:text-lg md:text-xl leading-snug">${q.label}</div>
+                                        <div class="text-[15px] sm:text-base md:text-[17px] text-slate-800 font-normal leading-relaxed text-justify sm:text-left">${q.desc}</div>
                                     </div>
                                     <span class="text-xs sm:text-sm font-black text-[#3b4982] bg-[#3b4982]/10 px-3 py-1.5 rounded-lg border border-[#3b4982]/20 flex-shrink-0 shadow-2xs mt-0.5">
                                         Câu ${qIdx + 1}
                                     </span>
                                 </div>
 
-                                <!-- 5 COLOR LIKERT BUTTONS (NÚT BẤM TO, RÕ ĐIỂM SỐ 1 - 5) -->
-                                <div class="grid grid-cols-5 gap-2 sm:gap-2.5 pt-1.5 text-center w-full max-w-full">
+                                <!-- 5 COLOR LIKERT BUTTONS (NÚT BẤM TO, RÕ ĐIỂM SỐ 1 - 5, CHỮ GỌN ĐẸP KHÔNG TRÀN) -->
+                                <div class="grid grid-cols-5 gap-1.5 sm:gap-2.5 pt-1.5 text-center w-full max-w-full">
                                     ${[1, 2, 3, 4, 5].map(val => {
                                         const c = likertColorMap[val];
                                         return `
-                                        <label class="cursor-pointer group">
+                                        <label class="cursor-pointer group flex-1 min-w-0">
                                             <input type="radio" name="${q.id}" value="${val}" onchange="handleScoreChange('${q.id}', ${val})" class="peer hidden">
-                                            <div class="py-2.5 sm:py-3 px-1 sm:px-2 rounded-xl border-2 font-bold transition flex flex-col items-center justify-center min-h-[56px] shadow-2xs group-hover:scale-102 ${c.cardClass}">
-                                                <span class="text-lg sm:text-xl font-black">${val}</span>
-                                                <span class="text-[10px] sm:text-xs font-semibold block leading-tight mt-0.5 truncate px-0.5">${c.short}</span>
+                                            <div class="py-2 sm:py-2.5 px-0.5 sm:px-1.5 rounded-xl border-2 font-bold transition flex flex-col items-center justify-center min-h-[58px] sm:min-h-[64px] shadow-2xs group-hover:scale-102 ${c.cardClass}">
+                                                <span class="text-base sm:text-xl font-black leading-tight">${val}</span>
+                                                <span class="text-[9px] sm:text-[11px] font-semibold leading-tight mt-0.5 text-center px-0.5 w-full">${c.labelHtml}</span>
                                             </div>
                                         </label>
                                         `;
@@ -3060,7 +3121,7 @@
                                         <i class="fa-solid fa-triangle-exclamation text-rose-600 text-base flex-shrink-0"></i>
                                         <span>Lý do đánh giá chưa phù hợp & Điểm cần cải thiện (${q.label}):</span>
                                     </div>
-                                    <textarea id="reason_${q.id}" name="reason_${q.id}" oninput="saveSurveyDraft()" rows="2" class="w-full text-sm sm:text-base p-3.5 rounded-xl border border-rose-300 focus:ring-2 focus:ring-rose-500 bg-white placeholder-slate-400 outline-none leading-relaxed text-justify" placeholder="Quý vị vui lòng nêu ra một số điểm chưa phù hợp..."></textarea>
+                                    <textarea id="reason_${q.id}" name="reason_${q.id}" oninput="saveSurveyDraft()" rows="2" class="w-full text-sm sm:text-base p-3.5 rounded-xl border border-rose-300 focus:ring-2 focus:ring-rose-500 bg-white placeholder-slate-400 outline-none leading-relaxed text-justify sm:text-left" placeholder="Quý vị vui lòng nêu ra một số điểm chưa phù hợp..."></textarea>
                                 </div>
                             </div>
                         `).join('')}
@@ -3782,7 +3843,8 @@
                                 labels: [
                                     'Trụ Cột I: Khung & Phân Cấp',
                                     'Trụ Cột II: 5 Khối Nội Dung',
-                                    'Trụ Cột III: Đầu Ra & Ứng Dụng'
+                                    'Trụ Cột III: Đầu Ra & Ứng Dụng',
+                                    'Trụ Cột IV: Đối Sánh Thực Tiễn'
                                 ],
                                 datasets: [{
                                     label: 'Điểm đánh giá của bạn (Thang 5)',
@@ -4108,7 +4170,8 @@
                         labels: [
                             'Trụ Cột I: Khung & Phân Cấp',
                             'Trụ Cột II: 5 Khối Nội Dung',
-                            'Trụ Cột III: Đầu Ra & Ứng Dụng'
+                            'Trụ Cột III: Đầu Ra & Ứng Dụng',
+                            'Trụ Cột IV: Đối Sánh Thực Tiễn'
                         ],
                         datasets: [{
                             label: 'Điểm Trung Bình (Thang 1 - 5)',
@@ -4116,7 +4179,7 @@
                                 const d = pillarSums[p.id];
                                 return d.count > 0 ? parseFloat((d.sum / d.count).toFixed(2)) : 0;
                             }),
-                            backgroundColor: ['#3b4982', '#0284c7', '#10b981'],
+                            backgroundColor: ['#3b4982', '#0284c7', '#10b981', '#f59e0b'],
                             borderRadius: 10,
                             barPercentage: 0.55
                         }]
@@ -4283,10 +4346,10 @@
                         </div>
                     </div>
 
-                    <!-- 15 CÂU HỎI LIKERT -->
+                    <!-- CÂU HỎI LIKERT -->
                     <div class="space-y-2">
                         <div class="font-bold text-slate-800 text-xs sm:text-sm uppercase tracking-wide border-b pb-1">
-                            <i class="fa-solid fa-list-check mr-1 text-[#3b4982]"></i> Kết Quả Đánh Giá 15 Câu Likert:
+                            <i class="fa-solid fa-list-check mr-1 text-[#3b4982]"></i> Kết Quả Đánh Giá ${allLikertQuestions.length} Câu Likert:
                         </div>
                         <div class="space-y-1.5 max-h-60 overflow-y-auto pr-1">
                 `;
@@ -4556,7 +4619,7 @@
                 return;
             }
             
-            // 15 cặp tiêu đề tường minh: [Điểm] và [Lý do điểm < 3] riêng biệt từng câu
+            // Các cặp tiêu đề tường minh: [Điểm] và [Lý do điểm < 3] riêng biệt từng câu
             const likertHeaders = [];
             allLikertQuestions.forEach((q, idx) => {
                 const num = String(idx + 1).padStart(2, '0');
@@ -4564,7 +4627,7 @@
                 likertHeaders.push(`"[C${num}] Lý do điểm < 3"`);
             });
 
-            // Header columns chuẩn hóa 48 cột tường minh
+            // Header columns chuẩn hóa 54 cột tường minh
             const headers = [
                 "Mã phiếu", "Thời gian", "Họ và tên", "Số điện thoại", "Vai trò hiện nay",
                 "Đơn vị sinh hoạt", "Cấp PTV cao nhất", "Thâm niên", "Khu vực sinh hoạt", "Điểm TB",

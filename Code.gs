@@ -5,9 +5,9 @@
  * Dự án: Luận Văn Tốt Nghiệp Phổ Tế Viên
  * ==============================================================================
  * 
- * BẢNG DỮ LIỆU ĐƯỢC CHUẨN HÓA 48 CỘT TƯỜNG MINH:
+ * BẢNG DỮ LIỆU ĐƯỢC CHUẨN HÓA 54 CỘT TƯỜNG MINH:
  * - 10 cột Thông tin người tham gia & Điểm TB
- * - 30 cột: 15 câu Likert, mỗi câu tách riêng [Điểm] và [Lý do điểm < 3] rõ ràng
+ * - 36 cột: 18 câu Likert (4 Trụ Cột), mỗi câu tách riêng [Điểm] và [Lý do điểm < 3] rõ ràng
  * - 4 cột Thực trạng tu học & phụng sự
  * - 4 cột Ý kiến đóng góp & đề xuất cải tiến
  * - Tự động định dạng hàng tiêu đề màu xanh trang trọng, cố định (Freeze row 1).
@@ -19,14 +19,15 @@ var ADMIN_CONFIG = {
   passwords: ["trungchau@123", "admin123"]
 };
 
-// 15 MÃ CÂU HỎI LIKERT
+// 18 MÃ CÂU HỎI LIKERT (4 TRỤ CỘT)
 var Q_KEYS = [
   "q1_levels", "q2_entry", "q3_duration", "q4_method", "q5_motto", "q6_grad",
   "q7_doctrine", "q8_tradition", "q9_skills_guide", "q10_skills_ceremony", "q11_cultivation", "q12_digital_safety",
-  "q13_competence", "q14_application", "q15_commitment"
+  "q13_competence", "q14_application", "q15_commitment",
+  "q16_psychology", "q17_church_needs", "q18_social_context"
 ];
 
-// DANH SÁCH 48 TIÊU ĐỀ CỘT TƯỜNG MINH (KHÔNG DÙNG TÊN MÃ KHÓ HIỂU)
+// DANH SÁCH 54 TIÊU ĐỀ CỘT TƯỜNG MINH (KHÔNG DÙNG TÊN MÃ KHÓ HIỂU)
 var SHEET_HEADERS_EXPLICIT = [
   "Mã Phiếu", "Thời Gian Gửi", "Họ Và Tên", "Số Điện Thoại", "Vai Trò Hiện Nay",
   "Đơn Vị Sinh Hoạt", "Cấp PTV Cao Nhất", "Thâm Niên", "Khu Vực", "Điểm Đánh Giá TB",
@@ -45,6 +46,9 @@ var SHEET_HEADERS_EXPLICIT = [
   "[C13] Điểm: Năng lực thực tế đầu ra", "[C13] Lý do điểm < 3",
   "[C14] Điểm: Khả năng vận dụng tại Họ đạo", "[C14] Lý do điểm < 3",
   "[C15] Điểm: Tinh thần gắn bó phụng sự lâu dài", "[C15] Lý do điểm < 3",
+  "[C16] Điểm: Phù hợp độ tuổi & Tâm sinh lý", "[C16] Lý do điểm < 3",
+  "[C17] Điểm: Đáp ứng nhu cầu thực tế Giáo hội", "[C17] Lý do điểm < 3",
+  "[C18] Điểm: Thích ứng bối cảnh xã hội & Tương lai", "[C18] Lý do điểm < 3",
   "Thực hành trai kỳ", "Duy trì thời cúng & Công phu", "Tình trạng phụng sự hiện nay", "Khó khăn / Rào cản lớn nhất",
   "Mặt làm được (Ưu điểm)", "Mặt chưa được (Hạn chế)", "Thực trạng PTV sau tốt nghiệp", "Đề xuất cải tiến chương trình"
 ];
@@ -110,7 +114,7 @@ function buildRowData(data) {
   return row;
 }
 
-// Nâng cấp tự động bảng tính cũ (34 cột, JSON ở cột Z) sang chuẩn 48 cột rõ ràng
+// Nâng cấp tự động bảng tính cũ (34 hoặc 48 cột) sang chuẩn 54 cột tường minh
 function upgradeSheetToExplicitHeaders(sheet) {
   if (!sheet) {
     sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
@@ -125,21 +129,55 @@ function upgradeSheetToExplicitHeaders(sheet) {
   }
 
   var firstCellH11 = (lastCol >= 11) ? sheet.getRange(1, 11).getValue().toString().trim() : "";
-  if (firstCellH11.indexOf("q1") === 0 || lastCol < 48) {
+  if (firstCellH11.indexOf("q1") === 0 || lastCol < 54) {
     var oldValues = [];
     if (lastRow >= 2) {
       oldValues = sheet.getRange(2, 1, lastRow - 1, Math.max(lastCol, 34)).getValues();
     }
 
     var newMatrix = [];
+    var is48Layout = (lastCol >= 48 && lastCol < 54);
+
     for (var i = 0; i < oldValues.length; i++) {
       var oldRow = oldValues[i];
-      var oldReasons = {};
-      if (oldRow[25]) {
-        try {
-          var str = oldRow[25].toString().trim();
-          if (str.indexOf("{") === 0) oldReasons = JSON.parse(str);
-        } catch(e) {}
+      var rowScores = {};
+      var rowReasons = {};
+      var dietVal = "", practiceVal = "", serviceVal = "", challengeVal = "";
+      var advVal = "", disadvVal = "", realityVal = "", suggVal = "";
+
+      if (is48Layout) {
+        for (var k = 0; k < 15; k++) {
+          var qk = Q_KEYS[k];
+          rowScores[qk] = oldRow[10 + k * 2];
+          var rVal = oldRow[10 + k * 2 + 1] ? oldRow[10 + k * 2 + 1].toString().trim() : "";
+          if (rVal) rowReasons[qk] = rVal;
+        }
+        dietVal = oldRow[40];
+        practiceVal = oldRow[41];
+        serviceVal = oldRow[42];
+        challengeVal = oldRow[43];
+        advVal = oldRow[44];
+        disadvVal = oldRow[45];
+        realityVal = oldRow[46];
+        suggVal = oldRow[47];
+      } else {
+        if (oldRow[25]) {
+          try {
+            var str = oldRow[25].toString().trim();
+            if (str.indexOf("{") === 0) rowReasons = JSON.parse(str);
+          } catch(e) {}
+        }
+        for (var kOld = 0; kOld < 15; kOld++) {
+          rowScores[Q_KEYS[kOld]] = oldRow[10 + kOld];
+        }
+        dietVal = oldRow[26];
+        practiceVal = oldRow[27];
+        serviceVal = oldRow[28];
+        challengeVal = oldRow[29];
+        advVal = oldRow[30];
+        disadvVal = oldRow[31];
+        realityVal = oldRow[32];
+        suggVal = oldRow[33];
       }
 
       var rowItem = {
@@ -153,21 +191,17 @@ function upgradeSheetToExplicitHeaders(sheet) {
         tenure: oldRow[7],
         region: oldRow[8],
         avgScore: oldRow[9],
-        scores: {},
-        reasons: oldReasons,
-        diet: oldRow[26],
-        practice: oldRow[27],
-        serviceStatus: oldRow[28],
-        challenge: oldRow[29],
-        advantages: oldRow[30],
-        disadvantages: oldRow[31],
-        reality: oldRow[32],
-        suggestions: oldRow[33]
+        scores: rowScores,
+        reasons: rowReasons,
+        diet: dietVal,
+        practice: practiceVal,
+        serviceStatus: serviceVal,
+        challenge: challengeVal,
+        advantages: advVal,
+        disadvantages: disadvVal,
+        reality: realityVal,
+        suggestions: suggVal
       };
-
-      for (var k = 0; k < Q_KEYS.length; k++) {
-        rowItem.scores[Q_KEYS[k]] = oldRow[10 + k];
-      }
 
       newMatrix.push(buildRowData(rowItem));
     }
@@ -191,7 +225,7 @@ function setupHeaderIfEmpty(sheet) {
     formatHeaderRow(sheet);
   } else {
     var c11 = (sheet.getLastColumn() >= 11) ? sheet.getRange(1, 11).getValue().toString().trim() : "";
-    if (c11.indexOf("q1") === 0 || sheet.getLastColumn() < 48) {
+    if (c11.indexOf("q1") === 0 || sheet.getLastColumn() < 54) {
       upgradeSheetToExplicitHeaders(sheet);
     }
   }
@@ -239,7 +273,7 @@ function doPost(e) {
       return handleClearAll(data, sheet);
     } else if (action === "upgradeHeaders") {
       upgradeSheetToExplicitHeaders(sheet);
-      return createJsonResponse({ success: true, message: "Đã nâng cấp bảng tính lên 48 cột tường minh thành công!" });
+      return createJsonResponse({ success: true, message: "Đã nâng cấp bảng tính lên 54 cột tường minh thành công!" });
     } else if (action === "ping") {
       return createJsonResponse({ success: true, message: "PONG - Kết nối máy chủ thành công!", timestamp: new Date().toISOString() });
     } else {
@@ -322,13 +356,14 @@ function handleSubmitSurvey(data, sheet) {
   }
 }
 
-// 3. ĐỌC TẤT CẢ DỮ LIỆU TỪ GOOGLE SHEET (HỖ TRỢ CẢ 48 CỘT VÀ 34 CỘT)
+// 3. ĐỌC TẤT CẢ DỮ LIỆU TỪ GOOGLE SHEET (HỖ TRỢ 54 CỘT, 48 CỘT VÀ 34 CỘT)
 function readAllResponsesFromSheet(sheet) {
   var lastRow = sheet.getLastRow();
   if (lastRow < 2) return [];
 
   var lastCol = sheet.getLastColumn();
-  var is48 = (lastCol >= 48);
+  var is54 = (lastCol >= 54);
+  var is48 = (!is54 && lastCol >= 48);
   var data = sheet.getRange(2, 1, lastRow - 1, lastCol).getValues();
   var responses = [];
 
@@ -337,12 +372,42 @@ function readAllResponsesFromSheet(sheet) {
     var scores = {};
     var reasons = {};
 
-    if (is48) {
+    if (is54) {
       for (var k = 0; k < Q_KEYS.length; k++) {
         var qk = Q_KEYS[k];
         scores[qk] = parseFloat(r[10 + k * 2]) || 0;
         var rVal = r[10 + k * 2 + 1] ? r[10 + k * 2 + 1].toString().trim() : "";
         if (rVal) reasons[qk] = rVal;
+      }
+
+      responses.push({
+        id: r[0] ? r[0].toString() : "",
+        timestamp: r[1] ? r[1].toString() : "",
+        name: r[2] ? r[2].toString() : "Ẩn danh",
+        phone: r[3] ? r[3].toString() : "",
+        role: r[4] ? r[4].toString() : "",
+        unit: r[5] ? r[5].toString() : "",
+        gradLevel: r[6] ? r[6].toString() : "",
+        tenure: r[7] ? r[7].toString() : "",
+        region: r[8] ? r[8].toString() : "",
+        avgScore: parseFloat(r[9]) || 0,
+        scores: scores,
+        reasons: reasons,
+        diet: r[46] ? r[46].toString() : "",
+        practice: r[47] ? r[47].toString() : "",
+        serviceStatus: r[48] ? r[48].toString() : "",
+        challenge: r[49] ? r[49].toString() : "",
+        advantages: r[50] ? r[50].toString() : "",
+        disadvantages: r[51] ? r[51].toString() : "",
+        reality: r[52] ? r[52].toString() : "",
+        suggestions: r[53] ? r[53].toString() : ""
+      });
+    } else if (is48) {
+      for (var k48 = 0; k48 < 15; k48++) {
+        var qk48 = Q_KEYS[k48];
+        scores[qk48] = parseFloat(r[10 + k48 * 2]) || 0;
+        var rVal48 = r[10 + k48 * 2 + 1] ? r[10 + k48 * 2 + 1].toString().trim() : "";
+        if (rVal48) reasons[qk48] = rVal48;
       }
 
       responses.push({
@@ -374,7 +439,7 @@ function readAllResponsesFromSheet(sheet) {
           if (str.indexOf("{") === 0) reasons = JSON.parse(str);
         } catch(e) {}
       }
-      for (var k2 = 0; k2 < Q_KEYS.length; k2++) {
+      for (var k2 = 0; k2 < 15; k2++) {
         scores[Q_KEYS[k2]] = parseFloat(r[10 + k2]) || 0;
       }
 
