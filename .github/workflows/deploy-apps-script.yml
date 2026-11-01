@@ -46,3 +46,4 @@ jobs:
           DEPLOYMENT_ID: "AKfycbwvin6XGotcqOwqyNowHyhW6eF66yLBuT44Q7m5g_ivSl-ObRCLO-GfYJAqsJjkQ0KB1Q"
         run: |
           clasp deploy --deploymentId "$DEPLOYMENT_ID" --description "Auto deployed from GitHub Actions (${GITHUB_SHA::7})" || clasp deploy --description "Auto deployed from GitHub Actions (${GITHUB_SHA::7})"
+

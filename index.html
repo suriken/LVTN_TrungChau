@@ -2133,6 +2133,21 @@
             <p id="deleteSingleModalText" class="text-xs sm:text-sm text-slate-600 leading-relaxed text-pretty">
                 Quý vị có chắc chắn muốn xóa vĩnh viễn phiếu này khỏi hệ thống không?
             </p>
+            <div class="text-left space-y-1.5 pt-1">
+                <label for="deleteSinglePassword" class="block text-xs font-bold text-slate-700">
+                    <i class="fa-solid fa-lock text-rose-600 mr-1"></i>Nhập mật khẩu quản trị để xác nhận:
+                </label>
+                <div class="relative">
+                    <input type="password" id="deleteSinglePassword" placeholder="Nhập mật khẩu quản trị..." 
+                        onkeydown="if(event.key==='Enter') confirmExecuteDeleteSingle()"
+                        class="w-full text-xs sm:text-sm px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-rose-500 pr-10">
+                    <button type="button" onclick="toggleAdminPasswordVisibility('deleteSinglePassword', 'deleteSinglePassEyeIcon')" 
+                        class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer p-1">
+                        <i id="deleteSinglePassEyeIcon" class="fa-solid fa-eye text-xs"></i>
+                    </button>
+                </div>
+                <div id="deleteSinglePasswordError" class="hidden text-rose-600 text-xs font-semibold flex items-center gap-1 mt-1"></div>
+            </div>
             <div class="flex items-center gap-2 pt-2">
                 <button type="button" onclick="closeDeleteSingleModal()" class="w-1/2 py-2.5 rounded-xl border border-slate-300 text-slate-700 font-bold hover:bg-slate-100 cursor-pointer transition">
                     Hủy
@@ -2154,11 +2169,26 @@
             <p class="text-xs sm:text-sm text-slate-600 leading-relaxed text-pretty">
                 Hành động này sẽ dọn dẹp sạch toàn bộ các phiếu khảo sát trên hệ thống. Quý vị có chắc chắn muốn tiếp tục không?
             </p>
+            <div class="text-left space-y-1.5 pt-1">
+                <label for="clearAllPassword" class="block text-xs font-bold text-slate-700">
+                    <i class="fa-solid fa-lock text-rose-600 mr-1"></i>Nhập mật khẩu quản trị để xác nhận:
+                </label>
+                <div class="relative">
+                    <input type="password" id="clearAllPassword" placeholder="Nhập mật khẩu quản trị..." 
+                        onkeydown="if(event.key==='Enter') executeClearAllData()"
+                        class="w-full text-xs sm:text-sm px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-rose-500 pr-10">
+                    <button type="button" onclick="toggleAdminPasswordVisibility('clearAllPassword', 'clearAllPassEyeIcon')" 
+                        class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer p-1">
+                        <i id="clearAllPassEyeIcon" class="fa-solid fa-eye text-xs"></i>
+                    </button>
+                </div>
+                <div id="clearAllPasswordError" class="hidden text-rose-600 text-xs font-semibold flex items-center gap-1 mt-1"></div>
+            </div>
             <div class="flex items-center gap-2 pt-2">
                 <button type="button" onclick="closeConfirmClearModal()" class="w-1/2 py-2.5 rounded-xl border border-slate-300 text-slate-700 font-bold hover:bg-slate-100 cursor-pointer transition">
                     Hủy
                 </button>
-                <button type="button" onclick="executeClearAllData()" class="w-1/2 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold shadow-md cursor-pointer transition">
+                <button type="button" onclick="executeClearAllData()" id="btnConfirmClearAll" class="w-1/2 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold shadow-md cursor-pointer transition">
                     Xác Nhận Xóa
                 </button>
             </div>
@@ -4563,6 +4593,19 @@
             }
         }
 
+        function toggleAdminPasswordVisibility(inputId, iconId) {
+            const input = document.getElementById(inputId);
+            const icon = document.getElementById(iconId);
+            if (!input || !icon) return;
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.className = 'fa-solid fa-eye-slash text-xs';
+            } else {
+                input.type = 'password';
+                icon.className = 'fa-solid fa-eye text-xs';
+            }
+        }
+
         function closeLoginModal() {
             const modal = document.getElementById('loginModal');
             if (modal) modal.classList.add('hidden');
@@ -4637,20 +4680,65 @@
 
         function openConfirmClearModal() {
             const modal = document.getElementById('confirmClearModal');
+            const passInput = document.getElementById('clearAllPassword');
+            const errEl = document.getElementById('clearAllPasswordError');
+            if (passInput) passInput.value = '';
+            if (errEl) {
+                errEl.classList.add('hidden');
+                errEl.textContent = '';
+            }
             if (modal) modal.classList.remove('hidden');
+            setTimeout(() => { if (passInput) passInput.focus(); }, 100);
         }
 
         function closeConfirmClearModal() {
             const modal = document.getElementById('confirmClearModal');
             if (modal) modal.classList.add('hidden');
+            const passInput = document.getElementById('clearAllPassword');
+            const errEl = document.getElementById('clearAllPasswordError');
+            if (passInput) passInput.value = '';
+            if (errEl) {
+                errEl.classList.add('hidden');
+                errEl.textContent = '';
+            }
         }
 
         async function executeClearAllData() {
-            surveyResponses = [];
-            try { localStorage.removeItem("ptv_survey_responses"); } catch(e){}
-            closeConfirmClearModal();
-            renderGlobalDashboard();
-            showToast("Đang xóa dữ liệu trên hệ thống...", "info");
+            const passInput = document.getElementById('clearAllPassword');
+            const errEl = document.getElementById('clearAllPasswordError');
+            const btn = document.getElementById('btnConfirmClearAll');
+            const pass = passInput ? passInput.value.trim() : '';
+
+            if (!pass) {
+                if (errEl) {
+                    errEl.classList.remove('hidden');
+                    errEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation mr-1"></i> Vui lòng nhập mật khẩu quản trị để xác nhận xóa!';
+                }
+                if (passInput) passInput.focus();
+                return;
+            }
+
+            // Kiểm tra mật khẩu quản trị hợp lệ
+            const validPasswords = ["trungchau@123", "admin123"];
+            if (!validPasswords.includes(pass)) {
+                if (errEl) {
+                    errEl.classList.remove('hidden');
+                    errEl.innerHTML = '<i class="fa-solid fa-circle-xmark mr-1"></i> Mật khẩu quản trị không chính xác!';
+                }
+                if (passInput) {
+                    passInput.focus();
+                    passInput.select();
+                }
+                return;
+            }
+
+            if (errEl) errEl.classList.add('hidden');
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Đang xóa...';
+            }
+
+            showToast("Đang gửi yêu cầu xóa toàn bộ dữ liệu tới hệ thống...", "info");
 
             const targetUrl = getEffectiveBackendUrl();
             try {
@@ -4659,23 +4747,39 @@
                     res = await fetch(targetUrl, {
                         method: "POST",
                         headers: { "Content-Type": "text/plain;charset=utf-8" },
-                        body: JSON.stringify({ action: "clearAll" })
+                        body: JSON.stringify({ action: "clearAll", password: pass })
                     });
                     if (!res.ok && targetUrl !== DEFAULT_SERVER_API_URL) throw new Error("Proxy error");
                 } catch(proxyErr) {
                     res = await fetch(DEFAULT_SERVER_API_URL, {
                         method: "POST",
                         headers: { "Content-Type": "text/plain;charset=utf-8" },
-                        body: JSON.stringify({ action: "clearAll" })
+                        body: JSON.stringify({ action: "clearAll", password: pass })
                     });
                 }
 
                 const json = await res.json();
                 if (json && json.success) {
+                    surveyResponses = [];
+                    try { localStorage.removeItem("ptv_survey_responses"); } catch(e){}
+                    closeConfirmClearModal();
+                    renderGlobalDashboard();
                     showToast("Đã dọn dẹp sạch toàn bộ dữ liệu trên hệ thống!", "success");
+                } else {
+                    if (errEl) {
+                        errEl.classList.remove('hidden');
+                        errEl.innerHTML = '<i class="fa-solid fa-circle-exclamation mr-1"></i> ' + (json.message || "Không thể xóa dữ liệu!");
+                    }
+                    showToast(json.message || "Xóa dữ liệu thất bại!", "warning");
                 }
             } catch(err) {
                 console.error("Lỗi dọn dẹp Hệ thống:", err);
+                showToast("Lỗi kết nối tới máy chủ khi xóa dữ liệu!", "warning");
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = 'Xác Nhận Xóa';
+                }
             }
         }
 
@@ -5002,27 +5106,76 @@
             pendingDeleteId = respId;
             const modal = document.getElementById('confirmDeleteSingleModal');
             const textEl = document.getElementById('deleteSingleModalText');
+            const passInput = document.getElementById('deleteSinglePassword');
+            const errEl = document.getElementById('deleteSinglePasswordError');
+
             if (textEl) {
                 textEl.innerHTML = `Quý vị có chắc chắn muốn xóa vĩnh viễn phiếu mã <strong class="text-rose-700">${respId}</strong> khỏi hệ thống không?`;
             }
+            if (passInput) passInput.value = '';
+            if (errEl) {
+                errEl.classList.add('hidden');
+                errEl.textContent = '';
+            }
             if (modal) modal.classList.remove('hidden');
+            setTimeout(() => { if (passInput) passInput.focus(); }, 100);
         }
 
         function closeDeleteSingleModal() {
             pendingDeleteId = null;
             const modal = document.getElementById('confirmDeleteSingleModal');
             if (modal) modal.classList.add('hidden');
+            const passInput = document.getElementById('deleteSinglePassword');
+            const errEl = document.getElementById('deleteSinglePasswordError');
+            if (passInput) passInput.value = '';
+            if (errEl) {
+                errEl.classList.add('hidden');
+                errEl.textContent = '';
+            }
         }
 
         async function confirmExecuteDeleteSingle() {
             const respId = pendingDeleteId;
-            closeDeleteSingleModal();
-            if (!respId) return;
+            if (!respId) {
+                closeDeleteSingleModal();
+                return;
+            }
 
-            surveyResponses = surveyResponses.filter(r => r && r.id !== respId);
-            try { localStorage.setItem("ptv_survey_responses", JSON.stringify(surveyResponses)); } catch(e){}
-            renderGlobalDashboard();
-            showToast(`Đang xóa phiếu ${respId} khỏi hệ thống...`, "info");
+            const passInput = document.getElementById('deleteSinglePassword');
+            const errEl = document.getElementById('deleteSinglePasswordError');
+            const btn = document.getElementById('btnConfirmDeleteSingle');
+            const pass = passInput ? passInput.value.trim() : '';
+
+            if (!pass) {
+                if (errEl) {
+                    errEl.classList.remove('hidden');
+                    errEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation mr-1"></i> Vui lòng nhập mật khẩu quản trị để xác nhận xóa!';
+                }
+                if (passInput) passInput.focus();
+                return;
+            }
+
+            // Kiểm tra mật khẩu quản trị hợp lệ
+            const validPasswords = ["trungchau@123", "admin123"];
+            if (!validPasswords.includes(pass)) {
+                if (errEl) {
+                    errEl.classList.remove('hidden');
+                    errEl.innerHTML = '<i class="fa-solid fa-circle-xmark mr-1"></i> Mật khẩu quản trị không chính xác!';
+                }
+                if (passInput) {
+                    passInput.focus();
+                    passInput.select();
+                }
+                return;
+            }
+
+            if (errEl) errEl.classList.add('hidden');
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Đang xóa...';
+            }
+
+            showToast(`Đang gửi yêu cầu xóa phiếu ${respId} tới hệ thống...`, "info");
 
             const targetUrl = getEffectiveBackendUrl();
             try {
@@ -5031,25 +5184,39 @@
                     res = await fetch(targetUrl, {
                         method: "POST",
                         headers: { "Content-Type": "text/plain;charset=utf-8" },
-                        body: JSON.stringify({ action: "deleteResponse", id: respId })
+                        body: JSON.stringify({ action: "deleteResponse", id: respId, password: pass })
                     });
                     if (!res.ok && targetUrl !== DEFAULT_SERVER_API_URL) throw new Error("Proxy error");
                 } catch(proxyErr) {
                     res = await fetch(DEFAULT_SERVER_API_URL, {
                         method: "POST",
                         headers: { "Content-Type": "text/plain;charset=utf-8" },
-                        body: JSON.stringify({ action: "deleteResponse", id: respId })
+                        body: JSON.stringify({ action: "deleteResponse", id: respId, password: pass })
                     });
                 }
 
                 const json = await res.json();
                 if (json && json.success) {
+                    surveyResponses = surveyResponses.filter(r => r && r.id !== respId);
+                    try { localStorage.setItem("ptv_survey_responses", JSON.stringify(surveyResponses)); } catch(e){}
+                    closeDeleteSingleModal();
+                    renderGlobalDashboard();
                     showToast(`Đã xóa phiếu ${respId} thành công!`, "success");
                 } else {
-                    showToast(json.message || `Đã cập nhật hệ thống (phiếu ${respId})!`, "warning");
+                    if (errEl) {
+                        errEl.classList.remove('hidden');
+                        errEl.innerHTML = '<i class="fa-solid fa-circle-exclamation mr-1"></i> ' + (json.message || `Không thể xóa phiếu ${respId}!`);
+                    }
+                    showToast(json.message || `Lỗi khi xóa phiếu ${respId}!`, "warning");
                 }
             } catch(err) {
-                showToast(`Đã cập nhật dữ liệu hiển thị (phiếu ${respId})`, "warning");
+                console.error("Lỗi xóa phiếu:", err);
+                showToast(`Lỗi kết nối tới máy chủ khi xóa phiếu ${respId}!`, "warning");
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = 'Xóa Phiếu';
+                }
             }
         }
 
@@ -5524,7 +5691,11 @@
                 else if (e.key === "0") resetLightboxZoom();
                 else if (e.key === "Escape") closeImageLightbox();
             } else {
-                if (e.key === "Escape") closeLoginModal();
+                if (e.key === "Escape") {
+                    closeLoginModal();
+                    closeConfirmClearModal();
+                    closeDeleteSingleModal();
+                }
             }
         });
 

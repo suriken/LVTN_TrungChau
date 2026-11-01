@@ -559,8 +559,13 @@ function readAllResponsesFromSheet(sheet) {
   return responses;
 }
 
-// 4. XỬ LÝ XÓA 1 PHIẾU THEO ID TRÊN GOOGLE SHEET
+// 4. XỬ LÝ XÓA 1 PHIẾU THEO ID TRÊN GOOGLE SHEET (YÊU CẦU MẬT KHẨU QUẢN TRỊ ĐỂ TRÁNH XÓA NHẦM)
 function handleDeleteResponse(data, sheet) {
+  var pass = (data.password || "").toString().trim();
+  if (!pass || ADMIN_CONFIG.passwords.indexOf(pass) === -1) {
+    return createJsonResponse({ success: false, message: "Mật khẩu quản trị không chính xác! Thao tác xóa phiếu bị từ chối để bảo vệ dữ liệu." });
+  }
+
   var targetId = (data.id || "").toString().trim();
   if (!targetId) {
     return createJsonResponse({ success: false, message: "Thiếu ID phiếu cần xóa!" });
@@ -582,8 +587,13 @@ function handleDeleteResponse(data, sheet) {
   return createJsonResponse({ success: false, message: "Không tìm thấy mã phiếu " + targetId });
 }
 
-// 5. XỬ LÝ XÓA TOÀN BỘ DỮ LIỆU TRÊN GOOGLE SHEET (GIỮ LẠI HÀNG TIÊU ĐỀ)
+// 5. XỬ LÝ XÓA TOÀN BỘ DỮ LIỆU TRÊN GOOGLE SHEET (YÊU CẦU MẬT KHẨU QUẢN TRỊ ĐỂ TRÁNH XÓA NHẦM)
 function handleClearAll(data, sheet) {
+  var pass = (data.password || "").toString().trim();
+  if (!pass || ADMIN_CONFIG.passwords.indexOf(pass) === -1) {
+    return createJsonResponse({ success: false, message: "Mật khẩu quản trị không chính xác! Thao tác dọn dẹp toàn bộ dữ liệu bị từ chối để bảo vệ hệ thống." });
+  }
+
   var lastRow = sheet.getLastRow();
   if (lastRow >= 2) {
     sheet.deleteRows(2, lastRow - 1);
