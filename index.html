@@ -1537,49 +1537,66 @@
 
                 <!-- PHẦN 4: ĐÓNG GÓP Ý KIẾN VÀ ĐỀ XUẤT CẢI TIẾN TOÀN DIỆN -->
                 <div class="bg-white p-4 sm:p-6 rounded-2xl border border-[#e2d8c7] shadow-sm space-y-4">
-                    <div class="border-b border-[#e2d8c7] pb-3">
-                        <span class="text-[11px] font-bold uppercase tracking-wider text-[#3b4982] bg-amber-50 px-2 py-0.5 rounded border border-amber-200">Phần 4</span>
-                        <h3 class="font-bold text-[#3b4982] text-sm sm:text-base inline-block ml-2">
-                            <i class="fa-solid fa-comment-dots"></i> Ý Kiến Đóng Góp & Đề Xuất Cải Tiến Cho Chương Trình
-                        </h3>
-                        <p class="text-xs sm:text-sm text-slate-500 mt-1">Kính mong Quý vị ghi nhận những đánh giá thực tế về ưu điểm, hạn chế và đề xuất giải pháp phát triển.</p>
+                    <div class="border-b border-[#e2d8c7] pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
+                        <div>
+                            <span class="text-[11px] font-bold uppercase tracking-wider text-rose-700 bg-rose-50 px-2 py-0.5 rounded border border-rose-200">Phần 4 • Bắt buộc</span>
+                            <h3 class="font-bold text-[#3b4982] text-sm sm:text-base inline-block ml-2">
+                                <i class="fa-solid fa-comment-dots"></i> Ý Kiến Đóng Góp & Đề Xuất Cải Tiến Cho Chương Trình
+                            </h3>
+                            <p class="text-xs sm:text-sm text-slate-500 mt-1">Kính mong Quý vị ghi nhận những đánh giá thực tế về ưu điểm, hạn chế và đề xuất giải pháp phát triển (Bắt buộc cả 4 câu).</p>
+                        </div>
+                        <span class="text-xs font-bold text-rose-600 bg-rose-50 px-2.5 py-1 rounded-lg border border-rose-200 self-start sm:self-auto flex items-center gap-1 shadow-2xs">
+                            <i class="fa-solid fa-asterisk text-[10px]"></i> Bắt buộc trả lời
+                        </span>
                     </div>
 
                     <div class="space-y-4">
                         <!-- 1. MẶT ĐƯỢC -->
                         <div>
-                            <label class="block text-base sm:text-lg font-black text-emerald-900 mb-2 flex items-center gap-2">
-                                <i class="fa-solid fa-circle-check text-emerald-600"></i>
-                                <span>1. Những mặt LÀM ĐƯỢC (Ưu điểm nổi bật của chương trình đào tạo & PTV):</span>
+                            <label class="block text-base sm:text-lg font-black text-emerald-900 mb-2 flex items-center justify-between gap-2">
+                                <span class="flex items-center gap-2">
+                                    <i class="fa-solid fa-circle-check text-emerald-600"></i>
+                                    <span>1. Những mặt LÀM ĐƯỢC (Ưu điểm nổi bật của chương trình đào tạo & PTV):</span>
+                                    <span class="text-rose-600 font-black text-base">*</span>
+                                </span>
                             </label>
-                            <textarea id="respAdvantages" oninput="saveSurveyDraft()" rows="2" class="w-full text-sm sm:text-base p-3.5 rounded-xl border border-[#e2d8c7] focus:outline-none focus:border-[#3b4982] bg-[#fbf9f5] placeholder-slate-400 leading-relaxed transition text-justify" placeholder="Ví dụ: Giúp củng cố đức tin, trang bị lễ nghi bài bản, tinh thần kỷ luật trại huấn luyện tốt..."></textarea>
+                            <textarea id="respAdvantages" oninput="handleTextareaInput('respAdvantages')" rows="2" class="w-full text-sm sm:text-base p-3.5 rounded-xl border border-[#e2d8c7] focus:outline-none focus:border-[#3b4982] bg-[#fbf9f5] placeholder-slate-400 leading-relaxed transition text-justify" placeholder="Ví dụ: Giúp củng cố đức tin, trang bị lễ nghi bài bản, tinh thần kỷ luật trại huấn luyện tốt..."></textarea>
                         </div>
 
                         <!-- 2. MẶT CHƯA ĐƯỢC -->
                         <div>
-                            <label class="block text-base sm:text-lg font-black text-amber-900 mb-2 flex items-center gap-2">
-                                <i class="fa-solid fa-triangle-exclamation text-amber-600"></i>
-                                <span>2. Những mặt CHƯA LÀM ĐƯỢC (Hạn chế, bất cập hoặc nội dung chưa thực tế):</span>
+                            <label class="block text-base sm:text-lg font-black text-amber-900 mb-2 flex items-center justify-between gap-2">
+                                <span class="flex items-center gap-2">
+                                    <i class="fa-solid fa-triangle-exclamation text-amber-600"></i>
+                                    <span>2. Những mặt CHƯA LÀM ĐƯỢC (Hạn chế, bất cập hoặc nội dung chưa thực tế):</span>
+                                    <span class="text-rose-600 font-black text-base">*</span>
+                                </span>
                             </label>
-                            <textarea id="respDisadvantages" oninput="saveSurveyDraft()" rows="2" class="w-full text-sm sm:text-base p-3.5 rounded-xl border border-[#e2d8c7] focus:outline-none focus:border-[#3b4982] bg-[#fbf9f5] placeholder-slate-400 leading-relaxed transition text-justify" placeholder="Ví dụ: Nặng lý thuyết, thiếu kỹ năng sư phạm hiện đại, thời gian hàm thụ quá gấp, thiếu công nghệ số..."></textarea>
+                            <textarea id="respDisadvantages" oninput="handleTextareaInput('respDisadvantages')" rows="2" class="w-full text-sm sm:text-base p-3.5 rounded-xl border border-[#e2d8c7] focus:outline-none focus:border-[#3b4982] bg-[#fbf9f5] placeholder-slate-400 leading-relaxed transition text-justify" placeholder="Ví dụ: Nặng lý thuyết, thiếu kỹ năng sư phạm hiện đại, thời gian hàm thụ quá gấp, thiếu công nghệ số..."></textarea>
                         </div>
 
                         <!-- 3. THỰC TRẠNG PTV HIỆN NAY -->
                         <div>
-                            <label class="block text-base sm:text-lg font-black text-[#2e3a68] mb-2 flex items-center gap-2">
-                                <i class="fa-solid fa-users-line text-[#3b4982]"></i>
-                                <span>3. THỰC TRẠNG của Phổ Tế Viên sau khi tốt nghiệp hiện nay:</span>
+                            <label class="block text-base sm:text-lg font-black text-[#2e3a68] mb-2 flex items-center justify-between gap-2">
+                                <span class="flex items-center gap-2">
+                                    <i class="fa-solid fa-users-line text-[#3b4982]"></i>
+                                    <span>3. THỰC TRẠNG của Phổ Tế Viên sau khi tốt nghiệp hiện nay:</span>
+                                    <span class="text-rose-600 font-black text-base">*</span>
+                                </span>
                             </label>
-                            <textarea id="respReality" oninput="saveSurveyDraft()" rows="2" class="w-full text-sm sm:text-base p-3.5 rounded-xl border border-[#e2d8c7] focus:outline-none focus:border-[#3b4982] bg-[#fbf9f5] placeholder-slate-400 leading-relaxed transition text-justify" placeholder="Ví dụ: Tỷ lệ tiếp tục gắn bó phụng sự tại Họ đạo, sự nhiệt huyết, khó khăn khi hòa nhập với việc đạo..."></textarea>
+                            <textarea id="respReality" oninput="handleTextareaInput('respReality')" rows="2" class="w-full text-sm sm:text-base p-3.5 rounded-xl border border-[#e2d8c7] focus:outline-none focus:border-[#3b4982] bg-[#fbf9f5] placeholder-slate-400 leading-relaxed transition text-justify" placeholder="Ví dụ: Tỷ lệ tiếp tục gắn bó phụng sự tại Họ đạo, sự nhiệt huyết, khó khăn khi hòa nhập với việc đạo..."></textarea>
                         </div>
 
                         <!-- 4. ĐỀ XUẤT CẢI TIẾN -->
                         <div>
-                            <label class="block text-base sm:text-lg font-black text-blue-900 mb-2 flex items-center gap-2">
-                                <i class="fa-solid fa-lightbulb text-amber-500"></i>
-                                <span>4. Quý vị có ĐỀ XUẤT, KIẾN NGHỊ GÌ để cải tiến và phát triển chương trình?</span>
+                            <label class="block text-base sm:text-lg font-black text-blue-900 mb-2 flex items-center justify-between gap-2">
+                                <span class="flex items-center gap-2">
+                                    <i class="fa-solid fa-lightbulb text-amber-500"></i>
+                                    <span>4. Quý vị có ĐỀ XUẤT, KIẾN NGHỊ GÌ để cải tiến và phát triển chương trình?</span>
+                                    <span class="text-rose-600 font-black text-base">*</span>
+                                </span>
                             </label>
-                            <textarea id="respSuggestions" oninput="saveSurveyDraft()" rows="3" class="w-full text-sm sm:text-base p-3.5 rounded-xl border border-[#e2d8c7] focus:outline-none focus:border-[#3b4982] bg-[#fbf9f5] placeholder-slate-400 leading-relaxed transition text-justify" placeholder="Kính xin quý vị nêu những sáng kiến, đề xuất cụ thể gửi đến Hội Thánh và Ban Phụ trách GĐHĐ..."></textarea>
+                            <textarea id="respSuggestions" oninput="handleTextareaInput('respSuggestions')" rows="3" class="w-full text-sm sm:text-base p-3.5 rounded-xl border border-[#e2d8c7] focus:outline-none focus:border-[#3b4982] bg-[#fbf9f5] placeholder-slate-400 leading-relaxed transition text-justify" placeholder="Kính xin quý vị nêu những sáng kiến, đề xuất cụ thể gửi đến Hội Thánh và Ban Phụ trách GĐHĐ..."></textarea>
                         </div>
                     </div>
                 </div>
@@ -3162,6 +3179,14 @@
             saveSurveyDraft();
         }
 
+        function handleTextareaInput(id) {
+            const el = document.getElementById(id);
+            if (el && el.value.trim()) {
+                el.classList.remove('ring-4', 'ring-rose-500', 'animate-pulse');
+            }
+            saveSurveyDraft();
+        }
+
         // --- SURVEY DRAFT PERSISTENCE (LƯU VÀ KHÔI PHỤC KHI CHUYỂN TAB) ---
         function saveSurveyDraft() {
             try {
@@ -3578,6 +3603,31 @@
                     return;
                 }
 
+                // 6. KIỂM TRA PHẦN 4: Ý KIẾN ĐÓNG GÓP & ĐỀ XUẤT CẢI TIẾN (BẮT BUỘC ĐỦ CẢ 4 CÂU)
+                const advInput = document.getElementById('respAdvantages');
+                if (!advInput || !advInput.value.trim()) {
+                    showSubmitAlert("Quý vị vui lòng nhập ý kiến cho mục '1. Những mặt LÀM ĐƯỢC (Ưu điểm nổi bật)' trong Phần 4!", advInput);
+                    return;
+                }
+
+                const disadvInput = document.getElementById('respDisadvantages');
+                if (!disadvInput || !disadvInput.value.trim()) {
+                    showSubmitAlert("Quý vị vui lòng nhập ý kiến cho mục '2. Những mặt CHƯA LÀM ĐƯỢC (Hạn chế, bất cập)' trong Phần 4!", disadvInput);
+                    return;
+                }
+
+                const realityInput = document.getElementById('respReality');
+                if (!realityInput || !realityInput.value.trim()) {
+                    showSubmitAlert("Quý vị vui lòng ghi nhận ý kiến cho mục '3. THỰC TRẠNG của Phổ Tế Viên sau khi tốt nghiệp hiện nay' trong Phần 4!", realityInput);
+                    return;
+                }
+
+                const suggestionsInput = document.getElementById('respSuggestions');
+                if (!suggestionsInput || !suggestionsInput.value.trim()) {
+                    showSubmitAlert("Quý vị vui lòng nêu ý kiến cho mục '4. ĐỀ XUẤT, KIẾN NGHỊ để cải tiến và phát triển chương trình' trong Phần 4!", suggestionsInput);
+                    return;
+                }
+
                 // TẤT CẢ DỮ LIỆU ĐÃ HỢP LỆ -> LƯU VÀ CHUYỂN TAB
                 const name = isAnon ? "Ẩn danh" : nameInput.value.trim();
                 const phone = isAnon ? "Ẩn danh" : phoneInput.value.trim();
@@ -3592,10 +3642,10 @@
                 const serviceStatus = serviceSelect.value;
                 const challenge = challengeSelect.value;
 
-                const advantages = document.getElementById('respAdvantages') ? document.getElementById('respAdvantages').value.trim() : "";
-                const disadvantages = document.getElementById('respDisadvantages') ? document.getElementById('respDisadvantages').value.trim() : "";
-                const reality = document.getElementById('respReality') ? document.getElementById('respReality').value.trim() : "";
-                const suggestions = document.getElementById('respSuggestions') ? document.getElementById('respSuggestions').value.trim() : "";
+                const advantages = advInput.value.trim();
+                const disadvantages = disadvInput.value.trim();
+                const reality = realityInput.value.trim();
+                const suggestions = suggestionsInput.value.trim();
 
                 const avgScore = count > 0 ? (total / count).toFixed(2) : "5.00";
 

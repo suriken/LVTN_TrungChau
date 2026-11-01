@@ -475,6 +475,36 @@ function handleSubmitSurvey(data, sheet) {
     });
   }
 
+  // KIỂM TRA BẮT BUỘC CẢ 4 MỤC Ý KIẾN ĐÓNG GÓP TRONG PHẦN 4
+  if (!data.advantages || !data.advantages.toString().trim()) {
+    return createJsonResponse({
+      success: false,
+      result: "error",
+      message: "Vui lòng nhập ý kiến cho mục '1. Những mặt LÀM ĐƯỢC' trong Phần 4 trước khi gửi!"
+    });
+  }
+  if (!data.disadvantages || !data.disadvantages.toString().trim()) {
+    return createJsonResponse({
+      success: false,
+      result: "error",
+      message: "Vui lòng nhập ý kiến cho mục '2. Những mặt CHƯA LÀM ĐƯỢC' trong Phần 4 trước khi gửi!"
+    });
+  }
+  if (!data.reality || !data.reality.toString().trim()) {
+    return createJsonResponse({
+      success: false,
+      result: "error",
+      message: "Vui lòng ghi nhận ý kiến cho mục '3. THỰC TRẠNG của Phổ Tế Viên sau tốt nghiệp' trong Phần 4 trước khi gửi!"
+    });
+  }
+  if (!data.suggestions || !data.suggestions.toString().trim()) {
+    return createJsonResponse({
+      success: false,
+      result: "error",
+      message: "Vui lòng nêu ý kiến cho mục '4. ĐỀ XUẤT, KIẾN NGHỊ cải tiến chương trình' trong Phần 4 trước khi gửi!"
+    });
+  }
+
   var rowData = buildRowData(data);
   var lastRow = sheet.getLastRow();
   var existingRowIndex = -1;
