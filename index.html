@@ -1713,6 +1713,10 @@
                 
                 <!-- ACTION BUTTONS -->
                 <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto justify-start lg:justify-end">
+                    <button type="button" onclick="upgradeBackendSheet()" class="px-3.5 py-2 sm:px-4 sm:py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-1.5 shadow cursor-pointer active:scale-98" title="Đồng bộ & nâng cấp bảng tính hệ thống lên 54 cột (thêm câu 16, 17, 18)">
+                        <i class="fa-solid fa-table-columns"></i>
+                        <span>Nâng Cấp Bảng Tính 54 Cột</span>
+                    </button>
                     <button type="button" onclick="exportToCSV()" class="px-3.5 py-2 sm:px-4 sm:py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-1.5 shadow cursor-pointer active:scale-98">
                         <i class="fa-solid fa-file-excel"></i>
                         <span>Xuất File Excel (CSV)</span>
@@ -4007,6 +4011,31 @@
             } catch(e){}
             switchTab('welcome');
             showToast("Đã đăng xuất khỏi trang Quản trị thành công!", "success");
+        }
+
+        async function upgradeBackendSheet() {
+            const targetUrl = getEffectiveBackendUrl();
+            if (!targetUrl || targetUrl.trim() === '') {
+                showToast("Chưa cấu hình cổng API máy chủ!", "warning");
+                return;
+            }
+            showToast("Đang gửi yêu cầu nâng cấp bảng tính lên 54 cột...", "info");
+            try {
+                const response = await fetch(targetUrl, {
+                    method: "POST",
+                    headers: { "Content-Type": "text/plain;charset=utf-8" },
+                    body: JSON.stringify({ action: "upgradeHeaders" })
+                });
+                const result = await response.json();
+                if (result && result.success) {
+                    showToast("Đã nâng cấp bảng tính lên 54 cột (đã thêm Câu 16, 17, 18) thành công!", "success");
+                    fetchResponsesFromBackend();
+                } else {
+                    showToast("Để hoàn tất, Quý vị vui lòng dán mã Code.gs mới vào Apps Script và bấm Chạy!", "warning");
+                }
+            } catch(err) {
+                showToast("Vui lòng dán nội dung file Code.gs vào Apps Script trên Google Sheet để hoàn tất nâng cấp!", "warning");
+            }
         }
 
         async function fetchResponsesFromBackend() {

@@ -19,6 +19,17 @@ var ADMIN_CONFIG = {
   passwords: ["trungchau@123", "admin123"]
 };
 
+/**
+ * HÀM NÂNG CẤP BẢNG TÍNH GOOGLE SHEETS LÊN 54 CỘT (CHẠY TRỰC TIẾP TRÊN APPS SCRIPT)
+ * Hướng dẫn: Chọn hàm "NANG_CAP_BANG_TINH_54_COT" trong danh sách hàm ở thanh công cụ phía trên và nhấn nút "Chạy" (Run).
+ * Bảng tính sẽ tự động thêm Câu 16, Câu 17, Câu 18 và chuyển đổi dữ liệu an toàn 100%.
+ */
+function NANG_CAP_BANG_TINH_54_COT() {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  upgradeSheetToExplicitHeaders(sheet);
+  Logger.log(">>> ĐÃ NÂNG CẤP GOOGLE SHEET LÊN 54 CỘT TƯỜNG MINH THÀNH CÔNG! <<<");
+}
+
 // 18 MÃ CÂU HỎI LIKERT (4 TRỤ CỘT)
 var Q_KEYS = [
   "q1_levels", "q2_entry", "q3_duration", "q4_method", "q5_motto", "q6_grad",
