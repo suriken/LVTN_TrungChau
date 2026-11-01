@@ -5039,9 +5039,9 @@
 
                 // Mỗi câu hỏi tách riêng: Điểm & Lý do điểm < 3 (không dồn JSON)
                 allLikertQuestions.forEach(q => {
-                    const score = (r.scores && r.scores[q.id]) ? r.scores[q.id] : '';
+                    const rawVal = (r.scores && r.scores[q.id] !== undefined && r.scores[q.id] !== null && r.scores[q.id] !== '' && r.scores[q.id] !== 0) ? r.scores[q.id] : '';
                     const reason = (r.reasons && r.reasons[q.id]) ? r.reasons[q.id] : '';
-                    row.push(score !== '' ? score : '""');
+                    row.push(rawVal !== '' ? rawVal : '""');
                     row.push(`"${reason.replace(/"/g, '""')}"`);
                 });
 

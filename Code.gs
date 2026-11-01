@@ -86,7 +86,7 @@ function formatHeaderRow(sheet) {
   } catch(e) {}
 }
 
-// Tạo 1 hàng dữ liệu 48 cột từ đối tượng phiếu gửi lên
+// Tạo 1 hàng dữ liệu 54 cột chuẩn từ đối tượng phiếu
 function buildRowData(data) {
   var s = data.scores || {};
   var r = data.reasons || {};
@@ -104,6 +104,7 @@ function buildRowData(data) {
     parseFloat(data.avgScore) || 0
   ];
 
+  // 18 câu hỏi Likert x 2 cột = 36 cột ([Điểm] và [Lý do điểm < 3])
   for (var i = 0; i < Q_KEYS.length; i++) {
     var k = Q_KEYS[i];
     var scoreVal = (s[k] !== undefined && s[k] !== null && s[k] !== "") ? s[k] : "";
@@ -112,11 +113,13 @@ function buildRowData(data) {
     row.push(reasonVal);
   }
 
+  // 4 cột Tu học & Phụng sự
   row.push(data.diet || "");
   row.push(data.practice || "");
   row.push(data.serviceStatus || "");
   row.push(data.challenge || "");
 
+  // 4 cột Ý kiến định tính
   row.push(data.advantages || "");
   row.push(data.disadvantages || "");
   row.push(data.reality || "");
@@ -125,7 +128,175 @@ function buildRowData(data) {
   return row;
 }
 
-// Nâng cấp tự động bảng tính cũ (34 hoặc 48 cột) sang chuẩn 54 cột tường minh
+/**
+ * TỰ ĐỘNG PHÂN TÍCH VÀ NHẬN DIỆN MỌI ĐỊNH DẠNG HÀNG DỮ LIỆU TỪ GOOGLE SHEET:
+ * - Định dạng 34 cột cũ (15 điểm liên tiếp, JSON reasons ở col 26, Tu học từ col 27)
+ * - Định dạng 48 cột cũ (15 câu x 2 cột Điểm/Lý do, Tu học từ col 41)
+ * - Định dạng 54 cột chuẩn mới (18 câu x 2 cột Điểm/Lý do, Tu học từ col 47)
+ */
+function parseRowAuto(r) {
+  if (!r || r.length < 10) return null;
+
+  var id = r[0] ? r[0].toString().trim() : "";
+  if (!id) return null;
+
+  var timestamp = r[1] ? r[1].toString().trim() : "";
+  var name = r[2] ? r[2].toString().trim() : "Ẩn danh";
+  var phone = r[3] ? r[3].toString().trim() : "";
+  var role = r[4] ? r[4].toString().trim() : "";
+  var unit = r[5] ? r[5].toString().trim() : "";
+  var gradLevel = r[6] ? r[6].toString().trim() : "";
+  var tenure = r[7] ? r[7].toString().trim() : "";
+  var region = r[8] ? r[8].toString().trim() : "";
+  var avgScore = parseFloat(r[9]) || 0;
+
+  var scores = {};
+  var reasons = {};
+  var diet = "", practice = "", serviceStatus = "", challenge = "";
+  var advantages = "", disadvantages = "", reality = "", suggestions = "";
+
+  // DẤU HIỆU ĐỊNH DANH 34 CỘT CŨ:
+  // Cột index 25 là chuỗi JSON "{...}" hoặc "{}"
+  // Hoặc cột index 26 chứa từ khóa tu học "trai", "chay" (vd: "Thập trai", "Lục trai", "Chay trường")
+  // Hoặc cột index 28 chứa từ khóa phụng sự "phụng sự", "Trực tiếp", "Thỉnh thoảng"
+  var col25Str = (r[25] !== undefined && r[25] !== null) ? r[25].toString().trim() : "";
+  var col26Str = (r[26] !== undefined && r[26] !== null) ? r[26].toString().trim() : "";
+  var col28Str = (r[28] !== undefined && r[28] !== null) ? r[28].toString().trim() : "";
+
+  var isOld34 = false;
+  if (col25Str.indexOf("{") === 0 || 
+      col26Str.indexOf("trai") !== -1 || col26Str.indexOf("chay") !== -1 ||
+      col28Str.indexOf("phụng sự") !== -1 || col28Str.indexOf("Trực tiếp") !== -1) {
+    isOld34 = true;
+  }
+
+  // DẤU HIỆU ĐỊNH DANH 48 CỘT CŨ (15 câu x 2 = 30 + 10 meta = 40):
+  var isOld48 = false;
+  if (!isOld34) {
+    var col40Str = (r[40] !== undefined && r[40] !== null) ? r[40].toString().trim() : "";
+    var col42Str = (r[42] !== undefined && r[42] !== null) ? r[42].toString().trim() : "";
+    if (col40Str.indexOf("trai") !== -1 || col40Str.indexOf("chay") !== -1 ||
+        col42Str.indexOf("phụng sự") !== -1 || col42Str.indexOf("Trực tiếp") !== -1) {
+      isOld48 = true;
+    }
+  }
+
+  if (isOld34) {
+    // 34 CỘT CŨ: 15 điểm liên tiếp từ r[10] đến r[24]
+    for (var k34 = 0; k34 < 15; k34++) {
+      var qk34 = Q_KEYS[k34];
+      var sVal34 = parseFloat(r[10 + k34]);
+      if (!isNaN(sVal34) && sVal34 >= 1 && sVal34 <= 5) {
+        scores[qk34] = sVal34;
+      } else {
+        scores[qk34] = "";
+      }
+    }
+    // Câu 16, 17, 18 chưa có trong phiếu 34 cột cũ -> để trống
+    scores["q16_psychology"] = "";
+    scores["q17_church_needs"] = "";
+    scores["q18_social_context"] = "";
+
+    // Parse reasons JSON từ col 26 (index 25)
+    if (col25Str.indexOf("{") === 0) {
+      try {
+        var parsedReasons = JSON.parse(col25Str);
+        if (parsedReasons && typeof parsedReasons === "object") {
+          for (var rk in parsedReasons) {
+            reasons[rk] = parsedReasons[rk];
+          }
+        }
+      } catch(e) {}
+    }
+
+    diet = r[26] ? r[26].toString().trim() : "";
+    practice = r[27] ? r[27].toString().trim() : "";
+    serviceStatus = r[28] ? r[28].toString().trim() : "";
+    challenge = r[29] ? r[29].toString().trim() : "";
+
+    advantages = r[30] ? r[30].toString().trim() : "";
+    disadvantages = r[31] ? r[31].toString().trim() : "";
+    reality = r[32] ? r[32].toString().trim() : "";
+    suggestions = r[33] ? r[33].toString().trim() : "";
+
+  } else if (isOld48) {
+    // 48 CỘT CŨ: 15 câu x 2 cột (Điểm, Lý do) từ r[10] đến r[39]
+    for (var k48 = 0; k48 < 15; k48++) {
+      var qk48 = Q_KEYS[k48];
+      var sVal48 = parseFloat(r[10 + k48 * 2]);
+      if (!isNaN(sVal48) && sVal48 >= 1 && sVal48 <= 5) {
+        scores[qk48] = sVal48;
+      } else {
+        scores[qk48] = "";
+      }
+      var rVal48 = (r[10 + k48 * 2 + 1] !== undefined && r[10 + k48 * 2 + 1] !== null) ? r[10 + k48 * 2 + 1].toString().trim() : "";
+      if (rVal48) reasons[qk48] = rVal48;
+    }
+    scores["q16_psychology"] = "";
+    scores["q17_church_needs"] = "";
+    scores["q18_social_context"] = "";
+
+    diet = r[40] ? r[40].toString().trim() : "";
+    practice = r[41] ? r[41].toString().trim() : "";
+    serviceStatus = r[42] ? r[42].toString().trim() : "";
+    challenge = r[43] ? r[43].toString().trim() : "";
+
+    advantages = r[44] ? r[44].toString().trim() : "";
+    disadvantages = r[45] ? r[45].toString().trim() : "";
+    reality = r[46] ? r[46].toString().trim() : "";
+    suggestions = r[47] ? r[47].toString().trim() : "";
+
+  } else {
+    // 54 CỘT CHUẨN MỚI: 18 câu x 2 cột (Điểm, Lý do) từ r[10] đến r[45]
+    for (var k54 = 0; k54 < 18; k54++) {
+      var qk54 = Q_KEYS[k54];
+      var rawScore = r[10 + k54 * 2];
+      var sVal54 = (rawScore !== undefined && rawScore !== null && rawScore !== "") ? parseFloat(rawScore) : NaN;
+      if (!isNaN(sVal54) && sVal54 >= 1 && sVal54 <= 5) {
+        scores[qk54] = sVal54;
+      } else {
+        scores[qk54] = "";
+      }
+      var rVal54 = (r[10 + k54 * 2 + 1] !== undefined && r[10 + k54 * 2 + 1] !== null) ? r[10 + k54 * 2 + 1].toString().trim() : "";
+      if (rVal54) reasons[qk54] = rVal54;
+    }
+
+    diet = r[46] ? r[46].toString().trim() : "";
+    practice = r[47] ? r[47].toString().trim() : "";
+    serviceStatus = r[48] ? r[48].toString() : "";
+    challenge = r[49] ? r[49].toString() : "";
+
+    advantages = r[50] ? r[50].toString() : "";
+    disadvantages = r[51] ? r[51].toString() : "";
+    reality = r[52] ? r[52].toString() : "";
+    suggestions = r[53] ? r[53].toString() : "";
+  }
+
+  return {
+    id: id,
+    timestamp: timestamp,
+    name: name,
+    phone: phone,
+    role: role,
+    unit: unit,
+    gradLevel: gradLevel,
+    tenure: tenure,
+    region: region,
+    avgScore: avgScore,
+    scores: scores,
+    reasons: reasons,
+    diet: diet,
+    practice: practice,
+    serviceStatus: serviceStatus,
+    challenge: challenge,
+    advantages: advantages,
+    disadvantages: disadvantages,
+    reality: reality,
+    suggestions: suggestions
+  };
+}
+
+// Nâng cấp & tái căn chỉnh toàn diện bảng tính sang chuẩn 54 cột tường minh
 function upgradeSheetToExplicitHeaders(sheet) {
   if (!sheet) {
     sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
@@ -139,104 +310,57 @@ function upgradeSheetToExplicitHeaders(sheet) {
     return;
   }
 
-  var firstCellH11 = (lastCol >= 11) ? sheet.getRange(1, 11).getValue().toString().trim() : "";
-  if (firstCellH11.indexOf("q1") === 0 || lastCol < 54) {
-    var oldValues = [];
-    if (lastRow >= 2) {
-      oldValues = sheet.getRange(2, 1, lastRow - 1, Math.max(lastCol, 34)).getValues();
-    }
+  var maxCol = Math.max(lastCol, 54);
+  var allValues = sheet.getRange(1, 1, lastRow, maxCol).getValues();
+  var newMatrix = [];
 
-    var newMatrix = [];
-    var is48Layout = (lastCol >= 48 && lastCol < 54);
+  for (var i = 1; i < allValues.length; i++) {
+    var oldRow = allValues[i];
+    if (!oldRow[0] || oldRow[0].toString().trim() === "") continue;
 
-    for (var i = 0; i < oldValues.length; i++) {
-      var oldRow = oldValues[i];
-      var rowScores = {};
-      var rowReasons = {};
-      var dietVal = "", practiceVal = "", serviceVal = "", challengeVal = "";
-      var advVal = "", disadvVal = "", realityVal = "", suggVal = "";
-
-      if (is48Layout) {
-        for (var k = 0; k < 15; k++) {
-          var qk = Q_KEYS[k];
-          rowScores[qk] = oldRow[10 + k * 2];
-          var rVal = oldRow[10 + k * 2 + 1] ? oldRow[10 + k * 2 + 1].toString().trim() : "";
-          if (rVal) rowReasons[qk] = rVal;
-        }
-        dietVal = oldRow[40];
-        practiceVal = oldRow[41];
-        serviceVal = oldRow[42];
-        challengeVal = oldRow[43];
-        advVal = oldRow[44];
-        disadvVal = oldRow[45];
-        realityVal = oldRow[46];
-        suggVal = oldRow[47];
-      } else {
-        if (oldRow[25]) {
-          try {
-            var str = oldRow[25].toString().trim();
-            if (str.indexOf("{") === 0) rowReasons = JSON.parse(str);
-          } catch(e) {}
-        }
-        for (var kOld = 0; kOld < 15; kOld++) {
-          rowScores[Q_KEYS[kOld]] = oldRow[10 + kOld];
-        }
-        dietVal = oldRow[26];
-        practiceVal = oldRow[27];
-        serviceVal = oldRow[28];
-        challengeVal = oldRow[29];
-        advVal = oldRow[30];
-        disadvVal = oldRow[31];
-        realityVal = oldRow[32];
-        suggVal = oldRow[33];
-      }
-
-      var rowItem = {
-        id: oldRow[0],
-        timestamp: oldRow[1],
-        name: oldRow[2],
-        phone: oldRow[3],
-        role: oldRow[4],
-        unit: oldRow[5],
-        gradLevel: oldRow[6],
-        tenure: oldRow[7],
-        region: oldRow[8],
-        avgScore: oldRow[9],
-        scores: rowScores,
-        reasons: rowReasons,
-        diet: dietVal,
-        practice: practiceVal,
-        serviceStatus: serviceVal,
-        challenge: challengeVal,
-        advantages: advVal,
-        disadvantages: disadvVal,
-        reality: realityVal,
-        suggestions: suggVal
-      };
-
+    var rowItem = parseRowAuto(oldRow);
+    if (rowItem) {
       newMatrix.push(buildRowData(rowItem));
     }
-
-    sheet.clearContents();
-    sheet.getRange(1, 1, 1, SHEET_HEADERS_EXPLICIT.length).setValues([SHEET_HEADERS_EXPLICIT]);
-    if (newMatrix.length > 0) {
-      sheet.getRange(2, 1, newMatrix.length, SHEET_HEADERS_EXPLICIT.length).setValues(newMatrix);
-    }
-    formatHeaderRow(sheet);
   }
+
+  sheet.clearContents();
+  sheet.getRange(1, 1, 1, SHEET_HEADERS_EXPLICIT.length).setValues([SHEET_HEADERS_EXPLICIT]);
+  if (newMatrix.length > 0) {
+    sheet.getRange(2, 1, newMatrix.length, SHEET_HEADERS_EXPLICIT.length).setValues(newMatrix);
+  }
+  formatHeaderRow(sheet);
+  Logger.log(">>> ĐÃ NÂNG CẤP VÀ ĐỒNG BỘ CHÍNH XÁC " + newMatrix.length + " HÀNG DỮ LIỆU SANG 54 CỘT TƯỜNG MINH! <<<");
 }
 
-// Khởi tạo hàng tiêu đề nếu bảng tính trống hoặc tự động nâng cấp nếu đang dùng chuẩn cũ
+// Khởi tạo hàng tiêu đề nếu bảng tính trống hoặc tự động nâng cấp nếu phát hiện dữ liệu cũ chưa căn chỉnh
 function setupHeaderIfEmpty(sheet) {
   if (!sheet) {
     sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   }
-  if (sheet.getLastRow() === 0) {
+  var lastRow = sheet.getLastRow();
+  var lastCol = sheet.getLastColumn();
+
+  if (lastRow === 0) {
     sheet.appendRow(SHEET_HEADERS_EXPLICIT);
     formatHeaderRow(sheet);
+    return;
+  }
+
+  // Tự động kiểm tra nếu có hàng dữ liệu cũ (lệch cột) cần tái căn chỉnh sang 54 cột
+  if (lastRow >= 2) {
+    var checkRow = sheet.getRange(2, 1, 1, Math.max(lastCol, 54)).getValues()[0];
+    var col25Str = (checkRow[25] !== undefined && checkRow[25] !== null) ? checkRow[25].toString().trim() : "";
+    var col26Str = (checkRow[26] !== undefined && checkRow[26] !== null) ? checkRow[26].toString().trim() : "";
+    var c11 = (lastCol >= 11) ? sheet.getRange(1, 11).getValue().toString().trim() : "";
+    
+    // Nếu phát hiện dấu hiệu hàng cũ bị lệch cột hoặc thiếu cột 54:
+    if (col25Str.indexOf("{") === 0 || col26Str.indexOf("trai") !== -1 || col26Str.indexOf("chay") !== -1 || c11.indexOf("q1") === 0 || lastCol < 54) {
+      upgradeSheetToExplicitHeaders(sheet);
+    }
   } else {
-    var c11 = (sheet.getLastColumn() >= 11) ? sheet.getRange(1, 11).getValue().toString().trim() : "";
-    if (c11.indexOf("q1") === 0 || sheet.getLastColumn() < 54) {
+    var c11Only = (lastCol >= 11) ? sheet.getRange(1, 11).getValue().toString().trim() : "";
+    if (c11Only.indexOf("q1") === 0 || lastCol < 54) {
       upgradeSheetToExplicitHeaders(sheet);
     }
   }
@@ -386,115 +510,20 @@ function handleSubmitSurvey(data, sheet) {
   }
 }
 
-// 3. ĐỌC TẤT CẢ DỮ LIỆU TỪ GOOGLE SHEET (HỖ TRỢ 54 CỘT, 48 CỘT VÀ 34 CỘT)
+// 3. ĐỌC TẤT CẢ DỮ LIỆU TỪ GOOGLE SHEET (TỰ ĐỘNG CHUẨN HÓA DỮ LIỆU CHÍNH XÁC 100%)
 function readAllResponsesFromSheet(sheet) {
   var lastRow = sheet.getLastRow();
   if (lastRow < 2) return [];
 
   var lastCol = sheet.getLastColumn();
-  var is54 = (lastCol >= 54);
-  var is48 = (!is54 && lastCol >= 48);
-  var data = sheet.getRange(2, 1, lastRow - 1, lastCol).getValues();
+  var maxCol = Math.max(lastCol, 54);
+  var data = sheet.getRange(2, 1, lastRow - 1, maxCol).getValues();
   var responses = [];
 
   for (var i = 0; i < data.length; i++) {
-    var r = data[i];
-    var scores = {};
-    var reasons = {};
-
-    if (is54) {
-      for (var k = 0; k < Q_KEYS.length; k++) {
-        var qk = Q_KEYS[k];
-        scores[qk] = parseFloat(r[10 + k * 2]) || 0;
-        var rVal = r[10 + k * 2 + 1] ? r[10 + k * 2 + 1].toString().trim() : "";
-        if (rVal) reasons[qk] = rVal;
-      }
-
-      responses.push({
-        id: r[0] ? r[0].toString() : "",
-        timestamp: r[1] ? r[1].toString() : "",
-        name: r[2] ? r[2].toString() : "Ẩn danh",
-        phone: r[3] ? r[3].toString() : "",
-        role: r[4] ? r[4].toString() : "",
-        unit: r[5] ? r[5].toString() : "",
-        gradLevel: r[6] ? r[6].toString() : "",
-        tenure: r[7] ? r[7].toString() : "",
-        region: r[8] ? r[8].toString() : "",
-        avgScore: parseFloat(r[9]) || 0,
-        scores: scores,
-        reasons: reasons,
-        diet: r[46] ? r[46].toString() : "",
-        practice: r[47] ? r[47].toString() : "",
-        serviceStatus: r[48] ? r[48].toString() : "",
-        challenge: r[49] ? r[49].toString() : "",
-        advantages: r[50] ? r[50].toString() : "",
-        disadvantages: r[51] ? r[51].toString() : "",
-        reality: r[52] ? r[52].toString() : "",
-        suggestions: r[53] ? r[53].toString() : ""
-      });
-    } else if (is48) {
-      for (var k48 = 0; k48 < 15; k48++) {
-        var qk48 = Q_KEYS[k48];
-        scores[qk48] = parseFloat(r[10 + k48 * 2]) || 0;
-        var rVal48 = r[10 + k48 * 2 + 1] ? r[10 + k48 * 2 + 1].toString().trim() : "";
-        if (rVal48) reasons[qk48] = rVal48;
-      }
-
-      responses.push({
-        id: r[0] ? r[0].toString() : "",
-        timestamp: r[1] ? r[1].toString() : "",
-        name: r[2] ? r[2].toString() : "Ẩn danh",
-        phone: r[3] ? r[3].toString() : "",
-        role: r[4] ? r[4].toString() : "",
-        unit: r[5] ? r[5].toString() : "",
-        gradLevel: r[6] ? r[6].toString() : "",
-        tenure: r[7] ? r[7].toString() : "",
-        region: r[8] ? r[8].toString() : "",
-        avgScore: parseFloat(r[9]) || 0,
-        scores: scores,
-        reasons: reasons,
-        diet: r[40] ? r[40].toString() : "",
-        practice: r[41] ? r[41].toString() : "",
-        serviceStatus: r[42] ? r[42].toString() : "",
-        challenge: r[43] ? r[43].toString() : "",
-        advantages: r[44] ? r[44].toString() : "",
-        disadvantages: r[45] ? r[45].toString() : "",
-        reality: r[46] ? r[46].toString() : "",
-        suggestions: r[47] ? r[47].toString() : ""
-      });
-    } else {
-      if (r[25]) {
-        try {
-          var str = r[25].toString().trim();
-          if (str.indexOf("{") === 0) reasons = JSON.parse(str);
-        } catch(e) {}
-      }
-      for (var k2 = 0; k2 < 15; k2++) {
-        scores[Q_KEYS[k2]] = parseFloat(r[10 + k2]) || 0;
-      }
-
-      responses.push({
-        id: r[0] ? r[0].toString() : "",
-        timestamp: r[1] ? r[1].toString() : "",
-        name: r[2] ? r[2].toString() : "Ẩn danh",
-        phone: r[3] ? r[3].toString() : "",
-        role: r[4] ? r[4].toString() : "",
-        unit: r[5] ? r[5].toString() : "",
-        gradLevel: r[6] ? r[6].toString() : "",
-        tenure: r[7] ? r[7].toString() : "",
-        region: r[8] ? r[8].toString() : "",
-        avgScore: parseFloat(r[9]) || 0,
-        scores: scores,
-        reasons: reasons,
-        diet: r[26] ? r[26].toString() : "",
-        practice: r[27] ? r[27].toString() : "",
-        serviceStatus: r[28] ? r[28].toString() : "",
-        challenge: r[29] ? r[29].toString() : "",
-        advantages: r[30] ? r[30].toString() : "",
-        disadvantages: r[31] ? r[31].toString() : "",
-        reality: r[32] ? r[32].toString() : "",
-        suggestions: r[33] ? r[33].toString() : ""
-      });
+    var item = parseRowAuto(data[i]);
+    if (item && item.id) {
+      responses.push(item);
     }
   }
   return responses;
