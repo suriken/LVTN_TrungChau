@@ -1592,9 +1592,9 @@
                     <p class="text-xs sm:text-sm text-slate-600 italic">
                         <i class="fa-solid fa-shield-halved text-emerald-600 mr-1"></i> Dữ liệu khảo sát được tự động lưu tạm trên trình duyệt của bạn khi chuyển tab.
                     </p>
-                    <button type="button" onclick="handleFormSubmit(event)" class="w-full sm:w-auto px-6 sm:px-8 py-3.5 bg-gradient-to-r from-[#3b4982] to-[#252f54] hover:from-[#2e3a68] hover:to-[#1a223f] text-white font-extrabold rounded-xl shadow-lg hover:shadow-xl transition flex items-center justify-center space-x-2 text-sm sm:text-base cursor-pointer hover:scale-102 active:scale-98">
-                        <i class="fa-solid fa-paper-plane text-base"></i>
-                        <span>Hoàn Thành & Gửi Phiếu Khảo Sát</span>
+                    <button type="button" id="submitSurveyBtn" onclick="handleFormSubmit(event)" class="w-full sm:w-auto px-6 sm:px-8 py-3.5 bg-gradient-to-r from-[#3b4982] to-[#252f54] hover:from-[#2e3a68] hover:to-[#1a223f] text-white font-extrabold rounded-xl shadow-lg hover:shadow-xl transition flex items-center justify-center space-x-2 text-sm sm:text-base cursor-pointer hover:scale-102 active:scale-98">
+                        <i id="submitSurveyBtnIcon" class="fa-solid fa-paper-plane text-base"></i>
+                        <span id="submitSurveyBtnText">Hoàn Thành & Gửi Phiếu Khảo Sát</span>
                     </button>
                 </div>
             </form></section>
@@ -1630,11 +1630,17 @@
                         Ý kiến đóng góp quý báu của Quý vị đã được ghi nhận và lưu trữ an toàn trên hệ thống.<br class="hidden sm:inline"> Dữ liệu này là cơ sở thực tiễn quan trọng giúp tác giả hoàn thiện đề tài luận văn tốt nghiệp PTV Cấp III.
                     </p>
                     <div class="flex flex-wrap items-center justify-center gap-2.5 pt-1">
-                        <button type="button" onclick="switchTab('docs')" class="px-3.5 py-1.5 sm:px-4 sm:py-2 bg-[#fbf9f5] hover:bg-[#ede7da] text-[#3b4982] text-xs sm:text-sm font-bold rounded-xl border border-[#e2d8c7] transition flex items-center gap-1.5 cursor-pointer">
-                            <i class="fa-solid fa-book-open text-xs"></i> Xem Lại Khung Chương Trình
+                        <button type="button" onclick="editCurrentSurvey()" class="px-4 py-2 sm:px-4.5 sm:py-2.5 bg-amber-500 hover:bg-amber-600 text-white text-xs sm:text-sm font-black rounded-xl shadow-md transition flex items-center gap-2 cursor-pointer hover:scale-102 active:scale-98">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                            <span>Điều Chỉnh Lại Phiếu Này</span>
                         </button>
-                        <button type="button" onclick="resetSurveyForm()" class="px-3.5 py-1.5 sm:px-4 sm:py-2 bg-[#3b4982] hover:bg-[#2c3765] text-white text-xs sm:text-sm font-bold rounded-xl shadow transition flex items-center gap-1.5 cursor-pointer">
-                            <i class="fa-solid fa-rotate-right text-xs"></i> Điền Thêm Phiếu Mới
+                        <button type="button" onclick="switchTab('docs')" class="px-3.5 py-2 sm:px-4 sm:py-2.5 bg-[#fbf9f5] hover:bg-[#ede7da] text-[#3b4982] text-xs sm:text-sm font-bold rounded-xl border border-[#e2d8c7] transition flex items-center gap-1.5 cursor-pointer">
+                            <i class="fa-solid fa-book-open text-xs"></i>
+                            <span>Xem Lại Khung Chương Trình</span>
+                        </button>
+                        <button type="button" onclick="resetSurveyForm()" class="px-3.5 py-2 sm:px-4 sm:py-2.5 bg-[#3b4982] hover:bg-[#2c3765] text-white text-xs sm:text-sm font-bold rounded-xl shadow transition flex items-center gap-1.5 cursor-pointer">
+                            <i class="fa-solid fa-rotate-right text-xs"></i>
+                            <span>Điền Thêm Phiếu Mới</span>
                         </button>
                     </div>
                 </div>
@@ -3677,8 +3683,108 @@
             toggleAnonymousSurvey(false);
             updateSurveyProgress();
             clearSubmitAlerts();
+
+            // Khôi phục nút gửi về trạng thái gửi mới
+            const submitBtnText = document.getElementById('submitSurveyBtnText');
+            if (submitBtnText) submitBtnText.innerText = "Hoàn Thành & Gửi Phiếu Khảo Sát";
+            const floatingSubmitText = document.getElementById('floatingSubmitText');
+            if (floatingSubmitText) floatingSubmitText.innerText = "Gửi Khảo Sát";
+
             switchTab('form');
             window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // ĐIỀU CHỈNH LẠI PHIẾU KHẢO SÁT HIỆN HÀNH
+        function editCurrentSurvey() {
+            if (!currentSurveyId) {
+                currentSurveyId = sessionStorage.getItem("ptv_current_survey_id") || localStorage.getItem("ptv_current_survey_id");
+            }
+            if (!currentSurveyId) {
+                showToast("Không tìm thấy thông tin phiếu khảo sát để điều chỉnh!", "warning");
+                return;
+            }
+
+            const targetResp = (surveyResponses || []).find(r => r && r.id === currentSurveyId);
+            if (!targetResp) {
+                showToast("Không tìm thấy dữ liệu phiếu khảo sát hiện hành!", "warning");
+                return;
+            }
+
+            // 1. Chuyển sang Tab 2 (Bảng Khảo Sát)
+            switchTab('form');
+
+            // 2. Điền thông tin cá nhân (Phần 1)
+            const nameEl = document.getElementById('respName');
+            const phoneEl = document.getElementById('respPhone');
+            const roleEl = document.getElementById('respRole');
+            const unitEl = document.getElementById('respUnit');
+            const gradEl = document.getElementById('respGradLevel');
+            const tenureEl = document.getElementById('respTenure');
+            const regionEl = document.getElementById('respRegion');
+
+            if (nameEl) nameEl.value = targetResp.name || '';
+            if (phoneEl) phoneEl.value = targetResp.phone || '';
+            if (roleEl) roleEl.value = targetResp.role || '';
+            if (unitEl) unitEl.value = targetResp.unit || '';
+            if (gradEl) gradEl.value = targetResp.gradLevel || '';
+            if (tenureEl) tenureEl.value = targetResp.tenure || '';
+            if (regionEl) regionEl.value = targetResp.region || '';
+
+            // 3. Điền 18 câu hỏi Likert (Phần 2)
+            const scoresObj = targetResp.scores || {};
+            const reasonsObj = targetResp.reasons || {};
+
+            if (allLikertQuestions) {
+                allLikertQuestions.forEach(q => {
+                    const val = scoresObj[q.id];
+                    if (val !== undefined && val !== null && val !== '') {
+                        const radio = document.querySelector(`input[name="${q.id}"][value="${val}"]`);
+                        if (radio) {
+                            radio.checked = true;
+                            handleScoreChange(q.id, parseInt(val));
+                        }
+                    }
+                    if (reasonsObj && reasonsObj[q.id]) {
+                        const reasonInput = document.getElementById(`reason_${q.id}`);
+                        if (reasonInput) reasonInput.value = reasonsObj[q.id];
+                    }
+                });
+            }
+
+            // 4. Điền Phần 3: Tình trạng tu học & phụng sự
+            const dietEl = document.getElementById('respDiet');
+            const practiceEl = document.getElementById('respPractice');
+            const serviceEl = document.getElementById('respServiceStatus');
+            const challengeEl = document.getElementById('respChallenge');
+
+            if (dietEl) dietEl.value = targetResp.diet || '';
+            if (practiceEl) practiceEl.value = targetResp.practice || '';
+            if (serviceEl) serviceEl.value = targetResp.serviceStatus || '';
+            if (challengeEl) challengeEl.value = targetResp.challenge || '';
+
+            // 5. Điền Phần 4: Ý kiến tự luận
+            const advEl = document.getElementById('respAdvantages');
+            const disEl = document.getElementById('respDisadvantages');
+            const realEl = document.getElementById('respReality');
+            const sugEl = document.getElementById('respSuggestions');
+
+            if (advEl) advEl.value = targetResp.advantages || '';
+            if (disEl) disEl.value = targetResp.disadvantages || '';
+            if (realEl) realEl.value = targetResp.reality || '';
+            if (sugEl) sugEl.value = targetResp.suggestions || '';
+
+            // 6. Cập nhật tiến độ hoàn thành
+            updateSurveyProgress();
+
+            // 7. Cập nhật giao diện nút gửi sang chế độ Cập Nhật
+            const submitBtnText = document.getElementById('submitSurveyBtnText');
+            if (submitBtnText) submitBtnText.innerText = `Cập Nhật Phiếu Khảo Sát (${targetResp.id})`;
+            const floatingSubmitText = document.getElementById('floatingSubmitText');
+            if (floatingSubmitText) floatingSubmitText.innerText = "Cập Nhật";
+
+            // 8. Cuộn lên đầu form và thông báo
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            showToast(`Đang ở chế độ điều chỉnh phiếu [${targetResp.id}]. Quý vị có thể thay đổi và bấm Cập Nhật!`, "info");
         }
 
         function getRespondentGreeting(res) {
@@ -3755,56 +3861,280 @@
                 if (commentEl) commentEl.innerText = comment;
 
                 const scoresObj = res.scores || {};
-                const pillarAvg = surveyPillars.map(pillar => {
+                const reasonsObj = res.reasons || {};
+
+                // 1. Phân tích chi tiết 4 Trụ Cột Đào Tạo
+                const pillarAnalysis = surveyPillars.map(pillar => {
                     let pSum = 0;
-                    pillar.questions.forEach(q => pSum += (parseFloat(scoresObj[q.id]) || 0));
-                    return parseFloat((pSum / pillar.questions.length).toFixed(2));
+                    const lowInPillar = [];
+                    const medInPillar = [];
+                    const goodInPillar = [];
+
+                    pillar.questions.forEach(q => {
+                        const score = (scoresObj[q.id] !== undefined && scoresObj[q.id] !== null) ? parseFloat(scoresObj[q.id]) : 0;
+                        pSum += score;
+                        const reason = (reasonsObj && reasonsObj[q.id]) ? reasonsObj[q.id] : "";
+                        const item = { ...q, score, reason };
+                        if (score < 3) lowInPillar.push(item);
+                        else if (score === 3) medInPillar.push(item);
+                        else goodInPillar.push(item);
+                    });
+
+                    const avg = pillar.questions.length > 0 ? parseFloat((pSum / pillar.questions.length).toFixed(2)) : 0;
+                    return {
+                        pillar,
+                        avg,
+                        lowInPillar,
+                        medInPillar,
+                        goodInPillar
+                    };
                 });
 
-                // Render Qualitative Feedback into Personal Review Container
+                const pillarAvg = pillarAnalysis.map(pa => pa.avg);
+
+                // 2. Phân loại toàn bộ 18 câu hỏi thành 3 nhóm rõ ràng
+                const allLowItems = [];
+                const allMedItems = [];
+                const allGoodItems = [];
+
+                surveyPillars.forEach(p => {
+                    p.questions.forEach(q => {
+                        const score = (scoresObj[q.id] !== undefined && scoresObj[q.id] !== null) ? parseFloat(scoresObj[q.id]) : 0;
+                        const reason = (reasonsObj && reasonsObj[q.id]) ? reasonsObj[q.id] : "";
+                        const item = { ...q, score, reason, pillarTitle: p.title, pillarCode: p.code };
+                        if (score < 3) allLowItems.push(item);
+                        else if (score === 3) allMedItems.push(item);
+                        else allGoodItems.push(item);
+                    });
+                });
+
+                // Render Toàn Bộ Đánh Giá Phân Tích vào Vùng Chi Tiết Cá Nhân
                 const feedbackContainer = document.getElementById('personalQualitativeReview');
                 if (feedbackContainer) {
-                    let html = '<div class="space-y-3 pt-3 border-t border-[#e2d8c7] text-xs sm:text-sm">';
-                    
-                    // Phần Tình trạng tu học & phụng sự
+                    let html = '<div class="space-y-6 pt-2 text-xs sm:text-sm">';
+
+                    // ==========================================
+                    // MỤC 1: ĐIỂM TRUNG BÌNH & ĐIỂM CẦN LƯU Ý CỦA TỪNG TRỤ CỘT
+                    // ==========================================
                     html += `
-                        <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-2">
-                            <span class="font-extrabold text-[#3b4982] block text-xs sm:text-sm uppercase tracking-wide">
-                                <i class="fa-solid fa-hands-praying mr-1"></i> Tình trạng Tu học & Phụng sự thực tế của Quý vị:
-                            </span>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs sm:text-sm text-slate-700">
-                                <div><span class="text-slate-500 font-semibold">• Trai kỳ:</span> <strong class="text-slate-800">${res.diet || 'Chưa ghi nhận'}</strong></div>
-                                <div><span class="text-slate-500 font-semibold">• Thời cúng:</span> <strong class="text-slate-800">${res.practice || 'Chưa ghi nhận'}</strong></div>
-                                <div><span class="text-slate-500 font-semibold">• Phụng sự:</span> <strong class="text-slate-800">${res.serviceStatus || 'Chưa ghi nhận'}</strong></div>
-                                <div><span class="text-slate-500 font-semibold">• Rào cản lớn nhất:</span> <strong class="text-slate-800">${res.challenge || 'Không có'}</strong></div>
+                        <div class="space-y-3 pt-3 border-t border-[#e2d8c7]">
+                            <div class="flex items-center justify-between">
+                                <h4 class="font-black text-[#3b4982] text-sm sm:text-base flex items-center gap-2">
+                                    <i class="fa-solid fa-layer-group text-[#3b4982]"></i>
+                                    <span>Điểm Trung Bình & Điểm Cần Lưu Ý Của Từng Trụ Cột Đào Tạo:</span>
+                                </h4>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                                ${pillarAnalysis.map(pa => {
+                                    const avg = pa.avg;
+                                    let borderBg = "border-emerald-200 bg-emerald-50/50";
+                                    let statusPill = `<span class="px-2 py-0.5 rounded-full text-[10.5px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">Rất phù hợp</span>`;
+                                    let scoreColor = "text-emerald-700";
+
+                                    if (avg < 3.0) {
+                                        borderBg = "border-rose-200 bg-rose-50/50";
+                                        statusPill = `<span class="px-2 py-0.5 rounded-full text-[10.5px] font-bold bg-rose-100 text-rose-800 border border-rose-300">Cần cải tiến</span>`;
+                                        scoreColor = "text-rose-700";
+                                    } else if (avg < 3.8) {
+                                        borderBg = "border-amber-200 bg-amber-50/50";
+                                        statusPill = `<span class="px-2 py-0.5 rounded-full text-[10.5px] font-bold bg-amber-100 text-amber-800 border border-amber-300">Phù hợp vừa</span>`;
+                                        scoreColor = "text-amber-700";
+                                    }
+
+                                    let notesHtml = "";
+                                    if (pa.lowInPillar.length > 0) {
+                                        notesHtml = `
+                                            <div class="mt-2.5 p-2 bg-white/95 rounded-xl border border-rose-200 text-[11px] text-rose-800 space-y-1">
+                                                <strong class="text-rose-900 block font-bold"><i class="fa-solid fa-triangle-exclamation mr-1"></i>Điểm cần lưu ý (< 3đ):</strong>
+                                                ${pa.lowInPillar.map(x => `<div class="truncate">• <strong>${x.label.split('.')[0]}:</strong> ${x.score}đ</div>`).join('')}
+                                            </div>
+                                        `;
+                                    } else if (pa.medInPillar.length > 0) {
+                                        notesHtml = `
+                                            <div class="mt-2.5 p-2 bg-white/95 rounded-xl border border-yellow-200 text-[11px] text-yellow-800 space-y-1">
+                                                <strong class="text-yellow-900 block font-bold"><i class="fa-solid fa-scale-balanced mr-1"></i>Hạng mục phân vân (= 3đ):</strong>
+                                                ${pa.medInPillar.map(x => `<div class="truncate">• <strong>${x.label.split('.')[0]}:</strong> 3đ</div>`).join('')}
+                                            </div>
+                                        `;
+                                    } else {
+                                        notesHtml = `
+                                            <div class="mt-2.5 p-2 bg-white/95 rounded-xl border border-emerald-200 text-[11px] text-emerald-800">
+                                                <i class="fa-solid fa-circle-check mr-1 text-emerald-600"></i> Tất cả các câu đều đạt từ 4 - 5 điểm.
+                                            </div>
+                                        `;
+                                    }
+
+                                    return `
+                                        <div class="p-3.5 rounded-2xl border ${borderBg} flex flex-col justify-between shadow-2xs">
+                                            <div>
+                                                <div class="flex items-center justify-between gap-1 mb-1">
+                                                    <span class="text-[10px] font-black uppercase tracking-wider text-[#3b4982] bg-white/80 px-2 py-0.5 rounded-md border border-slate-200">Trụ Cột ${pa.pillar.code}</span>
+                                                    ${statusPill}
+                                                </div>
+                                                <h5 class="font-extrabold text-[#2e3a68] text-xs sm:text-sm mt-1 leading-snug line-clamp-2" title="${pa.pillar.title}">${pa.pillar.title}</h5>
+                                                <div class="mt-2">
+                                                    <span class="text-2xl font-black ${scoreColor}">${avg.toFixed(2)}</span>
+                                                    <span class="text-xs text-slate-500 font-semibold">/ 5.0</span>
+                                                </div>
+                                            </div>
+                                            ${notesHtml}
+                                        </div>
+                                    `;
+                                }).join('')}
                             </div>
                         </div>
                     `;
 
-                    if (res.advantages) {
-                        html += `<div class="bg-emerald-50/70 p-3 rounded-xl border border-emerald-200"><span class="font-bold text-emerald-800 block mb-1"><i class="fa-solid fa-circle-check text-emerald-600 mr-1"></i> Những mặt làm được:</span><p class="text-slate-700 italic pl-3 leading-relaxed">${res.advantages}</p></div>`;
-                    }
-                    if (res.disadvantages) {
-                        html += `<div class="bg-amber-50/70 p-3 rounded-xl border border-amber-200"><span class="font-bold text-amber-800 block mb-1"><i class="fa-solid fa-triangle-exclamation text-amber-600 mr-1"></i> Những mặt chưa làm được:</span><p class="text-slate-700 italic pl-3 leading-relaxed">${res.disadvantages}</p></div>`;
-                    }
-                    if (res.reality) {
-                        html += `<div class="bg-blue-50/70 p-3 rounded-xl border border-blue-200"><span class="font-bold text-[#3b4982] block mb-1"><i class="fa-solid fa-users-line mr-1"></i> Thực trạng PTV sau tốt nghiệp:</span><p class="text-slate-700 italic pl-3 leading-relaxed">${res.reality}</p></div>`;
-                    }
-                    if (res.suggestions) {
-                        html += `<div class="bg-indigo-50/70 p-3 rounded-xl border border-indigo-200"><span class="font-bold text-indigo-900 block mb-1"><i class="fa-solid fa-lightbulb text-indigo-600 mr-1"></i> Kiến nghị & Đề xuất:</span><p class="text-slate-700 italic pl-3 leading-relaxed">${res.suggestions}</p></div>`;
+                    // ==========================================
+                    // MỤC 2: DANH SÁCH PHÂN LOẠI 3 NHÓM HẠNG MỤC
+                    // ==========================================
+                    html += `
+                        <div class="space-y-4 pt-3 border-t border-[#e2d8c7]">
+                            <div class="flex items-center justify-between">
+                                <h4 class="font-black text-[#3b4982] text-sm sm:text-base flex items-center gap-2">
+                                    <i class="fa-solid fa-list-check text-[#3b4982]"></i>
+                                    <span>Danh Sách Phân Loại 3 Nhóm Hạng Mục Đánh Giá:</span>
+                                </h4>
+                            </div>
+
+                            <!-- NHÓM 1: DƯỚI 3 ĐIỂM (CẦN ĐẶC BIỆT LƯU Ý) -->
+                            <div class="bg-rose-50/70 p-4 sm:p-5 rounded-2xl border-2 border-rose-300 shadow-2xs space-y-3">
+                                <div class="flex items-center justify-between text-rose-900 font-black text-xs sm:text-sm">
+                                    <span class="flex items-center gap-2">
+                                        <i class="fa-solid fa-triangle-exclamation text-rose-600 text-base"></i>
+                                        <span>1. Hạng Mục Dưới 3 Điểm (< 3đ) — Cần Đặc Biệt Lưu Ý & Cải Tiến:</span>
+                                    </span>
+                                    <span class="px-2.5 py-0.5 bg-rose-200 text-rose-900 rounded-full text-xs font-black shadow-2xs">${allLowItems.length} hạng mục</span>
+                                </div>
+                                ${allLowItems.length > 0 ? `
+                                    <div class="space-y-2.5">
+                                        ${allLowItems.map(item => `
+                                            <div class="bg-white p-3 sm:p-3.5 rounded-xl border border-rose-200 shadow-2xs space-y-1.5">
+                                                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
+                                                    <span class="font-black text-slate-900 text-xs sm:text-sm">${item.label}</span>
+                                                    <span class="px-2 py-0.5 rounded text-white font-bold text-xs self-start sm:self-auto ${item.score === 1 ? 'bg-rose-600' : 'bg-amber-600'}">
+                                                        ${item.score} điểm: ${item.score === 1 ? 'Rất không phù hợp' : 'Không phù hợp'}
+                                                    </span>
+                                                </div>
+                                                <p class="text-xs text-slate-600 leading-relaxed text-justify sm:text-left">${item.desc}</p>
+                                                ${item.reason ? `
+                                                    <div class="text-xs p-2.5 bg-rose-50/80 rounded-lg text-rose-900 border border-rose-200 leading-relaxed">
+                                                        <strong class="font-bold text-rose-950"><i class="fa-solid fa-pen mr-1"></i>Lý do chưa phù hợp & Điểm cần cải thiện:</strong>
+                                                        <p class="italic mt-0.5">"${item.reason}"</p>
+                                                    </div>
+                                                ` : '<div class="text-xs text-slate-400 italic">(Chưa ghi nhận lý do cụ thể)</div>'}
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                ` : `
+                                    <div class="bg-white p-3.5 rounded-xl border border-rose-100 text-slate-600 italic text-xs flex items-center gap-2">
+                                        <i class="fa-solid fa-sparkles text-amber-500 text-sm"></i>
+                                        <span>Tuyệt vời! Quý vị không có câu nào đánh giá dưới 3 điểm. Khung chương trình được nhìn nhận rất tích cực.</span>
+                                    </div>
+                                `}
+                            </div>
+
+                            <!-- NHÓM 2: Ở ĐIỂM 3 (PHÂN VÂN) -->
+                            <div class="bg-yellow-50/70 p-4 sm:p-5 rounded-2xl border-2 border-yellow-300 shadow-2xs space-y-3">
+                                <div class="flex items-center justify-between text-yellow-900 font-black text-xs sm:text-sm">
+                                    <span class="flex items-center gap-2">
+                                        <i class="fa-solid fa-scale-balanced text-yellow-600 text-base"></i>
+                                        <span>2. Hạng Mục Ở Mức 3 Điểm (= 3đ) — Phân Vân / Cần Cân Nhắc Hoàn Thiện Thêm:</span>
+                                    </span>
+                                    <span class="px-2.5 py-0.5 bg-yellow-200 text-yellow-900 rounded-full text-xs font-black shadow-2xs">${allMedItems.length} hạng mục</span>
+                                </div>
+                                ${allMedItems.length > 0 ? `
+                                    <div class="space-y-2">
+                                        ${allMedItems.map(item => `
+                                            <div class="bg-white p-3 rounded-xl border border-yellow-200 shadow-2xs space-y-1">
+                                                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                                                    <span class="font-black text-slate-900 text-xs sm:text-sm">${item.label}</span>
+                                                    <span class="px-2 py-0.5 rounded text-slate-900 bg-yellow-300 font-bold text-xs self-start sm:self-auto border border-yellow-400">
+                                                        3 điểm: Phân vân
+                                                    </span>
+                                                </div>
+                                                <p class="text-xs text-slate-600 leading-relaxed text-justify sm:text-left">${item.desc}</p>
+                                                <div class="text-[11px] text-amber-900 font-medium italic pt-0.5">
+                                                    ℹ️ Mức độ phù hợp trung bình, cần cân nhắc hoàn thiện nội dung và phương pháp tổ chức để tạo sự thuyết phục cao hơn.
+                                                </div>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                ` : `
+                                    <div class="bg-white p-3.5 rounded-xl border border-yellow-100 text-slate-600 italic text-xs">
+                                        Không có hạng mục nào ở mức phân vân (3 điểm).
+                                    </div>
+                                `}
+                            </div>
+
+                            <!-- NHÓM 3: TRÊN 3 ĐIỂM (ĐANG LÀM TỐT) -->
+                            <div class="bg-emerald-50/70 p-4 sm:p-5 rounded-2xl border-2 border-emerald-300 shadow-2xs space-y-3">
+                                <div class="flex items-center justify-between text-emerald-900 font-black text-xs sm:text-sm">
+                                    <span class="flex items-center gap-2">
+                                        <i class="fa-solid fa-circle-check text-emerald-600 text-base"></i>
+                                        <span>3. Hạng Mục Trên 3 Điểm (> 3đ) — Đang Làm Tốt & Phù Hợp Cao (4 - 5 điểm):</span>
+                                    </span>
+                                    <span class="px-2.5 py-0.5 bg-emerald-200 text-emerald-900 rounded-full text-xs font-black shadow-2xs">${allGoodItems.length} hạng mục</span>
+                                </div>
+                                ${allGoodItems.length > 0 ? `
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2.5">
+                                        ${allGoodItems.map(item => `
+                                            <div class="bg-white p-3 rounded-xl border border-emerald-200 shadow-2xs space-y-1 flex flex-col justify-between">
+                                                <div>
+                                                    <div class="flex items-start justify-between gap-1.5 mb-1">
+                                                        <span class="font-black text-slate-900 text-xs sm:text-sm leading-snug">${item.label}</span>
+                                                        <span class="px-2 py-0.5 rounded text-white font-bold text-[11px] flex-shrink-0 ${item.score === 5 ? 'bg-[#3b4982]' : 'bg-emerald-600'}">
+                                                            ${item.score}đ: ${item.score === 5 ? 'Rất phù hợp' : 'Phù hợp'}
+                                                        </span>
+                                                    </div>
+                                                    <p class="text-xs text-slate-600 line-clamp-2 leading-relaxed">${item.desc}</p>
+                                                </div>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                ` : `
+                                    <div class="bg-white p-3.5 rounded-xl border border-emerald-100 text-slate-600 italic text-xs">
+                                        Chưa có hạng mục nào trên 3 điểm.
+                                    </div>
+                                `}
+                            </div>
+                        </div>
+                    `;
+
+                    // ==========================================
+                    // MỤC 3: TÌNH TRẠNG TU HỌC & PHỤNG SỰ THỰC TẾ
+                    // ==========================================
+                    html += `
+                        <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2.5 pt-3">
+                            <span class="font-extrabold text-[#3b4982] block text-xs sm:text-sm uppercase tracking-wide">
+                                <i class="fa-solid fa-hands-praying mr-1"></i> Tình trạng Tu học & Phụng sự thực tế của Quý vị:
+                            </span>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs sm:text-sm text-slate-700">
+                                <div class="bg-white p-2.5 rounded-xl border border-slate-200"><span class="text-slate-500 font-semibold">• Trai kỳ:</span> <strong class="text-slate-800">${res.diet || 'Chưa ghi nhận'}</strong></div>
+                                <div class="bg-white p-2.5 rounded-xl border border-slate-200"><span class="text-slate-500 font-semibold">• Thời cúng:</span> <strong class="text-slate-800">${res.practice || 'Chưa ghi nhận'}</strong></div>
+                                <div class="bg-white p-2.5 rounded-xl border border-slate-200"><span class="text-slate-500 font-semibold">• Phụng sự:</span> <strong class="text-slate-800">${res.serviceStatus || 'Chưa ghi nhận'}</strong></div>
+                                <div class="bg-white p-2.5 rounded-xl border border-slate-200"><span class="text-slate-500 font-semibold">• Rào cản lớn nhất:</span> <strong class="text-slate-800">${res.challenge || 'Không có'}</strong></div>
+                            </div>
+                        </div>
+                    `;
+
+                    // ==========================================
+                    // MỤC 4: Ý KIẾN TỰ LUẬN
+                    // ==========================================
+                    if (res.advantages || res.disadvantages || res.reality || res.suggestions) {
+                        html += `
+                            <div class="space-y-2.5 pt-2 border-t border-[#e2d8c7]">
+                                <h4 class="font-black text-[#3b4982] text-xs sm:text-sm uppercase tracking-wide">
+                                    <i class="fa-solid fa-pen-nib mr-1"></i> Ý Kiến Đóng Góp Định Tính Của Quý Vị:
+                                </h4>
+                                ${res.advantages ? `<div class="bg-emerald-50/70 p-3 rounded-xl border border-emerald-200"><span class="font-bold text-emerald-800 block mb-1"><i class="fa-solid fa-circle-check text-emerald-600 mr-1"></i> Những mặt làm được:</span><p class="text-slate-700 italic pl-3 leading-relaxed">${res.advantages}</p></div>` : ''}
+                                ${res.disadvantages ? `<div class="bg-amber-50/70 p-3 rounded-xl border border-amber-200"><span class="font-bold text-amber-800 block mb-1"><i class="fa-solid fa-triangle-exclamation text-amber-600 mr-1"></i> Những mặt chưa làm được:</span><p class="text-slate-700 italic pl-3 leading-relaxed">${res.disadvantages}</p></div>` : ''}
+                                ${res.reality ? `<div class="bg-blue-50/70 p-3 rounded-xl border border-blue-200"><span class="font-bold text-[#3b4982] block mb-1"><i class="fa-solid fa-users-line mr-1"></i> Thực trạng PTV sau tốt nghiệp:</span><p class="text-slate-700 italic pl-3 leading-relaxed">${res.reality}</p></div>` : ''}
+                                ${res.suggestions ? `<div class="bg-indigo-50/70 p-3 rounded-xl border border-indigo-200"><span class="font-bold text-indigo-900 block mb-1"><i class="fa-solid fa-lightbulb text-indigo-600 mr-1"></i> Kiến nghị & Đề xuất:</span><p class="text-slate-700 italic pl-3 leading-relaxed">${res.suggestions}</p></div>` : ''}
+                            </div>
+                        `;
                     }
 
-                    // Lý do điểm thấp (nếu có)
-                    const reasonKeys = Object.keys(res.reasons || {});
-                    if (reasonKeys.length > 0) {
-                        html += `<div class="bg-rose-50/70 p-3 rounded-xl border border-rose-200"><span class="font-bold text-rose-800 block mb-1"><i class="fa-solid fa-pen-to-square text-rose-600 mr-1"></i> Ghi chú các điểm cần cải thiện (< 3 điểm):</span><ul class="list-disc pl-5 text-slate-700 space-y-1 mt-1">`;
-                        reasonKeys.forEach(qId => {
-                            const qObj = allLikertQuestions.find(item => item.id === qId);
-                            const qLabel = qObj ? qObj.label : qId;
-                            html += `<li><strong>${qLabel}:</strong> ${res.reasons[qId]}</li>`;
-                        });
-                        html += `</ul></div>`;
-                    }
                     html += '</div>';
                     feedbackContainer.innerHTML = html;
                 }
