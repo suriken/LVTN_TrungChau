@@ -3048,7 +3048,7 @@
             if (!container) return;
 
             container.innerHTML = surveyPillars.map(pillar => `
-                <div class="bg-white p-4 sm:p-7 rounded-2xl border border-[#e2d8c7] shadow-sm space-y-5">
+                <div class="bg-white p-3.5 sm:p-7 rounded-2xl border border-[#e2d8c7] shadow-sm space-y-4 sm:space-y-5">
                     <div class="border-b border-[#e2d8c7] pb-3.5">
                         <div class="flex items-center gap-2 text-xs sm:text-sm font-black text-[#3b4982] uppercase tracking-wider">
                             <span class="w-7 h-7 rounded-lg bg-[#3b4982] text-white flex items-center justify-center text-xs sm:text-sm shadow-xs">
@@ -3057,21 +3057,22 @@
                             <span>Trụ Cột ${pillar.code}</span>
                         </div>
                         <h4 class="font-black text-[#222b4f] text-lg sm:text-xl md:text-2xl mt-1.5 leading-snug">${pillar.title}</h4>
-                        <p class="text-[15px] sm:text-base text-slate-700 mt-1.5 leading-relaxed text-justify sm:text-left">${pillar.desc}</p>
+                        <p class="text-[15.5px] sm:text-base text-slate-700 mt-1.5 leading-relaxed text-justify sm:text-left">${pillar.desc}</p>
                     </div>
 
                     <div class="space-y-4 sm:space-y-6">
                         ${pillar.questions.map((q, qIdx) => `
-                            <div class="bg-[#fbf9f5] p-4 sm:p-5 rounded-2xl border border-[#e8e2d4] space-y-3.5 hover:border-[#3b4982]/40 transition shadow-2xs" id="q_card_${q.id}">
-                                <div class="flex items-start justify-between gap-3">
-                                    <div class="space-y-1.5 flex-grow">
-                                        <div class="font-black text-[#2e3a68] text-[16px] sm:text-lg md:text-xl leading-snug">${q.label}</div>
-                                        <div class="text-[15px] sm:text-base md:text-[17px] text-slate-800 font-normal leading-relaxed text-justify sm:text-left">${q.desc}</div>
-                                    </div>
-                                    <span class="text-xs sm:text-sm font-black text-[#3b4982] bg-[#3b4982]/10 px-3 py-1.5 rounded-lg border border-[#3b4982]/20 flex-shrink-0 shadow-2xs mt-0.5">
+                            <div class="bg-[#fbf9f5] p-3.5 sm:p-5 rounded-2xl border border-[#e8e2d4] space-y-3 sm:space-y-3.5 hover:border-[#3b4982]/40 transition shadow-2xs" id="q_card_${q.id}">
+                                <!-- TIÊU ĐỀ CÂU HỎI & BADGE THỨ TỰ (NGANG HÀNG TRÊN CÙNG) -->
+                                <div class="flex items-start justify-between gap-2.5">
+                                    <div class="font-black text-[#2e3a68] text-[16.5px] sm:text-lg md:text-xl leading-snug flex-grow">${q.label}</div>
+                                    <span class="text-xs sm:text-sm font-black text-[#3b4982] bg-[#3b4982]/10 px-2.5 py-1 rounded-lg border border-[#3b4982]/20 flex-shrink-0 shadow-2xs mt-0.5">
                                         Câu ${qIdx + 1}
                                     </span>
                                 </div>
+
+                                <!-- NỘI DUNG CÂU HỎI (TRẢI RỘNG 100% CHIỀU NGANG TRÊN MOBILE, TỐI ƯU KHOẢNG TRỐNG VÀ CỠ CHỮ TO RÕ) -->
+                                <div class="text-[16px] sm:text-[17px] md:text-lg text-slate-800 font-normal leading-relaxed text-justify sm:text-left w-full">${q.desc}</div>
 
                                 <!-- 5 COLOR LIKERT BUTTONS (KÍCH THƯỚC Ô BẰNG NHAU 100%, ĐỐI XỨNG CÂN BẰNG) -->
                                 <div class="grid grid-cols-5 gap-1.5 sm:gap-2.5 pt-1.5 text-center w-full max-w-full items-stretch">
