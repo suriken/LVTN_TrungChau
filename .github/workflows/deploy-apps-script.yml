@@ -1,0 +1,48 @@
+name: Deploy Code.gs to Google Apps Script
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'Code.gs'
+      - 'appsscript.json'
+      - '.clasp.json'
+      - '.claspignore'
+      - '.github/workflows/deploy-apps-script.yml'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Google Clasp
+        run: sudo npm install -g @google/clasp
+
+      - name: Setup Clasp Authentication
+        env:
+          CLASPRC_JSON: ${{ secrets.CLASPRC_JSON }}
+        run: |
+          if [ -z "$CLASPRC_JSON" ]; then
+            echo "::error::Secret CLASPRC_JSON is not configured in GitHub Repository Secrets! Please add your .clasprc.json content to GitHub Secrets."
+            exit 1
+          fi
+          echo "$CLASPRC_JSON" > ~/.clasprc.json
+          chmod 600 ~/.clasprc.json
+
+      - name: Push Code to Google Apps Script
+        run: clasp push --force
+
+      - name: Deploy New Version to Web App
+        env:
+          DEPLOYMENT_ID: "AKfycbwvin6XGotcqOwqyNowHyhW6eF66yLBuT44Q7m5g_ivSl-ObRCLO-GfYJAqsJjkQ0KB1Q"
+        run: |
+          clasp deploy --deploymentId "$DEPLOYMENT_ID" --description "Auto deployed from GitHub Actions (${GITHUB_SHA::7})" || clasp deploy --description "Auto deployed from GitHub Actions (${GITHUB_SHA::7})"
