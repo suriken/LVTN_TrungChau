@@ -3832,6 +3832,9 @@
             };
         }
 
+        let currentActivePillarId = null;
+        let currentPersonalPillarAnalysis = [];
+
         function renderPersonalDashboard(res) {
             try {
                 if (!res || typeof res !== 'object') return;
@@ -3886,14 +3889,17 @@
                     const lowInPillar = [];
                     const medInPillar = [];
                     const goodInPillar = [];
+                    const allQuestionsInPillar = [];
 
                     pillar.questions.forEach(q => {
                         const rawVal = (scoresObj && scoresObj[q.id] !== undefined && scoresObj[q.id] !== null && scoresObj[q.id] !== '') ? parseFloat(scoresObj[q.id]) : 0;
+                        const reason = (reasonsObj && reasonsObj[q.id]) ? reasonsObj[q.id] : "";
+                        const item = { ...q, score: rawVal, reason, hasScore: (rawVal >= 1 && rawVal <= 5) };
+                        allQuestionsInPillar.push(item);
+
                         if (rawVal >= 1 && rawVal <= 5) {
                             pSum += rawVal;
                             pCount++;
-                            const reason = (reasonsObj && reasonsObj[q.id]) ? reasonsObj[q.id] : "";
-                            const item = { ...q, score: rawVal, reason };
                             if (rawVal < 3) lowInPillar.push(item);
                             else if (rawVal === 3) medInPillar.push(item);
                             else goodInPillar.push(item);
@@ -3906,9 +3912,13 @@
                         avg,
                         lowInPillar,
                         medInPillar,
-                        goodInPillar
+                        goodInPillar,
+                        allQuestionsInPillar
                     };
                 });
+
+                currentPersonalPillarAnalysis = pillarAnalysis;
+                currentActivePillarId = null;
 
                 const pillarAvg = pillarAnalysis.map(pa => pa.avg);
 
@@ -3987,23 +3997,30 @@
                                     }
 
                                     return `
-                                        <div class="p-3.5 rounded-2xl border ${borderBg} flex flex-col justify-between shadow-2xs">
+                                        <div class="p-3.5 rounded-2xl border ${borderBg} flex flex-col justify-between shadow-2xs cursor-pointer hover:border-[#3b4982] hover:shadow-md transition-all group active:scale-[0.99] select-none bg-white/70" id="pillar_card_${pa.pillar.id}" onclick="togglePillarDetail('${pa.pillar.id}')" title="Nhấn để xem danh sách chi tiết các câu và số điểm của Trụ Cột ${pa.pillar.code}">
                                             <div>
                                                 <div class="flex items-center justify-between gap-1 mb-1">
-                                                    <span class="text-[10px] font-black uppercase tracking-wider text-[#3b4982] bg-white/80 px-2 py-0.5 rounded-md border border-slate-200">Trụ Cột ${pa.pillar.code}</span>
+                                                    <span class="text-[10px] font-black uppercase tracking-wider text-[#3b4982] bg-white/90 px-2 py-0.5 rounded-md border border-slate-200">Trụ Cột ${pa.pillar.code}</span>
                                                     ${statusPill}
                                                 </div>
-                                                <h5 class="font-extrabold text-[#2e3a68] text-xs sm:text-sm mt-1 leading-snug line-clamp-2" title="${pa.pillar.title}">${pa.pillar.title}</h5>
+                                                <h5 class="font-extrabold text-[#2e3a68] text-xs sm:text-sm mt-1 leading-snug line-clamp-2 group-hover:text-[#3b4982] transition" title="${pa.pillar.title}">${pa.pillar.title}</h5>
                                                 <div class="mt-2">
                                                     <span class="text-2xl font-black ${scoreColor}">${avg.toFixed(2)}</span>
                                                     <span class="text-xs text-slate-500 font-semibold">/ 5.0</span>
                                                 </div>
                                             </div>
                                             ${notesHtml}
+                                            <div class="mt-2.5 pt-2 border-t border-slate-200/80 flex items-center justify-between text-[11px] font-bold text-[#3b4982] group-hover:text-blue-900 transition">
+                                                <span><i class="fa-solid fa-list-ul mr-1"></i>Xem điểm từng câu (${pa.pillar.questions.length} câu)</span>
+                                                <i class="fa-solid fa-chevron-down text-xs transition-transform duration-200" id="chevron_${pa.pillar.id}"></i>
+                                            </div>
                                         </div>
                                     `;
                                 }).join('')}
                             </div>
+
+                            <!-- KHUNG DANH SÁCH CHI TIẾT TỪNG CÂU VÀ SỐ ĐIỂM (HIỂN THỊ KHI NHẤN VÀO Ô) -->
+                            <div id="pillarQuestionsContainer" class="hidden mt-3 p-4 sm:p-5 rounded-2xl bg-white border-2 border-[#3b4982] shadow-md transition-all"></div>
                         </div>
                     `;
 
@@ -4235,6 +4252,154 @@
             } catch (err) {
                 console.error("Lỗi khi hiển thị dashboard cá nhân:", err);
             }
+        }
+
+        // ==================== XEM CHI TIẾT TỪNG CÂU VÀ SỐ ĐIỂM KHI NHẤN VÀO Ô TRỤ CỘT ====================
+        function togglePillarDetail(pillarId) {
+            const container = document.getElementById('pillarQuestionsContainer');
+            if (!container) return;
+
+            if (currentActivePillarId === pillarId && !container.classList.contains('hidden')) {
+                // Đang mở ô này -> bấm lại để đóng
+                container.classList.add('hidden');
+                resetPillarCardHighlights();
+                currentActivePillarId = null;
+                return;
+            }
+
+            currentActivePillarId = pillarId;
+            renderPillarQuestionsView(pillarId);
+        }
+
+        function resetPillarCardHighlights() {
+            ['pillar_1', 'pillar_2', 'pillar_3', 'pillar_4'].forEach(pid => {
+                const card = document.getElementById(`pillar_card_${pid}`);
+                const chevron = document.getElementById(`chevron_${pid}`);
+                if (card) {
+                    card.classList.remove('ring-4', 'ring-[#3b4982]', 'border-[#3b4982]', 'shadow-lg', 'bg-white');
+                }
+                if (chevron) {
+                    chevron.classList.remove('rotate-180');
+                }
+            });
+        }
+
+        function renderPillarQuestionsView(pillarId) {
+            const container = document.getElementById('pillarQuestionsContainer');
+            if (!container || !currentPersonalPillarAnalysis || currentPersonalPillarAnalysis.length === 0) return;
+
+            const pa = currentPersonalPillarAnalysis.find(p => p.pillar.id === pillarId);
+            if (!pa) return;
+
+            resetPillarCardHighlights();
+
+            // Highlight ô card được chọn
+            const activeCard = document.getElementById(`pillar_card_${pillarId}`);
+            const activeChevron = document.getElementById(`chevron_${pillarId}`);
+            if (activeCard) {
+                activeCard.classList.add('ring-4', 'ring-[#3b4982]', 'border-[#3b4982]', 'shadow-lg', 'bg-white');
+            }
+            if (activeChevron) {
+                activeChevron.classList.add('rotate-180');
+            }
+
+            // Tạo giao diện List View từng câu và số điểm
+            let html = `
+                <div class="space-y-4">
+                    <!-- HEADER CỦA DANH SÁCH -->
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 border-b border-slate-200 pb-3">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span class="px-2.5 py-0.5 rounded-lg bg-[#3b4982] text-white font-black text-xs uppercase tracking-wider shadow-2xs">
+                                    Trụ Cột ${pa.pillar.code}
+                                </span>
+                                <h4 class="font-black text-[#2e3a68] text-sm sm:text-base md:text-lg">
+                                    ${pa.pillar.title}
+                                </h4>
+                            </div>
+                            <p class="text-xs text-slate-600 mt-1 leading-relaxed text-justify sm:text-left">${pa.pillar.desc}</p>
+                        </div>
+                        <div class="flex items-center gap-2 self-end sm:self-auto flex-shrink-0">
+                            <span class="px-3 py-1 bg-blue-50 border border-blue-200 rounded-xl text-xs sm:text-sm font-black text-[#3b4982]">
+                                Điểm TB: <strong class="text-base font-black text-emerald-700">${pa.avg.toFixed(2)}</strong> / 5.0
+                            </span>
+                            <button type="button" onclick="togglePillarDetail('${pillarId}')" class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold flex items-center justify-center transition cursor-pointer" title="Đóng danh sách">
+                                <i class="fa-solid fa-xmark text-sm"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- THANH CHUYỂN NHANH QUA LẠI GIỮA CÁC TRỤ CỘT -->
+                    <div class="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs">
+                        <span class="font-bold text-slate-500 mr-1 flex-shrink-0"><i class="fa-solid fa-arrow-right-arrow-left mr-1"></i>Xem trụ cột khác:</span>
+                        ${currentPersonalPillarAnalysis.map(otherPa => `
+                            <button type="button" onclick="renderPillarQuestionsView('${otherPa.pillar.id}')" class="px-2.5 py-1 rounded-lg font-bold transition flex-shrink-0 cursor-pointer ${otherPa.pillar.id === pillarId ? 'bg-[#3b4982] text-white shadow-2xs' : 'bg-slate-100 hover:bg-slate-200 text-slate-700'}">
+                                Trụ Cột ${otherPa.pillar.code} (${otherPa.avg.toFixed(2)}đ)
+                            </button>
+                        `).join('')}
+                    </div>
+
+                    <!-- LIST VIEW TỪNG CÂU VÀ SỐ ĐIỂM -->
+                    <div class="space-y-2.5 max-h-[480px] overflow-y-auto pr-1">
+                        ${pa.allQuestionsInPillar.map((q) => {
+                            const score = q.score;
+                            let scoreBadgeClass = "bg-slate-200 text-slate-600 border border-slate-300";
+                            let scoreLabel = "Chưa đánh giá";
+                            let scoreIcon = "fa-circle-question";
+
+                            if (score === 5) {
+                                scoreBadgeClass = "bg-[#3b4982] text-white shadow-2xs";
+                                scoreLabel = "5 điểm: Rất phù hợp";
+                                scoreIcon = "fa-circle-check";
+                            } else if (score === 4) {
+                                scoreBadgeClass = "bg-emerald-600 text-white shadow-2xs";
+                                scoreLabel = "4 điểm: Phù hợp";
+                                scoreIcon = "fa-circle-check";
+                            } else if (score === 3) {
+                                scoreBadgeClass = "bg-yellow-400 text-slate-900 border border-yellow-500 font-black shadow-2xs";
+                                scoreLabel = "3 điểm: Phân vân";
+                                scoreIcon = "fa-scale-balanced";
+                            } else if (score === 2) {
+                                scoreBadgeClass = "bg-amber-600 text-white shadow-2xs";
+                                scoreLabel = "2 điểm: Không phù hợp";
+                                scoreIcon = "fa-triangle-exclamation";
+                            } else if (score === 1) {
+                                scoreBadgeClass = "bg-rose-600 text-white shadow-2xs";
+                                scoreLabel = "1 điểm: Rất không phù hợp";
+                                scoreIcon = "fa-circle-xmark";
+                            }
+
+                            return `
+                                <div class="p-3 sm:p-3.5 rounded-xl border border-slate-200 bg-white hover:border-[#3b4982]/50 hover:shadow-xs transition space-y-1.5">
+                                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
+                                        <div class="font-black text-slate-900 text-xs sm:text-sm leading-snug">
+                                            ${q.label}
+                                        </div>
+                                        <span class="px-2.5 py-1 rounded-lg font-bold text-xs self-start sm:self-auto flex items-center gap-1.5 flex-shrink-0 ${scoreBadgeClass}">
+                                            <i class="fa-solid ${scoreIcon} text-xs"></i>
+                                            <span>${scoreLabel}</span>
+                                        </span>
+                                    </div>
+                                    <p class="text-xs text-slate-600 leading-relaxed text-justify sm:text-left">${q.desc}</p>
+                                    ${q.reason ? `
+                                        <div class="p-2.5 bg-rose-50 rounded-lg border border-rose-200 text-xs text-rose-900 leading-relaxed mt-1">
+                                            <strong class="font-bold text-rose-950 block"><i class="fa-solid fa-pen mr-1 text-rose-600"></i>Lý do chưa phù hợp & Điểm cần cải thiện:</strong>
+                                            <p class="italic mt-0.5">"${q.reason}"</p>
+                                        </div>
+                                    ` : ''}
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+            `;
+
+            container.innerHTML = html;
+            container.classList.remove('hidden');
+
+            try {
+                container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            } catch(e){}
         }
 
         // ==================== ADMIN AUTHENTICATION & MANAGEMENT ENGINE ====================
