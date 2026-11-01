@@ -1338,7 +1338,7 @@
                         <div class="flex-grow sm:flex-grow-0 min-w-0">
                             <div class="text-xs sm:text-sm font-bold text-slate-800 flex items-center justify-between sm:justify-start gap-2">
                                 <span>Tiến độ khảo sát:</span>
-                                <span id="surveyTopProgressText" class="text-[#3b4982] font-black truncate">0 / 18 câu (0%)</span>
+                                <span id="surveyTopProgressText" class="text-[#3b4982] font-black truncate">0 / 26 mục (0%)</span>
                             </div>
                             <div class="w-full sm:w-56 bg-slate-100 rounded-full h-2 mt-1 overflow-hidden border border-[#e2d8c7]/50">
                                 <div id="surveyTopProgressBar" class="bg-[#3b4982] h-full rounded-full transition-all duration-300" style="width: 0%"></div>
@@ -1490,8 +1490,8 @@
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-base sm:text-lg font-black text-slate-900 mb-2">1. Mức độ thực hành trai kỳ hiện nay *</label>
-                            <select id="respDiet" required onchange="saveSurveyDraft()" class="w-full px-3 py-2 text-xs sm:text-sm rounded-xl border border-[#e2d8c7] focus:outline-none focus:border-[#3b4982] bg-white transition">
+                            <label class="block text-base sm:text-lg font-black text-slate-900 mb-2">19. Mức độ thực hành trai kỳ hiện nay *</label>
+                            <select id="respDiet" required onchange="saveSurveyDraft(); updateSurveyProgress();" class="w-full px-3 py-2 text-xs sm:text-sm rounded-xl border border-[#e2d8c7] focus:outline-none focus:border-[#3b4982] bg-white transition">
                                 <option value="">-- Chọn mức độ trai kỳ --</option>
                                 <option value="Lục trai">Lục trai</option>
                                 <option value="Thập trai">Thập trai</option>
@@ -1500,8 +1500,8 @@
                         </div>
 
                         <div>
-                            <label class="block text-base sm:text-lg font-black text-slate-900 mb-2">2. Duy trì thời cúng & công phu hằng ngày *</label>
-                            <select id="respPractice" required onchange="saveSurveyDraft()" class="w-full px-3 py-2 text-xs sm:text-sm rounded-xl border border-[#e2d8c7] focus:outline-none focus:border-[#3b4982] bg-white transition">
+                            <label class="block text-base sm:text-lg font-black text-slate-900 mb-2">20. Duy trì thời cúng & công phu hằng ngày *</label>
+                            <select id="respPractice" required onchange="saveSurveyDraft(); updateSurveyProgress();" class="w-full px-3 py-2 text-xs sm:text-sm rounded-xl border border-[#e2d8c7] focus:outline-none focus:border-[#3b4982] bg-white transition">
                                 <option value="">-- Chọn tình trạng cúng kính --</option>
                                 <option value="Đều đặn mỗi ngày">Đều đặn hằng ngày tại Thánh thất hoặc Thiên bàn tư gia</option>
                                 <option value="2 - 3 thời/tuần">Thường xuyên 2 đến 3 thời mỗi tuần</option>
@@ -1511,8 +1511,8 @@
                         </div>
 
                         <div>
-                            <label class="block text-base sm:text-lg font-black text-slate-900 mb-2">3. Tình trạng tham gia phụng sự tại Họ đạo / GĐHĐ hiện nay *</label>
-                            <select id="respServiceStatus" required onchange="saveSurveyDraft()" class="w-full px-3 py-2 text-xs sm:text-sm rounded-xl border border-[#e2d8c7] focus:outline-none focus:border-[#3b4982] bg-white transition">
+                            <label class="block text-base sm:text-lg font-black text-slate-900 mb-2">21. Tình trạng tham gia phụng sự tại Họ đạo / GĐHĐ hiện nay *</label>
+                            <select id="respServiceStatus" required onchange="saveSurveyDraft(); updateSurveyProgress();" class="w-full px-3 py-2 text-xs sm:text-sm rounded-xl border border-[#e2d8c7] focus:outline-none focus:border-[#3b4982] bg-white transition">
                                 <option value="">-- Chọn tình trạng phụng sự --</option>
                                 <option value="Trực tiếp phụ trách thường xuyên">Đang trực tiếp phụ trách, hướng dẫn sinh hoạt con em nhà Đạo thường xuyên</option>
                                 <option value="Hỗ trợ các kỳ trại, đại lễ">Tham gia hỗ trợ các kỳ trại huấn luyện hoặc đại lễ khi được phân công</option>
@@ -1522,8 +1522,8 @@
                         </div>
 
                         <div>
-                            <label class="block text-base sm:text-lg font-black text-slate-900 mb-2">4. Khó khăn / Rào cản lớn nhất gặp phải trong tu học & phụng sự *</label>
-                            <select id="respChallenge" required onchange="saveSurveyDraft()" class="w-full px-3.5 py-2.5 text-sm sm:text-base rounded-xl border border-[#e2d8c7] focus:outline-none focus:border-[#3b4982] bg-white transition">
+                            <label class="block text-base sm:text-lg font-black text-slate-900 mb-2">22. Khó khăn / Rào cản lớn nhất gặp phải trong tu học & phụng sự *</label>
+                            <select id="respChallenge" required onchange="saveSurveyDraft(); updateSurveyProgress();" class="w-full px-3.5 py-2.5 text-sm sm:text-base rounded-xl border border-[#e2d8c7] focus:outline-none focus:border-[#3b4982] bg-white transition">
                                 <option value="">-- Chọn khó khăn lớn nhất --</option>
                                 <option value="Áp lực mưu sinh & quỹ thời gian hạn hẹp">Áp lực công việc mưu sinh, học tập và quỹ thời gian gia đình</option>
                                 <option value="Khoảng cách địa lý / đi lại xa xôi">Khoảng cách địa lý xa xôi, di chuyển sinh hoạt khó khăn</option>
@@ -1543,7 +1543,7 @@
                             <h3 class="font-bold text-[#3b4982] text-sm sm:text-base inline-block ml-2">
                                 <i class="fa-solid fa-comment-dots"></i> Ý Kiến Đóng Góp & Đề Xuất Cải Tiến Cho Chương Trình
                             </h3>
-                            <p class="text-xs sm:text-sm text-slate-500 mt-1">Kính mong Quý vị ghi nhận những đánh giá thực tế về ưu điểm, hạn chế và đề xuất giải pháp phát triển (Bắt buộc cả 4 câu).</p>
+                            <p class="text-xs sm:text-sm text-slate-500 mt-1">Kính mong Quý vị ghi nhận những đánh giá thực tế về ưu điểm, hạn chế và đề xuất giải pháp phát triển (Bắt buộc cả 4 câu: Mục 23 - 26).</p>
                         </div>
                         <span class="text-xs font-bold text-rose-600 bg-rose-50 px-2.5 py-1 rounded-lg border border-rose-200 self-start sm:self-auto flex items-center gap-1 shadow-2xs">
                             <i class="fa-solid fa-asterisk text-[10px]"></i> Bắt buộc trả lời
@@ -1551,48 +1551,48 @@
                     </div>
 
                     <div class="space-y-4">
-                        <!-- 1. MẶT ĐƯỢC -->
+                        <!-- 23. MẶT ĐƯỢC -->
                         <div>
                             <label class="block text-base sm:text-lg font-black text-emerald-900 mb-2 flex items-center justify-between gap-2">
                                 <span class="flex items-center gap-2">
                                     <i class="fa-solid fa-circle-check text-emerald-600"></i>
-                                    <span>1. Những mặt LÀM ĐƯỢC (Ưu điểm nổi bật của chương trình đào tạo & PTV):</span>
+                                    <span>23. Những mặt LÀM ĐƯỢC (Ưu điểm nổi bật của chương trình đào tạo & PTV):</span>
                                     <span class="text-rose-600 font-black text-base">*</span>
                                 </span>
                             </label>
                             <textarea id="respAdvantages" oninput="handleTextareaInput('respAdvantages')" rows="2" class="w-full text-sm sm:text-base p-3.5 rounded-xl border border-[#e2d8c7] focus:outline-none focus:border-[#3b4982] bg-[#fbf9f5] placeholder-slate-400 leading-relaxed transition text-justify" placeholder="Ví dụ: Giúp củng cố đức tin, trang bị lễ nghi bài bản, tinh thần kỷ luật trại huấn luyện tốt..."></textarea>
                         </div>
 
-                        <!-- 2. MẶT CHƯA ĐƯỢC -->
+                        <!-- 24. MẶT CHƯA ĐƯỢC -->
                         <div>
                             <label class="block text-base sm:text-lg font-black text-amber-900 mb-2 flex items-center justify-between gap-2">
                                 <span class="flex items-center gap-2">
                                     <i class="fa-solid fa-triangle-exclamation text-amber-600"></i>
-                                    <span>2. Những mặt CHƯA LÀM ĐƯỢC (Hạn chế, bất cập hoặc nội dung chưa thực tế):</span>
+                                    <span>24. Những mặt CHƯA LÀM ĐƯỢC (Hạn chế, bất cập hoặc nội dung chưa thực tế):</span>
                                     <span class="text-rose-600 font-black text-base">*</span>
                                 </span>
                             </label>
                             <textarea id="respDisadvantages" oninput="handleTextareaInput('respDisadvantages')" rows="2" class="w-full text-sm sm:text-base p-3.5 rounded-xl border border-[#e2d8c7] focus:outline-none focus:border-[#3b4982] bg-[#fbf9f5] placeholder-slate-400 leading-relaxed transition text-justify" placeholder="Ví dụ: Nặng lý thuyết, thiếu kỹ năng sư phạm hiện đại, thời gian hàm thụ quá gấp, thiếu công nghệ số..."></textarea>
                         </div>
 
-                        <!-- 3. THỰC TRẠNG PTV HIỆN NAY -->
+                        <!-- 25. THỰC TRẠNG PTV HIỆN NAY -->
                         <div>
                             <label class="block text-base sm:text-lg font-black text-[#2e3a68] mb-2 flex items-center justify-between gap-2">
                                 <span class="flex items-center gap-2">
                                     <i class="fa-solid fa-users-line text-[#3b4982]"></i>
-                                    <span>3. THỰC TRẠNG của Phổ Tế Viên sau khi tốt nghiệp hiện nay:</span>
+                                    <span>25. THỰC TRẠNG của Phổ Tế Viên sau khi tốt nghiệp hiện nay:</span>
                                     <span class="text-rose-600 font-black text-base">*</span>
                                 </span>
                             </label>
                             <textarea id="respReality" oninput="handleTextareaInput('respReality')" rows="2" class="w-full text-sm sm:text-base p-3.5 rounded-xl border border-[#e2d8c7] focus:outline-none focus:border-[#3b4982] bg-[#fbf9f5] placeholder-slate-400 leading-relaxed transition text-justify" placeholder="Ví dụ: Tỷ lệ tiếp tục gắn bó phụng sự tại Họ đạo, sự nhiệt huyết, khó khăn khi hòa nhập với việc đạo..."></textarea>
                         </div>
 
-                        <!-- 4. ĐỀ XUẤT CẢI TIẾN -->
+                        <!-- 26. ĐỀ XUẤT CẢI TIẾN -->
                         <div>
                             <label class="block text-base sm:text-lg font-black text-blue-900 mb-2 flex items-center justify-between gap-2">
                                 <span class="flex items-center gap-2">
                                     <i class="fa-solid fa-lightbulb text-amber-500"></i>
-                                    <span>4. Quý vị có ĐỀ XUẤT, KIẾN NGHỊ GÌ để cải tiến và phát triển chương trình?</span>
+                                    <span>26. Quý vị có ĐỀ XUẤT, KIẾN NGHỊ GÌ để cải tiến và phát triển chương trình?</span>
                                     <span class="text-rose-600 font-black text-base">*</span>
                                 </span>
                             </label>
@@ -2075,7 +2075,7 @@
             </span>
         </div>
         <span class="text-xs sm:text-sm font-black whitespace-nowrap tracking-wide">Gửi Khảo Sát</span>
-        <span id="floatingSubmitProgressBadge" class="text-[10px] sm:text-xs font-black bg-white/25 px-2 py-0.5 rounded-full border border-white/30 hidden sm:inline-block">0/18</span>
+        <span id="floatingSubmitProgressBadge" class="text-[10px] sm:text-xs font-black bg-white/25 px-2 py-0.5 rounded-full border border-white/30 hidden sm:inline-block">0/26</span>
     </button>
 
     <!-- FLOATING PROGRAM BUTTON (XEM KHUNG CHƯƠNG TRÌNH KHI Ở TRANG KHẢO SÁT) -->
@@ -3155,8 +3155,9 @@
                                     <div class="flex items-center gap-2 text-sm sm:text-base font-black text-rose-800 mb-2">
                                         <i class="fa-solid fa-triangle-exclamation text-rose-600 text-base flex-shrink-0"></i>
                                         <span>Lý do đánh giá chưa phù hợp & Điểm cần cải thiện (${q.label}):</span>
+                                        <span class="text-rose-600 font-black text-xs sm:text-sm">* (Bắt buộc)</span>
                                     </div>
-                                    <textarea id="reason_${q.id}" name="reason_${q.id}" oninput="saveSurveyDraft()" rows="2" class="w-full text-sm sm:text-base p-3.5 rounded-xl border border-rose-300 focus:ring-2 focus:ring-rose-500 bg-white placeholder-slate-400 outline-none leading-relaxed text-justify sm:text-left" placeholder="Quý vị vui lòng nêu ra một số điểm chưa phù hợp..."></textarea>
+                                    <textarea id="reason_${q.id}" name="reason_${q.id}" oninput="handleReasonInput('${q.id}')" rows="2" class="w-full text-sm sm:text-base p-3.5 rounded-xl border border-rose-300 focus:ring-2 focus:ring-rose-500 bg-white placeholder-slate-400 outline-none leading-relaxed text-justify sm:text-left transition" placeholder="Quý vị vui lòng nêu rõ lý do đánh giá chưa phù hợp (Bắt buộc phải nhập khi đánh giá dưới 3 điểm)..."></textarea>
                                 </div>
                             </div>
                         `).join('')}
@@ -3165,23 +3166,47 @@
             `).join('');
         }
 
-        // UPDATE SURVEY PROGRESS BAR
+        // UPDATE SURVEY PROGRESS BAR (TỔNG CỘNG 26 MỤC BẮT BUỘC: 18 LIKERT + 4 PHẦN 3 + 4 PHẦN 4)
         function updateSurveyProgress() {
-            if (!allLikertQuestions || allLikertQuestions.length === 0) return;
-            const totalQ = allLikertQuestions.length;
             let answered = 0;
-            allLikertQuestions.forEach(q => {
-                if (document.querySelector(`input[name="${q.id}"]:checked`)) answered++;
-            });
-            const percent = totalQ > 0 ? Math.round((answered / totalQ) * 100) : 0;
+            const totalMandatory = 26;
+
+            // 1. 18 câu Likert (1 - 18)
+            if (allLikertQuestions && allLikertQuestions.length > 0) {
+                allLikertQuestions.forEach(q => {
+                    if (document.querySelector(`input[name="${q.id}"]:checked`)) answered++;
+                });
+            }
+
+            // 2. 4 mục Phần 3: Tu học & phụng sự (19 - 22)
+            const diet = document.getElementById('respDiet');
+            if (diet && diet.value) answered++;
+            const practice = document.getElementById('respPractice');
+            if (practice && practice.value) answered++;
+            const service = document.getElementById('respServiceStatus');
+            if (service && service.value) answered++;
+            const challenge = document.getElementById('respChallenge');
+            if (challenge && challenge.value) answered++;
+
+            // 3. 4 mục Phần 4: Ý kiến định tính (23 - 26)
+            const adv = document.getElementById('respAdvantages');
+            if (adv && adv.value.trim()) answered++;
+            const disadv = document.getElementById('respDisadvantages');
+            if (disadv && disadv.value.trim()) answered++;
+            const reality = document.getElementById('respReality');
+            if (reality && reality.value.trim()) answered++;
+            const suggestions = document.getElementById('respSuggestions');
+            if (suggestions && suggestions.value.trim()) answered++;
+
+            const percent = Math.min(100, Math.round((answered / totalMandatory) * 100));
             const textEl = document.getElementById('surveyTopProgressText');
             const barEl = document.getElementById('surveyTopProgressBar');
-            if (textEl) textEl.innerText = `${answered} / ${totalQ} câu Likert (${percent}%)`;
+            if (textEl) textEl.innerText = `${answered} / ${totalMandatory} mục (${percent}%)`;
             if (barEl) barEl.style.width = `${percent}%`;
 
             const floatingBadge = document.getElementById('floatingSubmitProgressBadge');
             if (floatingBadge) {
-                floatingBadge.innerText = `${answered}/${totalQ}`;
+                floatingBadge.innerText = `${answered}/${totalMandatory}`;
             }
         }
 
@@ -3204,8 +3229,19 @@
                 }
             } else {
                 container.classList.add('hidden');
+                if (textarea) {
+                    textarea.classList.remove('ring-4', 'ring-rose-500', 'animate-pulse');
+                }
             }
             updateSurveyProgress();
+            saveSurveyDraft();
+        }
+
+        function handleReasonInput(qId) {
+            const textarea = document.getElementById(`reason_${qId}`);
+            if (textarea && textarea.value.trim()) {
+                textarea.classList.remove('ring-4', 'ring-rose-500', 'animate-pulse');
+            }
             saveSurveyDraft();
         }
 
@@ -3215,6 +3251,7 @@
                 el.classList.remove('ring-4', 'ring-rose-500', 'animate-pulse');
             }
             saveSurveyDraft();
+            updateSurveyProgress();
         }
 
         // --- SURVEY DRAFT PERSISTENCE (LƯU VÀ KHÔI PHỤC KHI CHUYỂN TAB) ---
@@ -3571,6 +3608,7 @@
                 let total = 0;
                 let count = 0;
                 const missingQuestions = [];
+                const missingReasons = [];
 
                 allLikertQuestions.forEach(q => {
                     const sel = document.querySelector(`input[name="${q.id}"]:checked`);
@@ -3584,8 +3622,11 @@
 
                         if (val < 3) {
                             const reasonEl = document.getElementById(`reason_${q.id}`);
-                            if (reasonEl && reasonEl.value.trim()) {
-                                reasons[q.id] = reasonEl.value.trim();
+                            const reasonText = reasonEl ? reasonEl.value.trim() : '';
+                            if (!reasonText) {
+                                missingReasons.push({ q: q, val: val, el: reasonEl });
+                            } else {
+                                reasons[q.id] = reasonText;
                             }
                         }
                     }
@@ -3608,53 +3649,78 @@
                     return;
                 }
 
-                // 5. Kiểm tra Phần 3: Tình trạng tu học & phụng sự
+                // BẮT BUỘC NHẬP LÝ DO ĐỐI VỚI TẤT CẢ CÁC CÂU CÓ ĐIỂM DƯỚI 3 (ĐIỂM 1 HOẶC 2)
+                if (missingReasons.length > 0) {
+                    const firstItem = missingReasons[0];
+                    const firstEl = firstItem.el || document.getElementById(`reason_${firstItem.q.id}`);
+                    const cardEl = document.getElementById(`q_card_${firstItem.q.id}`);
+
+                    // Đánh dấu viền đỏ nhấp nháy cho tất cả các ô lý do chưa nhập
+                    missingReasons.forEach(item => {
+                        const rEl = item.el || document.getElementById(`reason_${item.q.id}`);
+                        if (rEl) {
+                            rEl.classList.add('ring-4', 'ring-rose-500', 'animate-pulse');
+                        }
+                    });
+
+                    const alertMsg = missingReasons.length === 1
+                        ? `Quý vị đã đánh giá ${firstItem.val} điểm cho câu: "${firstItem.q.label}". Trường hợp điểm dưới 3, quý vị BẮT BUỘC phải nhập lý do đánh giá chưa phù hợp & điểm cần cải thiện trước khi nộp phiếu!`
+                        : `Có ${missingReasons.length} câu đánh giá dưới 3 điểm nhưng chưa nhập lý do (đầu tiên là câu: "${firstItem.q.label}"). Vui lòng nhập đầy đủ lý do giải trình trước khi nộp phiếu!`;
+
+                    showSubmitAlert(alertMsg, firstEl || cardEl);
+                    if (firstEl) {
+                        setTimeout(() => firstEl.focus(), 200);
+                    }
+                    return;
+                }
+
+                // 5. Kiểm tra Phần 3: Tình trạng tu học & phụng sự (Mục 19 - 22)
                 const dietSelect = document.getElementById('respDiet');
                 if (!dietSelect || !dietSelect.value) {
-                    showSubmitAlert("Quý vị vui lòng chọn mức độ 'Thực hành trai kỳ hiện nay' trong Phần 3!", dietSelect);
+                    showSubmitAlert("Quý vị vui lòng chọn mục '19. Mức độ thực hành trai kỳ hiện nay' trong Phần 3!", dietSelect);
                     return;
                 }
 
                 const practiceSelect = document.getElementById('respPractice');
                 if (!practiceSelect || !practiceSelect.value) {
-                    showSubmitAlert("Quý vị vui lòng chọn tình trạng 'Duy trì thời cúng & công phu' trong Phần 3!", practiceSelect);
+                    showSubmitAlert("Quý vị vui lòng chọn mục '20. Duy trì thời cúng & công phu hằng ngày' trong Phần 3!", practiceSelect);
                     return;
                 }
 
                 const serviceSelect = document.getElementById('respServiceStatus');
                 if (!serviceSelect || !serviceSelect.value) {
-                    showSubmitAlert("Quý vị vui lòng chọn 'Tình trạng tham gia phụng sự hiện nay' trong Phần 3!", serviceSelect);
+                    showSubmitAlert("Quý vị vui lòng chọn mục '21. Tình trạng tham gia phụng sự tại Họ đạo / GĐHĐ hiện nay' trong Phần 3!", serviceSelect);
                     return;
                 }
 
                 const challengeSelect = document.getElementById('respChallenge');
                 if (!challengeSelect || !challengeSelect.value) {
-                    showSubmitAlert("Quý vị vui lòng chọn 'Khó khăn / Rào cản lớn nhất' trong Phần 3!", challengeSelect);
+                    showSubmitAlert("Quý vị vui lòng chọn mục '22. Khó khăn / Rào cản lớn nhất gặp phải trong tu học & phụng sự' trong Phần 3!", challengeSelect);
                     return;
                 }
 
-                // 6. KIỂM TRA PHẦN 4: Ý KIẾN ĐÓNG GÓP & ĐỀ XUẤT CẢI TIẾN (BẮT BUỘC ĐỦ CẢ 4 CÂU)
+                // 6. KIỂM TRA PHẦN 4: Ý KIẾN ĐÓNG GÓP & ĐỀ XUẤT CẢI TIẾN (BẮT BUỘC CẢ 4 CÂU: MỤC 23 - 26)
                 const advInput = document.getElementById('respAdvantages');
                 if (!advInput || !advInput.value.trim()) {
-                    showSubmitAlert("Quý vị vui lòng nhập ý kiến cho mục '1. Những mặt LÀM ĐƯỢC (Ưu điểm nổi bật)' trong Phần 4!", advInput);
+                    showSubmitAlert("Quý vị vui lòng nhập ý kiến cho mục '23. Những mặt LÀM ĐƯỢC (Ưu điểm nổi bật)' trong Phần 4!", advInput);
                     return;
                 }
 
                 const disadvInput = document.getElementById('respDisadvantages');
                 if (!disadvInput || !disadvInput.value.trim()) {
-                    showSubmitAlert("Quý vị vui lòng nhập ý kiến cho mục '2. Những mặt CHƯA LÀM ĐƯỢC (Hạn chế, bất cập)' trong Phần 4!", disadvInput);
+                    showSubmitAlert("Quý vị vui lòng nhập ý kiến cho mục '24. Những mặt CHƯA LÀM ĐƯỢC (Hạn chế, bất cập)' trong Phần 4!", disadvInput);
                     return;
                 }
 
                 const realityInput = document.getElementById('respReality');
                 if (!realityInput || !realityInput.value.trim()) {
-                    showSubmitAlert("Quý vị vui lòng ghi nhận ý kiến cho mục '3. THỰC TRẠNG của Phổ Tế Viên sau khi tốt nghiệp hiện nay' trong Phần 4!", realityInput);
+                    showSubmitAlert("Quý vị vui lòng ghi nhận ý kiến cho mục '25. THỰC TRẠNG của Phổ Tế Viên sau khi tốt nghiệp hiện nay' trong Phần 4!", realityInput);
                     return;
                 }
 
                 const suggestionsInput = document.getElementById('respSuggestions');
                 if (!suggestionsInput || !suggestionsInput.value.trim()) {
-                    showSubmitAlert("Quý vị vui lòng nêu ý kiến cho mục '4. ĐỀ XUẤT, KIẾN NGHỊ để cải tiến và phát triển chương trình' trong Phần 4!", suggestionsInput);
+                    showSubmitAlert("Quý vị vui lòng nêu ý kiến cho mục '26. Quý vị có ĐỀ XUẤT, KIẾN NGHỊ GÌ để cải tiến và phát triển chương trình?' trong Phần 4!", suggestionsInput);
                     return;
                 }
 
@@ -5027,20 +5093,20 @@
                     <!-- THỰC HÀNH TU HỌC -->
                     <div class="bg-blue-50/60 p-4 rounded-2xl border border-blue-200 space-y-1.5">
                         <div class="font-bold text-[#3b4982] text-xs sm:text-sm uppercase tracking-wide">
-                            <i class="fa-solid fa-hands-praying mr-1"></i> Thực Trạng Tu Học & Phụng Sự:
+                            <i class="fa-solid fa-hands-praying mr-1"></i> Thực Trạng Tu Học & Phụng Sự (Mục 19 - 22):
                         </div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs sm:text-sm">
-                            <div>• Trai kỳ: <strong>${r.diet || '--'}</strong></div>
-                            <div>• Thời cúng: <strong>${r.practice || '--'}</strong></div>
-                            <div>• Phụng sự: <strong>${r.serviceStatus || '--'}</strong></div>
-                            <div>• Rào cản lớn nhất: <strong>${r.challenge || 'Không có'}</strong></div>
+                            <div>• <strong>19. Trai kỳ:</strong> <span class="font-bold text-slate-800">${r.diet || '--'}</span></div>
+                            <div>• <strong>20. Thời cúng:</strong> <span class="font-bold text-slate-800">${r.practice || '--'}</span></div>
+                            <div>• <strong>21. Phụng sự:</strong> <span class="font-bold text-slate-800">${r.serviceStatus || '--'}</span></div>
+                            <div>• <strong>22. Rào cản lớn nhất:</strong> <span class="font-bold text-slate-800">${r.challenge || 'Không có'}</span></div>
                         </div>
                     </div>
 
                     <!-- CÂU HỎI LIKERT -->
                     <div class="space-y-2">
                         <div class="font-bold text-slate-800 text-xs sm:text-sm uppercase tracking-wide border-b pb-1">
-                            <i class="fa-solid fa-list-check mr-1 text-[#3b4982]"></i> Kết Quả Đánh Giá ${allLikertQuestions.length} Câu Likert:
+                            <i class="fa-solid fa-list-check mr-1 text-[#3b4982]"></i> Kết Quả Đánh Giá 18 Câu Likert (Mục 1 - 18):
                         </div>
                         <div class="space-y-1.5 max-h-60 overflow-y-auto pr-1">
                 `;
@@ -5064,7 +5130,7 @@
                         <div class="p-2.5 rounded-xl border border-slate-200 bg-white flex items-start justify-between gap-2.5 text-xs hover:bg-slate-50 transition">
                             <div class="flex-grow">
                                 <span class="font-bold text-slate-800 leading-snug">${q.label}</span>
-                                ${reason ? `<div class="text-rose-600 italic mt-0.5">⚠️ Lý do < 3đ: ${reason}</div>` : ''}
+                                ${reason ? `<div class="text-rose-600 italic mt-0.5 font-semibold">⚠️ Lý do < 3đ: ${reason}</div>` : ''}
                                 ${rawScore === 0 ? `<div class="text-amber-700 font-medium italic mt-0.5 text-[11px]"><i class="fa-solid fa-circle-info mr-1"></i>Phiếu nộp từ phiên bản trước khi bổ sung câu hỏi này (hoặc chưa ghi nhận điểm).</div>` : ''}
                             </div>
                             <div class="flex-shrink-0">
@@ -5080,12 +5146,12 @@
                 html += `
                     <div class="space-y-2 pt-2 border-t border-slate-200">
                         <div class="font-bold text-slate-800 text-xs sm:text-sm uppercase tracking-wide">
-                            <i class="fa-solid fa-pen-nib mr-1 text-[#3b4982]"></i> Ý Kiến Đóng Góp Định Tính:
+                            <i class="fa-solid fa-pen-nib mr-1 text-[#3b4982]"></i> Ý Kiến Đóng Góp Định Tính (Mục 23 - 26):
                         </div>
-                        ${r.advantages ? `<div class="p-3 bg-emerald-50 rounded-xl border border-emerald-200"><span class="font-bold text-emerald-800 block text-xs">Mặt làm được:</span><p class="text-slate-700 italic mt-0.5">${r.advantages}</p></div>` : ''}
-                        ${r.disadvantages ? `<div class="p-3 bg-amber-50 rounded-xl border border-amber-200"><span class="font-bold text-amber-800 block text-xs">Mặt chưa làm được:</span><p class="text-slate-700 italic mt-0.5">${r.disadvantages}</p></div>` : ''}
-                        ${r.reality ? `<div class="p-3 bg-blue-50 rounded-xl border border-blue-200"><span class="font-bold text-[#3b4982] block text-xs">Thực trạng PTV:</span><p class="text-slate-700 italic mt-0.5">${r.reality}</p></div>` : ''}
-                        ${r.suggestions ? `<div class="p-3 bg-indigo-50 rounded-xl border border-indigo-200"><span class="font-bold text-indigo-900 block text-xs">Kiến nghị & đề xuất:</span><p class="text-slate-700 italic mt-0.5">${r.suggestions}</p></div>` : ''}
+                        ${r.advantages ? `<div class="p-3 bg-emerald-50 rounded-xl border border-emerald-200"><span class="font-bold text-emerald-800 block text-xs">23. Những mặt làm được:</span><p class="text-slate-700 italic mt-0.5">${r.advantages}</p></div>` : ''}
+                        ${r.disadvantages ? `<div class="p-3 bg-amber-50 rounded-xl border border-amber-200"><span class="font-bold text-amber-800 block text-xs">24. Những mặt chưa làm được:</span><p class="text-slate-700 italic mt-0.5">${r.disadvantages}</p></div>` : ''}
+                        ${r.reality ? `<div class="p-3 bg-blue-50 rounded-xl border border-blue-200"><span class="font-bold text-[#3b4982] block text-xs">25. Thực trạng PTV sau tốt nghiệp:</span><p class="text-slate-700 italic mt-0.5">${r.reality}</p></div>` : ''}
+                        ${r.suggestions ? `<div class="p-3 bg-indigo-50 rounded-xl border border-indigo-200"><span class="font-bold text-indigo-900 block text-xs">26. Kiến nghị & đề xuất:</span><p class="text-slate-700 italic mt-0.5">${r.suggestions}</p></div>` : ''}
                     </div>
                 `;
 

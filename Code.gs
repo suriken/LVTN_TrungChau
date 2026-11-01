@@ -475,33 +475,85 @@ function handleSubmitSurvey(data, sheet) {
     });
   }
 
-  // KIỂM TRA BẮT BUỘC CẢ 4 MỤC Ý KIẾN ĐÓNG GÓP TRONG PHẦN 4
+  // KIỂM TRA BẮT BUỘC NHẬP LÝ DO ĐỐI VỚI CÂU ĐÁNH GIÁ DƯỚI 3 ĐIỂM (ĐIỂM 1 HOẶC 2)
+  var reasons = data.reasons || {};
+  var missingReasons = [];
+  for (var k = 0; k < Q_KEYS.length; k++) {
+    var qk = Q_KEYS[k];
+    var val = parseFloat(scores[qk]);
+    if (val < 3) {
+      var rText = (reasons[qk] || "").toString().trim();
+      if (!rText) {
+        missingReasons.push(qk);
+      }
+    }
+  }
+
+  if (missingReasons.length > 0) {
+    return createJsonResponse({
+      success: false,
+      result: "error",
+      message: "Có " + missingReasons.length + " câu đánh giá dưới 3 điểm nhưng chưa có lý do. Trường hợp điểm dưới 3, hệ thống BẮT BUỘC phải nhập lý do đánh giá chưa phù hợp & điểm cần cải thiện trước khi nộp phiếu!"
+    });
+  }
+
+  // KIỂM TRA BẮT BUỘC CẢ 4 MỤC PHẦN 3: TU HỌC & PHỤNG SỰ (MỤC 19 - 22)
+  if (!data.diet || !data.diet.toString().trim()) {
+    return createJsonResponse({
+      success: false,
+      result: "error",
+      message: "Vui lòng chọn mục '19. Mức độ thực hành trai kỳ hiện nay' trong Phần 3 trước khi gửi!"
+    });
+  }
+  if (!data.practice || !data.practice.toString().trim()) {
+    return createJsonResponse({
+      success: false,
+      result: "error",
+      message: "Vui lòng chọn mục '20. Duy trì thời cúng & công phu hằng ngày' trong Phần 3 trước khi gửi!"
+    });
+  }
+  if (!data.serviceStatus || !data.serviceStatus.toString().trim()) {
+    return createJsonResponse({
+      success: false,
+      result: "error",
+      message: "Vui lòng chọn mục '21. Tình trạng tham gia phụng sự tại Họ đạo / GĐHĐ hiện nay' trong Phần 3 trước khi gửi!"
+    });
+  }
+  if (!data.challenge || !data.challenge.toString().trim()) {
+    return createJsonResponse({
+      success: false,
+      result: "error",
+      message: "Vui lòng chọn mục '22. Khó khăn / Rào cản lớn nhất gặp phải trong tu học & phụng sự' trong Phần 3 trước khi gửi!"
+    });
+  }
+
+  // KIỂM TRA BẮT BUỘC CẢ 4 MỤC Ý KIẾN ĐÓNG GÓP TRONG PHẦN 4 (MỤC 23 - 26)
   if (!data.advantages || !data.advantages.toString().trim()) {
     return createJsonResponse({
       success: false,
       result: "error",
-      message: "Vui lòng nhập ý kiến cho mục '1. Những mặt LÀM ĐƯỢC' trong Phần 4 trước khi gửi!"
+      message: "Vui lòng nhập ý kiến cho mục '23. Những mặt LÀM ĐƯỢC' trong Phần 4 trước khi gửi!"
     });
   }
   if (!data.disadvantages || !data.disadvantages.toString().trim()) {
     return createJsonResponse({
       success: false,
       result: "error",
-      message: "Vui lòng nhập ý kiến cho mục '2. Những mặt CHƯA LÀM ĐƯỢC' trong Phần 4 trước khi gửi!"
+      message: "Vui lòng nhập ý kiến cho mục '24. Những mặt CHƯA LÀM ĐƯỢC' trong Phần 4 trước khi gửi!"
     });
   }
   if (!data.reality || !data.reality.toString().trim()) {
     return createJsonResponse({
       success: false,
       result: "error",
-      message: "Vui lòng ghi nhận ý kiến cho mục '3. THỰC TRẠNG của Phổ Tế Viên sau tốt nghiệp' trong Phần 4 trước khi gửi!"
+      message: "Vui lòng ghi nhận ý kiến cho mục '25. THỰC TRẠNG của Phổ Tế Viên sau tốt nghiệp' trong Phần 4 trước khi gửi!"
     });
   }
   if (!data.suggestions || !data.suggestions.toString().trim()) {
     return createJsonResponse({
       success: false,
       result: "error",
-      message: "Vui lòng nêu ý kiến cho mục '4. ĐỀ XUẤT, KIẾN NGHỊ cải tiến chương trình' trong Phần 4 trước khi gửi!"
+      message: "Vui lòng nêu ý kiến cho mục '26. ĐỀ XUẤT, KIẾN NGHỊ cải tiến chương trình' trong Phần 4 trước khi gửi!"
     });
   }
 
