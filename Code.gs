@@ -324,12 +324,31 @@ function handleLogin(data, sheet) {
   }
 }
 
-// 2. XỬ LÝ LƯU HOẶC GHI ĐÈ PHIẾU KHẢO SÁT VÀO GOOGLE SHEET (48 CỘT TƯỜNG MINH)
+// 2. XỬ LÝ LƯU HOẶC GHI ĐÈ PHIẾU KHẢO SÁT VÀO GOOGLE SHEET (54 CỘT TƯỜNG MINH)
 function handleSubmitSurvey(data, sheet) {
   var targetId = (data.id || "").toString().trim();
   if (!targetId) {
     targetId = "PTV-" + Math.floor(100000 + Math.random() * 900000);
     data.id = targetId;
+  }
+
+  // KIỂM TRA TÍNH TOÀN VẸN CỦA ĐIỂM SỐ LIKERT (BẮT BUỘC ĐỦ 18 CÂU VÀ TỪ 1 ĐẾN 5 ĐIỂM)
+  var scores = data.scores || {};
+  var missingOrInvalid = [];
+  for (var k = 0; k < Q_KEYS.length; k++) {
+    var qk = Q_KEYS[k];
+    var val = parseFloat(scores[qk]);
+    if (isNaN(val) || val < 1 || val > 5) {
+      missingOrInvalid.push(qk);
+    }
+  }
+
+  if (missingOrInvalid.length > 0) {
+    return createJsonResponse({
+      success: false,
+      result: "error",
+      message: "Phiếu khảo sát chưa hợp lệ: Có " + missingOrInvalid.length + " câu Likert chưa được đánh giá đầy đủ (thang điểm hợp lệ từ 1 đến 5). Vui lòng hoàn thành toàn bộ 18 câu trước khi nộp!"
+    });
   }
 
   var rowData = buildRowData(data);

@@ -3144,6 +3144,12 @@
             const textarea = document.getElementById(`reason_${qId}`);
             if (!container) return;
 
+            // Xóa viền đỏ cảnh báo nếu câu này vừa được chọn điểm
+            const cardEl = document.getElementById(`q_card_${qId}`);
+            if (cardEl) {
+                cardEl.classList.remove('ring-4', 'ring-rose-500', 'animate-pulse');
+            }
+
             if (val < 3) {
                 container.classList.remove('hidden');
                 if (shouldFocus && textarea && !textarea.value.trim()) {
@@ -3450,10 +3456,11 @@
 
             if (targetEl) {
                 try {
+                    targetEl.tabIndex = -1;
                     targetEl.focus();
                     targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    targetEl.classList.add('ring-4', 'ring-rose-500');
-                    setTimeout(() => targetEl.classList.remove('ring-4', 'ring-rose-500'), 3000);
+                    targetEl.classList.add('ring-4', 'ring-rose-500', 'animate-pulse');
+                    setTimeout(() => targetEl.classList.remove('ring-4', 'ring-rose-500', 'animate-pulse'), 3500);
                 } catch (e) {
                     console.error("Scroll error:", e);
                 }
@@ -3503,17 +3510,19 @@
                     return;
                 }
 
-                // 4. Kiểm tra 15 câu Likert
+                // 4. KIỂM TRA ĐẦY ĐỦ 18 CÂU LIKERT (NGHIÊM NGẶT: BẮT BUỘC 100% PHẢI CÓ ĐIỂM TỪ 1 ĐẾN 5)
                 const scores = {};
                 const reasons = {};
                 let total = 0;
                 let count = 0;
-                let firstUnansweredQ = null;
+                const missingQuestions = [];
 
                 allLikertQuestions.forEach(q => {
                     const sel = document.querySelector(`input[name="${q.id}"]:checked`);
-                    if (sel) {
-                        const val = parseInt(sel.value);
+                    const val = sel ? parseInt(sel.value, 10) : 0;
+                    if (!sel || isNaN(val) || val < 1 || val > 5) {
+                        missingQuestions.push(q);
+                    } else {
                         scores[q.id] = val;
                         total += val;
                         count++;
@@ -3524,16 +3533,23 @@
                                 reasons[q.id] = reasonEl.value.trim();
                             }
                         }
-                    } else {
-                        if (!firstUnansweredQ) {
-                            firstUnansweredQ = q;
-                        }
                     }
                 });
 
-                if (firstUnansweredQ) {
-                    const cardEl = document.getElementById(`q_card_${firstUnansweredQ.id}`);
-                    showSubmitAlert(`Quý vị vui lòng hoàn thành câu đánh giá: "${firstUnansweredQ.label}"!`, cardEl);
+                // Nếu còn bất kỳ câu nào chưa chọn điểm (hoặc điểm = 0), TUYỆT ĐỐI CHẶN NỘP BÁO CÁO VÀ CUỘN ĐẾN CÂU ĐÓ
+                if (missingQuestions.length > 0) {
+                    const firstMissing = missingQuestions[0];
+                    const cardEl = document.getElementById(`q_card_${firstMissing.id}`);
+                    const alertMsg = missingQuestions.length === 1
+                        ? `Quý vị còn 1 câu chưa đánh giá! Vui lòng chọn điểm (thang điểm 1 - 5) cho câu: "${firstMissing.label}" trước khi nộp phiếu!`
+                        : `Quý vị còn ${missingQuestions.length} câu chưa đánh giá (đầu tiên là câu: "${firstMissing.label}")! Vui lòng chọn điểm đầy đủ từ 1 đến 5 cho toàn bộ 18 câu trước khi nộp phiếu!`;
+                    showSubmitAlert(alertMsg, cardEl);
+                    return;
+                }
+
+                // Kiểm tra chéo số lượng câu trả lời
+                if (count !== allLikertQuestions.length || Object.keys(scores).length !== allLikertQuestions.length) {
+                    showSubmitAlert(`Hệ thống yêu cầu đánh giá đầy đủ toàn bộ ${allLikertQuestions.length} câu hỏi Likert (hiện mới hoàn thành ${count}/${allLikertQuestions.length} câu). Xin vui lòng kiểm tra lại!`);
                     return;
                 }
 
@@ -3863,24 +3879,28 @@
                 const scoresObj = res.scores || {};
                 const reasonsObj = res.reasons || {};
 
-                // 1. Phân tích chi tiết 4 Trụ Cột Đào Tạo
+                // 1. Phân tích chi tiết 4 Trụ Cột Đào Tạo (chỉ tính các câu có điểm hợp lệ từ 1 - 5)
                 const pillarAnalysis = surveyPillars.map(pillar => {
                     let pSum = 0;
+                    let pCount = 0;
                     const lowInPillar = [];
                     const medInPillar = [];
                     const goodInPillar = [];
 
                     pillar.questions.forEach(q => {
-                        const score = (scoresObj[q.id] !== undefined && scoresObj[q.id] !== null) ? parseFloat(scoresObj[q.id]) : 0;
-                        pSum += score;
-                        const reason = (reasonsObj && reasonsObj[q.id]) ? reasonsObj[q.id] : "";
-                        const item = { ...q, score, reason };
-                        if (score < 3) lowInPillar.push(item);
-                        else if (score === 3) medInPillar.push(item);
-                        else goodInPillar.push(item);
+                        const rawVal = (scoresObj && scoresObj[q.id] !== undefined && scoresObj[q.id] !== null && scoresObj[q.id] !== '') ? parseFloat(scoresObj[q.id]) : 0;
+                        if (rawVal >= 1 && rawVal <= 5) {
+                            pSum += rawVal;
+                            pCount++;
+                            const reason = (reasonsObj && reasonsObj[q.id]) ? reasonsObj[q.id] : "";
+                            const item = { ...q, score: rawVal, reason };
+                            if (rawVal < 3) lowInPillar.push(item);
+                            else if (rawVal === 3) medInPillar.push(item);
+                            else goodInPillar.push(item);
+                        }
                     });
 
-                    const avg = pillar.questions.length > 0 ? parseFloat((pSum / pillar.questions.length).toFixed(2)) : 0;
+                    const avg = pCount > 0 ? parseFloat((pSum / pCount).toFixed(2)) : 0;
                     return {
                         pillar,
                         avg,
@@ -3892,19 +3912,21 @@
 
                 const pillarAvg = pillarAnalysis.map(pa => pa.avg);
 
-                // 2. Phân loại toàn bộ 18 câu hỏi thành 3 nhóm rõ ràng
+                // 2. Phân loại toàn bộ câu hỏi thành 3 nhóm rõ ràng (chỉ lấy các câu đã chấm từ 1 - 5 điểm)
                 const allLowItems = [];
                 const allMedItems = [];
                 const allGoodItems = [];
 
                 surveyPillars.forEach(p => {
                     p.questions.forEach(q => {
-                        const score = (scoresObj[q.id] !== undefined && scoresObj[q.id] !== null) ? parseFloat(scoresObj[q.id]) : 0;
-                        const reason = (reasonsObj && reasonsObj[q.id]) ? reasonsObj[q.id] : "";
-                        const item = { ...q, score, reason, pillarTitle: p.title, pillarCode: p.code };
-                        if (score < 3) allLowItems.push(item);
-                        else if (score === 3) allMedItems.push(item);
-                        else allGoodItems.push(item);
+                        const rawVal = (scoresObj && scoresObj[q.id] !== undefined && scoresObj[q.id] !== null && scoresObj[q.id] !== '') ? parseFloat(scoresObj[q.id]) : 0;
+                        if (rawVal >= 1 && rawVal <= 5) {
+                            const reason = (reasonsObj && reasonsObj[q.id]) ? reasonsObj[q.id] : "";
+                            const item = { ...q, score: rawVal, reason, pillarTitle: p.title, pillarCode: p.code };
+                            if (rawVal < 3) allLowItems.push(item);
+                            else if (rawVal === 3) allMedItems.push(item);
+                            else allGoodItems.push(item);
+                        }
                     });
                 });
 
@@ -4705,17 +4727,30 @@
                 `;
 
                 allLikertQuestions.forEach((q, idx) => {
-                    const score = (r.scores && r.scores[q.id]) ? r.scores[q.id] : 0;
+                    const rawScore = (r.scores && r.scores[q.id] !== undefined && r.scores[q.id] !== null && r.scores[q.id] !== '') ? parseInt(r.scores[q.id], 10) : 0;
                     const reason = (r.reasons && r.reasons[q.id]) ? r.reasons[q.id] : '';
+
+                    let badgeHtml = '';
+                    if (rawScore >= 4) {
+                        badgeHtml = `<span class="px-2.5 py-0.5 rounded font-black text-xs text-white bg-emerald-600 shadow-2xs">${rawScore} điểm</span>`;
+                    } else if (rawScore === 3) {
+                        badgeHtml = `<span class="px-2.5 py-0.5 rounded font-black text-xs text-white bg-amber-500 shadow-2xs">${rawScore} điểm</span>`;
+                    } else if (rawScore >= 1) {
+                        badgeHtml = `<span class="px-2.5 py-0.5 rounded font-black text-xs text-white bg-rose-600 shadow-2xs">${rawScore} điểm</span>`;
+                    } else {
+                        badgeHtml = `<span class="px-2.5 py-0.5 rounded font-bold text-xs text-slate-500 bg-slate-100 border border-slate-300">Chưa đánh giá</span>`;
+                    }
+
                     html += `
-                        <div class="p-2 rounded-xl border border-slate-200 bg-white flex items-start justify-between gap-2 text-xs">
+                        <div class="p-2.5 rounded-xl border border-slate-200 bg-white flex items-start justify-between gap-2.5 text-xs hover:bg-slate-50 transition">
                             <div class="flex-grow">
-                                <span class="font-bold text-slate-800">${idx + 1}. ${q.label}</span>
+                                <span class="font-bold text-slate-800 leading-snug">${q.label}</span>
                                 ${reason ? `<div class="text-rose-600 italic mt-0.5">⚠️ Lý do < 3đ: ${reason}</div>` : ''}
+                                ${rawScore === 0 ? `<div class="text-amber-700 font-medium italic mt-0.5 text-[11px]"><i class="fa-solid fa-circle-info mr-1"></i>Phiếu nộp từ phiên bản trước khi bổ sung câu hỏi này (hoặc chưa ghi nhận điểm).</div>` : ''}
                             </div>
-                            <span class="px-2 py-0.5 rounded font-black text-xs text-white ${score >= 4 ? 'bg-emerald-600' : (score === 3 ? 'bg-amber-500' : 'bg-rose-600')}">
-                                ${score} điểm
-                            </span>
+                            <div class="flex-shrink-0">
+                                ${badgeHtml}
+                            </div>
                         </div>
                     `;
                 });
