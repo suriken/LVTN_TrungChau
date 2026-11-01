@@ -1876,8 +1876,11 @@
                             <p class="text-xs text-slate-500">Tra cứu, xem chi tiết đánh giá của từng Huynh trưởng</p>
                         </div>
                     </div>
-                    <div class="w-full sm:w-72">
-                        <input type="text" id="adminSearchInput" oninput="renderAdminResponsesTable()" placeholder="Tìm theo tên, đơn vị, vai trò..." class="w-full px-3.5 py-2 text-xs sm:text-sm rounded-xl border border-[#e2d8c7] focus:outline-none focus:border-[#3b4982] bg-[#fbf9f5]">
+                    <div class="relative w-full sm:w-72">
+                        <input type="text" id="adminSearchInput" oninput="filterAdminDashboard()" placeholder="Tìm theo tên, đơn vị, vai trò..." class="w-full pl-3.5 pr-8 py-2 text-xs sm:text-sm rounded-xl border border-[#e2d8c7] focus:outline-none focus:border-[#3b4982] bg-[#fbf9f5]">
+                        <button type="button" onclick="clearAdminSearch()" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer text-xs" title="Xóa tìm kiếm">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
                     </div>
                 </div>
 
@@ -5004,22 +5007,42 @@
             renderAdminFeedbackCards();
         }
 
+        // LỌC DỮ LIỆU BẢNG QUẢN TRỊ & Ý KIẾN THEO TỪ KHÓA TÌM KIẾM
+        function getFilteredAdminResponses() {
+            const searchInput = document.getElementById('adminSearchInput');
+            const query = searchInput ? searchInput.value.trim().toLowerCase() : '';
+            if (!query) return surveyResponses || [];
+
+            return (surveyResponses || []).filter(r => {
+                if (!r) return false;
+                const name = (r.name || '').toLowerCase();
+                const unit = (r.unit || '').toLowerCase();
+                const role = (r.role || '').toLowerCase();
+                const id = (r.id || '').toLowerCase();
+                const phone = (r.phone || '').toLowerCase();
+                const gradLevel = (r.gradLevel || '').toLowerCase();
+                const tenure = (r.tenure || '').toLowerCase();
+                return name.includes(query) || unit.includes(query) || role.includes(query) || id.includes(query) || phone.includes(query) || gradLevel.includes(query) || tenure.includes(query);
+            });
+        }
+
+        function filterAdminDashboard() {
+            renderAdminResponsesTable();
+            renderAdminFeedbackCards();
+        }
+
+        function clearAdminSearch() {
+            const input = document.getElementById('adminSearchInput');
+            if (input) input.value = '';
+            filterAdminDashboard();
+        }
+
         // RENDER ADMIN RESPONSES TABLE
         function renderAdminResponsesTable() {
             const tbody = document.getElementById('adminResponsesTableBody');
             if (!tbody) return;
 
-            const searchInput = document.getElementById('adminSearchInput');
-            const query = searchInput ? searchInput.value.trim().toLowerCase() : '';
-
-            const filtered = surveyResponses.filter(r => {
-                if (!query) return true;
-                const name = (r.name || '').toLowerCase();
-                const unit = (r.unit || '').toLowerCase();
-                const role = (r.role || '').toLowerCase();
-                const id = (r.id || '').toLowerCase();
-                return name.includes(query) || unit.includes(query) || role.includes(query) || id.includes(query);
-            });
+            const filtered = getFilteredAdminResponses();
 
             if (filtered.length === 0) {
                 tbody.innerHTML = `
@@ -5291,29 +5314,42 @@
             openDeleteSingleModal(respId);
         }
 
-        // RENDER ADMIN FEEDBACK CARDS (CHIA THEO 4 NHÓM Ý KIẾN)
+        // RENDER ADMIN FEEDBACK CARDS (CHIA THEO 4 NHÓM Ý KIẾN & TỰ ĐỘNG LỌC THEO TỪ KHÓA)
         function renderAdminFeedbackCards() {
             const container = document.getElementById('adminFeedbackContainer');
             if (!container) return;
+
+            const searchInput = document.getElementById('adminSearchInput');
+            const query = searchInput ? searchInput.value.trim() : '';
+            const filtered = getFilteredAdminResponses();
 
             const advList = [];
             const disList = [];
             const realList = [];
             const sugList = [];
 
-            surveyResponses.forEach(r => {
-                const author = `${r.name || 'Ẩn danh'} (${r.role || 'PTV'})`;
-                if (r.advantages) advList.push({ author, text: r.advantages });
-                if (r.disadvantages) disList.push({ author, text: r.disadvantages });
-                if (r.reality) realList.push({ author, text: r.reality });
-                if (r.suggestions) sugList.push({ author, text: r.suggestions });
+            filtered.forEach(r => {
+                if (!r) return;
+                const author = `${r.name || 'Ẩn danh'} (${r.role || 'PTV'}${r.unit ? ' • ' + r.unit : ''})`;
+                if (r.advantages && r.advantages.trim()) advList.push({ author, text: r.advantages });
+                if (r.disadvantages && r.disadvantages.trim()) disList.push({ author, text: r.disadvantages });
+                if (r.reality && r.reality.trim()) realList.push({ author, text: r.reality });
+                if (r.suggestions && r.suggestions.trim()) sugList.push({ author, text: r.suggestions });
             });
 
+            const filterNotice = query
+                ? `<div class="col-span-1 md:col-span-2 p-2.5 bg-amber-50 rounded-xl border border-amber-200 text-xs font-semibold text-amber-800 flex items-center justify-between">
+                     <span><i class="fa-solid fa-filter mr-1.5 text-amber-600"></i> Đang lọc ý kiến theo từ khóa: <strong class="text-amber-900 font-bold">"${query}"</strong> (Hiển thị ${filtered.length}/${surveyResponses.length} phiếu)</span>
+                     <button type="button" onclick="clearAdminSearch()" class="text-rose-600 hover:text-rose-800 underline font-bold cursor-pointer">Xóa bộ lọc</button>
+                   </div>`
+                : '';
+
             container.innerHTML = `
+                ${filterNotice}
                 <!-- 1. MẶT LÀM ĐƯỢC -->
                 <div class="bg-emerald-50/70 p-4 rounded-2xl border border-emerald-200 space-y-2.5">
                     <div class="font-black text-emerald-900 text-xs sm:text-sm uppercase flex items-center justify-between">
-                        <span><i class="fa-solid fa-circle-check text-emerald-600 mr-1.5"></i> Những Mặt Làm Được (${advList.length})</span>
+                        <span><i class="fa-solid fa-circle-check text-emerald-600 mr-1.5"></i> 23. Những Mặt Làm Được (${advList.length})</span>
                     </div>
                     <div class="space-y-2 max-h-56 overflow-y-auto pr-1 text-xs">
                         ${advList.length > 0 ? advList.map(item => `
@@ -5321,14 +5357,14 @@
                                 <p class="text-slate-700 italic leading-relaxed">"${item.text}"</p>
                                 <span class="text-[10px] font-bold text-emerald-700 block text-right mt-1">— ${item.author}</span>
                             </div>
-                        `).join('') : '<p class="text-slate-400 italic text-xs">Chưa có ý kiến nào.</p>'}
+                        `).join('') : '<p class="text-slate-400 italic text-xs">Không có ý kiến nào phù hợp với bộ lọc.</p>'}
                     </div>
                 </div>
 
                 <!-- 2. MẶT CHƯA ĐƯỢC -->
                 <div class="bg-amber-50/70 p-4 rounded-2xl border border-amber-200 space-y-2.5">
                     <div class="font-black text-amber-900 text-xs sm:text-sm uppercase flex items-center justify-between">
-                        <span><i class="fa-solid fa-triangle-exclamation text-amber-600 mr-1.5"></i> Mặt Chưa Làm Được (${disList.length})</span>
+                        <span><i class="fa-solid fa-triangle-exclamation text-amber-600 mr-1.5"></i> 24. Mặt Chưa Làm Được (${disList.length})</span>
                     </div>
                     <div class="space-y-2 max-h-56 overflow-y-auto pr-1 text-xs">
                         ${disList.length > 0 ? disList.map(item => `
@@ -5336,14 +5372,14 @@
                                 <p class="text-slate-700 italic leading-relaxed">"${item.text}"</p>
                                 <span class="text-[10px] font-bold text-amber-700 block text-right mt-1">— ${item.author}</span>
                             </div>
-                        `).join('') : '<p class="text-slate-400 italic text-xs">Chưa có ý kiến nào.</p>'}
+                        `).join('') : '<p class="text-slate-400 italic text-xs">Không có ý kiến nào phù hợp với bộ lọc.</p>'}
                     </div>
                 </div>
 
                 <!-- 3. THỰC TRẠNG PTV -->
                 <div class="bg-blue-50/70 p-4 rounded-2xl border border-blue-200 space-y-2.5">
                     <div class="font-black text-[#3b4982] text-xs sm:text-sm uppercase flex items-center justify-between">
-                        <span><i class="fa-solid fa-users-line text-[#3b4982] mr-1.5"></i> Thực Trạng PTV Hiện Nay (${realList.length})</span>
+                        <span><i class="fa-solid fa-users-line text-[#3b4982] mr-1.5"></i> 25. Thực Trạng PTV Hiện Nay (${realList.length})</span>
                     </div>
                     <div class="space-y-2 max-h-56 overflow-y-auto pr-1 text-xs">
                         ${realList.length > 0 ? realList.map(item => `
@@ -5351,14 +5387,14 @@
                                 <p class="text-slate-700 italic leading-relaxed">"${item.text}"</p>
                                 <span class="text-[10px] font-bold text-[#3b4982] block text-right mt-1">— ${item.author}</span>
                             </div>
-                        `).join('') : '<p class="text-slate-400 italic text-xs">Chưa có ý kiến nào.</p>'}
+                        `).join('') : '<p class="text-slate-400 italic text-xs">Không có ý kiến nào phù hợp với bộ lọc.</p>'}
                     </div>
                 </div>
 
                 <!-- 4. KIẾN NGHỊ & ĐỀ XUẤT -->
                 <div class="bg-indigo-50/70 p-4 rounded-2xl border border-indigo-200 space-y-2.5">
                     <div class="font-black text-indigo-900 text-xs sm:text-sm uppercase flex items-center justify-between">
-                        <span><i class="fa-solid fa-lightbulb text-indigo-600 mr-1.5"></i> Kiến Nghị & Đề Xuất (${sugList.length})</span>
+                        <span><i class="fa-solid fa-lightbulb text-indigo-600 mr-1.5"></i> 26. Kiến Nghị & Đề Xuất (${sugList.length})</span>
                     </div>
                     <div class="space-y-2 max-h-56 overflow-y-auto pr-1 text-xs">
                         ${sugList.length > 0 ? sugList.map(item => `
@@ -5366,7 +5402,7 @@
                                 <p class="text-slate-700 italic leading-relaxed">"${item.text}"</p>
                                 <span class="text-[10px] font-bold text-indigo-800 block text-right mt-1">— ${item.author}</span>
                             </div>
-                        `).join('') : '<p class="text-slate-400 italic text-xs">Chưa có ý kiến nào.</p>'}
+                        `).join('') : '<p class="text-slate-400 italic text-xs">Không có ý kiến nào phù hợp với bộ lọc.</p>'}
                     </div>
                 </div>
             `;
