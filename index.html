@@ -2000,6 +2000,19 @@
     </div>
 
 
+    <!-- FLOATING SUBMIT SURVEY BUTTON (NỔI DỌC BÊN PHẢI KHI LÀM KHẢO SÁT) -->
+    <button id="floatingSubmitSurveyBtn" onclick="handleFormSubmit(event)" class="hidden fixed right-3.5 sm:right-5 bottom-32 sm:bottom-36 z-40 px-3.5 py-2.5 sm:px-4 sm:py-3 rounded-full bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-teal-600 text-white shadow-2xl transition-all duration-300 hover:scale-105 active:scale-95 border-2 border-emerald-300/80 cursor-pointer flex items-center justify-center gap-2 group" title="Bấm để gửi phiếu khảo sát ngay bất kỳ lúc nào">
+        <div class="relative flex items-center justify-center">
+            <i class="fa-solid fa-paper-plane text-white text-xs sm:text-sm group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform"></i>
+            <span class="absolute -top-1 -right-1 flex h-2 w-2">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-200 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
+            </span>
+        </div>
+        <span class="text-xs sm:text-sm font-black whitespace-nowrap tracking-wide">Gửi Khảo Sát</span>
+        <span id="floatingSubmitProgressBadge" class="text-[10px] sm:text-xs font-black bg-white/25 px-2 py-0.5 rounded-full border border-white/30 hidden sm:inline-block">0/15</span>
+    </button>
+
     <!-- FLOATING PROGRAM BUTTON (XEM KHUNG CHƯƠNG TRÌNH KHI Ở TRANG KHẢO SÁT) -->
     <button id="floatingProgramBtn" onclick="switchTab('docs')" class="hidden fixed right-3.5 sm:right-5 bottom-18 sm:bottom-20 z-40 w-11 h-11 sm:w-auto sm:h-11 sm:px-4 rounded-full bg-[#3b4982] hover:bg-[#2e3a68] text-white shadow-2xl transition-all duration-300 hover:scale-105 active:scale-95 border-2 border-amber-300 cursor-pointer flex items-center justify-center gap-2" title="Xem tra cứu Khung Chương Trình Đào Tạo">
         <i class="fa-solid fa-book-open text-amber-300 text-sm sm:text-base"></i>
@@ -2375,16 +2388,22 @@
         let currentActiveTab = 'welcome';
         let currentSubDocTab = 'digitized';
 
-        function updateFloatingScanBtn() {
+        function updateFloatingButtons() {
             const scanBtn = document.getElementById('floatingScanBtn');
             const progBtn = document.getElementById('floatingProgramBtn');
+            const submitBtn = document.getElementById('floatingSubmitSurveyBtn');
 
-            // 1. Khi ở trang Khảo sát: hiển thị nút floating xem khung chương trình
+            // 1. Khi ở trang Khảo sát: hiển thị nút floating gửi khảo sát & xem khung chương trình
             if (currentActiveTab === 'form') {
+                if (submitBtn) submitBtn.classList.remove('hidden');
                 if (progBtn) progBtn.classList.remove('hidden');
                 if (scanBtn) scanBtn.classList.add('hidden');
+                if (typeof updateSurveyProgress === 'function') {
+                    updateSurveyProgress();
+                }
                 return;
             } else {
+                if (submitBtn) submitBtn.classList.add('hidden');
                 if (progBtn) progBtn.classList.add('hidden');
             }
 
@@ -2412,8 +2431,8 @@
                 if (scanBtn) scanBtn.classList.add('hidden');
             }
         }
-        function updateFloatingButtons() {
-            updateFloatingScanBtn();
+        function updateFloatingScanBtn() {
+            updateFloatingButtons();
         }
 
         function switchTab(tabId) {
@@ -3039,6 +3058,11 @@
             const barEl = document.getElementById('surveyTopProgressBar');
             if (textEl) textEl.innerText = `${answered} / ${totalQ} câu Likert (${percent}%)`;
             if (barEl) barEl.style.width = `${percent}%`;
+
+            const floatingBadge = document.getElementById('floatingSubmitProgressBadge');
+            if (floatingBadge) {
+                floatingBadge.innerText = `${answered}/${totalQ}`;
+            }
         }
 
         // HANDLE SCORE SELECTION (SHOW/HIDE REASON BOX)
