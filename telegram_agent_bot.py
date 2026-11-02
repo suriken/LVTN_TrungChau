@@ -16,12 +16,25 @@ Chức năng:
 
 import os
 import sys
+
+# Đảm bảo in tiếng Việt & emoji UTF-8 an toàn trên Windows CMD
+if hasattr(sys.stdout, "reconfigure"):
+    try:
+        sys.stdout.reconfigure(encoding="utf-8")
+        sys.stderr.reconfigure(encoding="utf-8")
+    except Exception:
+        pass
+
 import json
 import time
 import subprocess
 import traceback
 import requests
+import urllib3
 from pathlib import Path
+
+# Vô hiệu hóa cảnh báo SSL khi chạy trong mạng doanh nghiệp / proxy
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # Thư mục gốc của repository
 REPO_DIR = Path(__file__).resolve().parent
@@ -72,7 +85,7 @@ class TelegramBot:
             if parse_mode:
                 payload["parse_mode"] = parse_mode
             try:
-                requests.post(url, json=payload, timeout=15)
+                requests.post(url, json=payload, verify=False, timeout=15)
             except Exception as e:
                 print(f"[!] Lỗi gửi tin nhắn Telegram: {e}")
 
@@ -81,7 +94,7 @@ class TelegramBot:
         url = f"{self.base_url}/getUpdates"
         params = {"timeout": 30, "offset": self.last_update_id + 1}
         try:
-            resp = requests.get(url, params=params, timeout=35)
+            resp = requests.get(url, params=params, verify=False, timeout=35)
             if resp.ok:
                 data = resp.json()
                 if data.get("ok"):
@@ -225,7 +238,7 @@ Nhiệm vụ của bạn khi nhận yêu cầu từ người dùng qua điện t
 
     try:
         chat = client.chats.create(
-            model="gemini-2.5-flash",
+            model="gemini-flash-latest",
             config=types.GenerateContentConfig(
                 system_instruction=system_instruction,
                 temperature=0.2,
@@ -315,7 +328,7 @@ def run_bot():
 
     # Thử gọi getMe để xác minh Token
     try:
-        me_resp = requests.get(f"{bot.base_url}/getMe", timeout=10).json()
+        me_resp = requests.get(f"{bot.base_url}/getMe", verify=False, timeout=15).json()
         if not me_resp.get("ok"):
             print(f"[❌] Bot Token không hợp lệ: {me_resp}")
             return
@@ -453,3 +466,4 @@ def run_bot():
 
 if __name__ == "__main__":
     run_bot()
+
