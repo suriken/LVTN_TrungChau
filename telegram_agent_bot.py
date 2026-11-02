@@ -90,6 +90,34 @@ class TelegramBot:
             except Exception as e:
                 print(f"[!] Lỗi gửi tin nhắn Telegram: {e}")
 
+    def send_initial_console(self, chat_id, text):
+        """Gửi khung tin nhắn Live Console ban đầu để chuẩn bị edit thời gian thực"""
+        url = f"{self.base_url}/sendMessage"
+        payload = {"chat_id": chat_id, "text": text}
+        try:
+            r = requests.post(url, json=payload, verify=False, timeout=15)
+            if r.ok:
+                return r.json().get("result", {}).get("message_id")
+        except Exception as e:
+            print(f"[!] Lỗi gửi Live Console ban đầu: {e}")
+        return None
+
+    def update_console(self, chat_id, message_id, text):
+        """Cập nhật nội dung Live Console trên Telegram theo thời gian thực (editMessageText)"""
+        if not message_id:
+            return
+        url = f"{self.base_url}/editMessageText"
+        payload = {
+            "chat_id": chat_id,
+            "message_id": message_id,
+            "text": text
+        }
+        try:
+            requests.post(url, json=payload, verify=False, timeout=15)
+        except Exception as e:
+            # Bỏ qua lỗi nếu tin nhắn không đổi hoặc lỗi rate-limit nhỏ
+            pass
+
     def get_updates(self):
         """Lấy tin nhắn mới theo cơ chế long-polling"""
         url = f"{self.base_url}/getUpdates"
@@ -108,11 +136,124 @@ class TelegramBot:
         return []
 
 # ==============================================================================
+# HỆ THỐNG LIVE CONSOLE TƯỜNG MINH THỜI GIAN THỰC (VS CODE & TELEGRAM STREAM)
+# ==============================================================================
+
+from datetime import datetime
+
+class LiveConsole:
+    def __init__(self, bot, chat_id, prompt):
+        self.bot = bot
+        self.chat_id = chat_id
+        self.prompt = prompt
+        self.start_time = datetime.now()
+        self.steps = []
+        self.model_name = "Đang khởi tạo..."
+        self.last_update_time = 0
+        
+        # 1. Gửi tin nhắn Live Console ban đầu lên Telegram
+        initial_text = (
+            f"🖥️ [LIVE CONSOLE - THỜI GIAN THỰC]\n"
+            f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+            f"📌 Yêu cầu: \"{self.prompt}\"\n"
+            f"⏳ Trạng thái: 🧠 Đang khởi tạo kết nối Gemini AI...\n"
+            f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+            f"(Màn hình này sẽ tự động cập nhật từng bước)"
+        )
+        self.message_id = self.bot.send_initial_console(self.chat_id, initial_text)
+        self._append_history_start()
+
+    def set_model(self, model_name):
+        self.model_name = model_name
+        self.refresh(force=True)
+
+    def log_action(self, action_text):
+        ts = datetime.now().strftime("%H:%M:%S")
+        self.steps.append(f"[{ts}] {action_text}")
+        print(f"[LIVE] {action_text}")
+        self.refresh()
+
+    def refresh(self, force=False):
+        now = time.time()
+        # Giới hạn tối thiểu 0.8s mỗi lần edit để tránh Telegram 429 rate limit
+        if not force and (now - self.last_update_time < 0.8):
+            return
+        self.last_update_time = now
+
+        recent_steps = self.steps[-6:] if self.steps else ["Đang chuẩn bị phân tích mã nguồn..."]
+        steps_display = "\n".join([f"• {s}" for s in recent_steps])
+        
+        console_text = (
+            f"🖥️ [LIVE CONSOLE - ĐANG XỬ LÝ]\n"
+            f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+            f"📌 Yêu cầu: \"{self.prompt}\"\n"
+            f"🤖 Mô hình: {self.model_name}\n"
+            f"⏱️ Bắt đầu: {self.start_time.strftime('%H:%M:%S')}\n"
+            f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+            f"⚡ TIẾN TRÌNH THỰC THI:\n"
+            f"{steps_display}\n"
+            f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+            f"🔄 Đang trực tiếp sửa đổi & kiểm thử..."
+        )
+        self.bot.update_console(self.chat_id, self.message_id, console_text)
+
+    def finish(self, final_report, deploy_report):
+        duration = (datetime.now() - self.start_time).total_seconds()
+        final_console_text = (
+            f"🖥️ [LIVE CONSOLE - HOÀN TẤT]\n"
+            f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+            f"📌 Yêu cầu: \"{self.prompt}\"\n"
+            f"🤖 Mô hình: {self.model_name} (Xong trong {duration:.1f}s)\n"
+            f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+            f"✅ KẾT QUẢ THỰC HIỆN:\n"
+            f"{final_report}\n\n"
+            f"────────────────────────────\n"
+            f"{deploy_report}\n"
+            f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+            f"📜 Đã ghi nhật ký vào LIVE_PROMPT_HISTORY.md trên VS Code"
+        )
+        self.bot.update_console(self.chat_id, self.message_id, final_console_text)
+        self._append_history_done(final_report, deploy_report, duration)
+
+    def _append_history_start(self):
+        try:
+            entry = (
+                f"\n### ⏱️ [{self.start_time.strftime('%d/%m/%Y %H:%M:%S')}] Prompt: \"{self.prompt}\"\n"
+                f"- **Mô hình:** Đang phân tích...\n"
+                f"- **Trạng thái:** ⏳ Đang xử lý trực tiếp trong Live Console...\n"
+            )
+            with open(REPO_DIR / "LIVE_PROMPT_HISTORY.md", "a", encoding="utf-8") as f:
+                f.write(entry)
+        except Exception as e:
+            print(f"[!] Lỗi ghi file LIVE_PROMPT_HISTORY.md: {e}")
+
+    def _append_history_done(self, final_report, deploy_report, duration):
+        try:
+            steps_md = "\n".join([f"  - {s}" for s in self.steps])
+            entry = (
+                f"- **Thời gian xử lý:** {duration:.1f} giây\n"
+                f"- **Mô hình hoàn thành:** `{self.model_name}`\n"
+                f"- **Nhật ký tiến trình thực thi:**\n{steps_md}\n\n"
+                f"- **Báo cáo kết quả:**\n```\n{final_report}\n```\n\n"
+                f"- **Triển khai máy chủ:**\n```\n{deploy_report}\n```\n"
+                f"---\n"
+            )
+            with open(REPO_DIR / "LIVE_PROMPT_HISTORY.md", "a", encoding="utf-8") as f:
+                f.write(entry)
+        except Exception as e:
+            print(f"[!] Lỗi ghi file LIVE_PROMPT_HISTORY.md: {e}")
+
+# Biến toàn cục theo dõi phiên Live Console hiện hành
+ACTIVE_CONSOLE = None
+
+# ==============================================================================
 # CÁC CÔNG CỤ (TOOLS) CHO AGENT GEMINI
 # ==============================================================================
 
 def tool_list_files(subpath: str = "") -> str:
     """Liệt kê các tệp và thư mục trong dự án."""
+    if ACTIVE_CONSOLE:
+        ACTIVE_CONSOLE.log_action(f"📁 Duyệt thư mục: `{subpath or '.'}`")
     try:
         target = REPO_DIR / subpath.strip("/")
         if not target.exists():
@@ -131,6 +272,8 @@ def tool_list_files(subpath: str = "") -> str:
 
 def tool_read_file(file_path: str, start_line: int = 1, end_line: int = 500) -> str:
     """Đọc nội dung một tệp theo phạm vi dòng."""
+    if ACTIVE_CONSOLE:
+        ACTIVE_CONSOLE.log_action(f"📖 Đọc tệp: `{file_path}` (dòng {start_line} - {end_line})")
     try:
         path = REPO_DIR / file_path.strip("/")
         if not path.is_file():
@@ -148,6 +291,8 @@ def tool_read_file(file_path: str, start_line: int = 1, end_line: int = 500) -> 
 
 def tool_edit_file(file_path: str, target: str, replacement: str) -> str:
     """Thay thế chính xác một đoạn văn bản trong tệp."""
+    if ACTIVE_CONSOLE:
+        ACTIVE_CONSOLE.log_action(f"✏️ Đang sửa đổi nội dung: `{file_path}`")
     try:
         path = REPO_DIR / file_path.strip("/")
         if not path.is_file():
@@ -165,6 +310,8 @@ def tool_edit_file(file_path: str, target: str, replacement: str) -> str:
 
 def tool_write_full_file(file_path: str, content: str) -> str:
     """Tạo mới hoặc ghi đè toàn bộ nội dung một tệp."""
+    if ACTIVE_CONSOLE:
+        ACTIVE_CONSOLE.log_action(f"📝 Đang ghi tệp: `{file_path}` ({len(content)} ký tự)")
     try:
         path = REPO_DIR / file_path.strip("/")
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -176,6 +323,8 @@ def tool_write_full_file(file_path: str, content: str) -> str:
 
 def tool_run_terminal(command: str) -> str:
     """Chạy lệnh dòng lệnh kiểm thử (ví dụ: git status, node -c...)."""
+    if ACTIVE_CONSOLE:
+        ACTIVE_CONSOLE.log_action(f"⚡ Chạy kiểm thử: `{command[:65]}`")
     try:
         # Ngăn chặn các lệnh nguy hiểm
         blocked = ["rmdir /s /q c:", "format", "del /f /s /q *", "drop database"]
@@ -305,15 +454,23 @@ def check_and_deploy_changes(prompt_summary: str) -> str:
         changes = status_res.stdout.strip()
         
         if not changes:
+            if ACTIVE_CONSOLE:
+                ACTIVE_CONSOLE.log_action("ℹ️ Không có file nào thay đổi.")
             return "ℹ️ Không có file nào thay đổi sau khi xử lý yêu cầu."
 
         # 2. Chạy kiểm tra cú pháp nhanh
+        if ACTIVE_CONSOLE:
+            ACTIVE_CONSOLE.log_action("🔍 Kiểm tra cú pháp JavaScript & Apps Script...")
         try:
             subprocess.run([
                 "node", "-e",
                 "const fs = require('fs'); const html = fs.readFileSync('index.html', 'utf8'); const scripts = html.match(/<script[\\s\\S]*?<\\/script>/gi) || []; scripts.forEach(s => new Function(s.replace(/<script[^>]*>|<\\/script>/gi, ''))); console.log('Syntax OK');"
             ], cwd=REPO_DIR, check=True, capture_output=True, encoding="utf-8", errors="replace")
+            if ACTIVE_CONSOLE:
+                ACTIVE_CONSOLE.log_action("✅ Kiểm tra cú pháp hoàn tất: 0 lỗi!")
         except Exception as e:
+            if ACTIVE_CONSOLE:
+                ACTIVE_CONSOLE.log_action(f"❌ Cú pháp có lỗi: {e}")
             return f"⚠️ Cảnh báo cú pháp JavaScript trong index.html có lỗi! Hủy thao tác đẩy code lên máy chủ để tránh hỏng hệ thống.\nChi tiết: {e}"
 
         # 3. Git add
@@ -321,16 +478,24 @@ def check_and_deploy_changes(prompt_summary: str) -> str:
 
         # 4. Git commit
         commit_msg = f"feat(mobile): {prompt_summary[:80]}"
+        if ACTIVE_CONSOLE:
+            ACTIVE_CONSOLE.log_action(f"📦 Đang tạo commit: `{commit_msg}`")
         subprocess.run(["git", "commit", "-m", commit_msg], cwd=REPO_DIR, check=True)
 
         # 5. Git push
+        if ACTIVE_CONSOLE:
+            ACTIVE_CONSOLE.log_action("🚀 Đang Git push lên GitHub origin/main...")
         push_res = subprocess.run(["git", "push", "origin", "main"], cwd=REPO_DIR, capture_output=True, text=True, encoding="utf-8", errors="replace")
         if push_res.returncode != 0:
+            if ACTIVE_CONSOLE:
+                ACTIVE_CONSOLE.log_action("❌ Git push thất bại!")
             return f"❌ Lỗi khi git push lên GitHub:\n{push_res.stderr}"
 
         # Lấy commit hash vừa push
         rev_res = subprocess.run(["git", "rev-parse", "--short", "HEAD"], cwd=REPO_DIR, capture_output=True, text=True, encoding="utf-8", errors="replace")
         commit_hash = rev_res.stdout.strip()
+        if ACTIVE_CONSOLE:
+            ACTIVE_CONSOLE.log_action(f"✅ Đã push commit `{commit_hash}`! GitHub Actions đang deploy...")
 
         return (
             f"🚀 **ĐÃ ĐẨY CODE LÊN GITHUB THÀNH CÔNG!**\n"
@@ -484,27 +649,26 @@ def run_bot():
                     )
                     continue
 
-                bot.send_message(chat_id, f"⏳ **Đang tiếp nhận yêu cầu từ iPhone:**\n_{text}_\n\n🤖 Đang mở workspace và phân tích code...")
-
-                def update_cb(msg):
-                    bot.send_message(chat_id, msg)
-
                 selected_model = config.get("gemini_model", "gemini-3.8-flash")
 
-                # 1. Chạy AI code agent
+                # KHỞI TẠO PHIÊN LIVE CONSOLE THỜI GIAN THỰC
+                global ACTIVE_CONSOLE
+                ACTIVE_CONSOLE = LiveConsole(bot, chat_id, text)
+
+                def update_cb(msg):
+                    if ACTIVE_CONSOLE:
+                        ACTIVE_CONSOLE.log_action(msg)
+
+                # 1. Chạy AI code agent (ghi nhật ký chi tiết từng bước)
                 agent_report = execute_mobile_prompt(text, gemini_key, model_name=selected_model, status_callback=update_cb)
 
                 # 2. Tự động commit, push & deploy nếu có thay đổi
                 deploy_report = check_and_deploy_changes(text)
 
-                # 3. Gửi kết quả hoàn chỉnh về Telegram
-                final_response = (
-                    f"✅ **KẾT QUẢ XỬ LÝ TỪ MÁY CHỦ:**\n\n"
-                    f"{agent_report}\n\n"
-                    f"────────────────────────\n"
-                    f"{deploy_report}"
-                )
-                bot.send_message(chat_id, final_response)
+                # 3. Kết thúc Live Console (cập nhật bảng điều khiển cuối và lưu lịch sử)
+                if ACTIVE_CONSOLE:
+                    ACTIVE_CONSOLE.finish(agent_report, deploy_report)
+                    ACTIVE_CONSOLE = None
 
         except KeyboardInterrupt:
             print("\n[!] Dừng Bot theo yêu cầu người dùng.")
