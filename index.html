@@ -1728,34 +1728,34 @@
         </section>
 
         <!-- ==================== TAB 4: DASHBOARD TỔNG QUAN (ADMIN) ==================== -->
-        <section id="dashboardSection" class="space-y-5 sm:space-y-6 hidden">
-            <!-- TOP BAR ADMIN HEADER -->
-            <div class="bg-white p-4 sm:p-6 rounded-2xl border border-[#e2d8c7] shadow-sm flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
-                <div class="space-y-1">
+        <section id="dashboardSection" class="space-y-4 sm:space-y-5 hidden">
+            <!-- TOP BAR ADMIN HEADER (LÀM GỌN GÀNG, HIỆN ĐẠI) -->
+            <div class="bg-white p-3.5 sm:p-4 rounded-2xl border border-[#e2d8c7] shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
+                <div class="space-y-0.5 min-w-0">
                     <div class="flex items-center gap-2">
-                        <span class="w-8 h-8 rounded-xl bg-[#3b4982] text-white flex items-center justify-center text-sm shadow">
+                        <span class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-[#3b4982] text-white flex items-center justify-center text-xs sm:text-sm shadow-xs flex-shrink-0">
                             <i class="fa-solid fa-chart-pie"></i>
                         </span>
-                        <h2 class="font-black text-[#3b4982] text-lg sm:text-2xl">Dashboard Báo Cáo Thống Kê & Quản Trị Khảo Sát</h2>
+                        <h2 class="font-black text-[#3b4982] text-sm sm:text-base md:text-lg truncate">Dashboard Báo Cáo Thống Kê & Quản Trị Khảo Sát</h2>
                     </div>
-                    <p class="text-xs sm:text-sm text-slate-600">Phân tích số liệu thực tế đề tài Luận văn tốt nghiệp PTV Cấp III - Khóa Trung Châu 1</p>
+                    <p class="text-[11px] sm:text-xs text-slate-500 truncate">Phân tích số liệu thực tế đề tài Luận văn tốt nghiệp PTV Cấp III - Khóa Trung Châu 1</p>
                 </div>
                 
-                <!-- ACTION BUTTONS -->
-                <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto justify-start lg:justify-end">
-                    <button type="button" onclick="exportToCSV()" class="px-3.5 py-2 sm:px-4 sm:py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-1.5 shadow cursor-pointer active:scale-98">
+                <!-- ACTION BUTTONS COMPACT (MỘT HÀNG GỌN GÀNG) -->
+                <div class="flex flex-wrap items-center gap-1.5 w-full md:w-auto justify-start md:justify-end flex-shrink-0">
+                    <button type="button" onclick="exportToCSV()" class="px-2.5 py-1.5 sm:px-3 sm:py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-xs cursor-pointer active:scale-98" title="Xuất toàn bộ dữ liệu ra tệp CSV / Excel">
                         <i class="fa-solid fa-file-excel"></i>
-                        <span>Xuất File Excel (CSV)</span>
+                        <span>Xuất Excel</span>
                     </button>
-                    <button type="button" onclick="fetchResponsesFromBackend()" class="px-3.5 py-2 sm:px-4 sm:py-2.5 bg-[#3b4982] hover:bg-[#2c3765] text-white rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-1.5 shadow cursor-pointer active:scale-98" title="Tải dữ liệu mới nhất từ máy chủ hệ thống">
+                    <button type="button" onclick="fetchResponsesFromBackend()" class="px-2.5 py-1.5 sm:px-3 sm:py-2 bg-[#3b4982] hover:bg-[#2c3765] text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-xs cursor-pointer active:scale-98" title="Tải dữ liệu mới nhất từ máy chủ hệ thống">
                         <i class="fa-solid fa-arrows-rotate"></i>
-                        <span>Làm Mới Dữ Liệu</span>
+                        <span>Làm Mới</span>
                     </button>
-                    <button type="button" onclick="openConfirmClearModal()" class="px-3 py-2 sm:px-3.5 sm:py-2.5 bg-rose-50 text-rose-600 hover:bg-rose-100 border border-rose-200 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-1.5 cursor-pointer" title="Xóa toàn bộ dữ liệu khảo sát">
+                    <button type="button" onclick="openConfirmClearModal()" class="px-2.5 py-1.5 sm:px-3 sm:py-2 bg-rose-50 text-rose-600 hover:bg-rose-100 border border-rose-200 rounded-xl text-xs font-bold transition flex items-center gap-1 cursor-pointer" title="Xóa toàn bộ dữ liệu khảo sát">
                         <i class="fa-solid fa-trash-can"></i>
-                        <span class="hidden sm:inline">Xóa Dữ Liệu</span>
+                        <span>Xóa Dữ Liệu</span>
                     </button>
-                    <button type="button" onclick="handleAdminLogout()" class="px-3 py-2 sm:px-3.5 sm:py-2.5 bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-300 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-1.5 cursor-pointer" title="Đăng xuất quyền Admin">
+                    <button type="button" onclick="handleAdminLogout()" class="px-2.5 py-1.5 sm:px-3 sm:py-2 bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-300 rounded-xl text-xs font-bold transition flex items-center gap-1 cursor-pointer" title="Đăng xuất quyền Admin">
                         <i class="fa-solid fa-arrow-right-from-bracket"></i>
                         <span>Đăng Xuất</span>
                     </button>
@@ -1763,205 +1763,175 @@
             </div>
 
             <!-- STATS 4 CARDS -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-                <div class="bg-white p-4 sm:p-5 rounded-2xl border border-[#e2d8c7] shadow-sm flex items-center justify-between">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                <div class="bg-white p-3.5 sm:p-4 rounded-2xl border border-[#e2d8c7] shadow-sm flex items-center justify-between">
                     <div>
-                        <div class="text-xs font-bold text-slate-500 uppercase tracking-wider">Tổng Lượt Phản Hồi</div>
-                        <div id="totalResponsesCount" class="text-2xl sm:text-3xl font-black text-[#3b4982] mt-1">0</div>
+                        <div class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Tổng Lượt Phản Hồi</div>
+                        <div id="totalResponsesCount" class="text-xl sm:text-2xl font-black text-[#3b4982] mt-0.5">0</div>
                     </div>
-                    <div class="w-12 h-12 bg-blue-50 text-[#3b4982] rounded-2xl flex items-center justify-center text-xl shadow-xs">
+                    <div class="w-10 h-10 bg-blue-50 text-[#3b4982] rounded-xl flex items-center justify-center text-lg shadow-xs">
                         <i class="fa-solid fa-users"></i>
                     </div>
                 </div>
 
-                <div class="bg-white p-4 sm:p-5 rounded-2xl border border-[#e2d8c7] shadow-sm flex items-center justify-between">
+                <div class="bg-white p-3.5 sm:p-4 rounded-2xl border border-[#e2d8c7] shadow-sm flex items-center justify-between">
                     <div>
-                        <div class="text-xs font-bold text-slate-500 uppercase tracking-wider">Điểm Trung Bình Chung</div>
-                        <div id="overallAvgScore" class="text-2xl sm:text-3xl font-black text-emerald-600 mt-1">0.0 / 5.0</div>
+                        <div class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Điểm Trung Bình Chung</div>
+                        <div id="overallAvgScore" class="text-xl sm:text-2xl font-black text-emerald-600 mt-0.5">0.0 / 5.0</div>
                     </div>
-                    <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center text-xl shadow-xs">
+                    <div class="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center text-lg shadow-xs">
                         <i class="fa-solid fa-star"></i>
                     </div>
                 </div>
 
-                <div class="bg-white p-4 sm:p-5 rounded-2xl border border-[#e2d8c7] shadow-sm flex items-center justify-between">
+                <div class="bg-white p-3.5 sm:p-4 rounded-2xl border border-[#e2d8c7] shadow-sm flex items-center justify-between">
                     <div>
-                        <div class="text-xs font-bold text-slate-500 uppercase tracking-wider">Mức Phù Hợp Tổng Quát</div>
-                        <div id="overallFitRatio" class="text-2xl sm:text-3xl font-black text-indigo-600 mt-1">0%</div>
+                        <div class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Mức Phù Hợp Tổng Quát</div>
+                        <div id="overallFitRatio" class="text-xl sm:text-2xl font-black text-indigo-600 mt-0.5">0%</div>
                     </div>
-                    <div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center text-xl shadow-xs">
+                    <div class="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center text-lg shadow-xs">
                         <i class="fa-solid fa-chart-line"></i>
                     </div>
                 </div>
 
-                <div class="bg-white p-4 sm:p-5 rounded-2xl border border-[#e2d8c7] shadow-sm flex items-center justify-between">
+                <div class="bg-white p-3.5 sm:p-4 rounded-2xl border border-[#e2d8c7] shadow-sm flex items-center justify-between">
                     <div>
-                        <div class="text-xs font-bold text-slate-500 uppercase tracking-wider">Trạng Thái Kết Nối</div>
-                        <div id="adminServerStatusText" class="text-sm font-black text-emerald-700 mt-1 flex items-center gap-1.5">
-                            <i class="fa-solid fa-circle text-xs text-emerald-500 animate-pulse"></i> Đã kết nối máy chủ
+                        <div class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Trạng Thái Kết Nối</div>
+                        <div id="adminServerStatusText" class="text-xs font-black text-emerald-700 mt-1 flex items-center gap-1.5">
+                            <i class="fa-solid fa-circle text-[9px] text-emerald-500 animate-pulse"></i> Đã kết nối máy chủ
                         </div>
                     </div>
-                    <div class="w-12 h-12 bg-emerald-50 text-emerald-700 rounded-2xl flex items-center justify-center text-xl shadow-xs">
+                    <div class="w-10 h-10 bg-emerald-50 text-emerald-700 rounded-xl flex items-center justify-center text-lg shadow-xs">
                         <i class="fa-solid fa-table"></i>
                     </div>
                 </div>
             </div>
 
-            <!-- TỔNG HỢP Ý KIẾN ĐÁNH GIÁ (PHẦN 4) ĐƯA LÊN TRÊN CÙNG KÈM BỘ LỌC ĐA TIÊU CHÍ TOÀN DIỆN -->
-            <div class="bg-white p-4 sm:p-6 rounded-2xl border border-[#e2d8c7] shadow-sm space-y-4">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#e2d8c7] pb-3">
-                    <div>
-                        <h3 class="font-black text-[#3b4982] text-base sm:text-lg flex items-center gap-2">
-                            <i class="fa-solid fa-comments text-[#3b4982]"></i> Tổng Hợp Ý Kiến Đóng Góp Định Tính & Đánh Giá Đề Tài (Phần 4)
-                        </h3>
-                        <p class="text-xs text-slate-500">Lọc và tổng hợp các điểm làm tốt, điểm chưa tốt, thực trạng và giải pháp cho đề tài luận văn</p>
-                    </div>
-                    <span id="adminFilteredStatsBadge" class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-indigo-50 text-[#3b4982] border border-indigo-200 self-start sm:self-auto">
-                        <i class="fa-solid fa-users text-[11px]"></i>
-                        <span id="adminFilteredCountText">Tất cả phiếu</span>
-                    </span>
-                </div>
-
-                <!-- BỘ LỌC ĐA TIÊU CHÍ (VAI TRÒ, CẤP ĐÀO TẠO, THÂM NIÊN, TRAI KỲ, THỜI CÚNG, MỨC ĐỘ SH) -->
-                <div class="bg-gradient-to-r from-slate-50 via-white to-slate-50 p-3.5 sm:p-4 rounded-xl border border-[#e2d8c7] space-y-3">
-                    <div class="flex items-center justify-between">
-                        <span class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-                            <i class="fa-solid fa-filter text-[#3b4982]"></i> Bộ Lọc Đa Tiêu Chí:
+            <!-- BỘ LỌC ĐA TIÊU CHÍ (ÁP DỤNG ĐỒNG BỘ TOÀN BỘ DASHBOARD, BIỂU ĐỒ & BẢNG) -->
+            <div class="bg-white p-3.5 sm:p-4 rounded-2xl border border-[#e2d8c7] shadow-sm space-y-3">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#e2d8c7] pb-2.5">
+                    <div class="flex items-center gap-2">
+                        <span class="w-7 h-7 rounded-lg bg-[#3b4982] text-white flex items-center justify-center text-xs shadow-xs">
+                            <i class="fa-solid fa-filter"></i>
                         </span>
-                        <button type="button" onclick="resetAdminFilters()" class="text-xs font-bold text-rose-600 hover:text-rose-800 underline flex items-center gap-1 cursor-pointer">
-                            <i class="fa-solid fa-rotate-left text-[10px]"></i> Đặt lại tất cả
-                        </button>
-                    </div>
-
-                    <!-- 6 DROPDOWN TIÊU CHÍ -->
-                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 text-xs">
-                        <!-- 1. VAI TRÒ HIỆN NAY -->
                         <div>
-                            <label class="block font-bold text-slate-600 mb-1 truncate" title="Vai Trò Hiện Nay">
-                                <i class="fa-solid fa-id-badge text-[#3b4982] mr-0.5"></i> Vai trò
-                            </label>
-                            <select id="adminRoleFilter" onchange="filterAdminDashboard()" class="w-full px-2 py-1.5 rounded-lg border border-[#e2d8c7] bg-white font-medium text-slate-700 focus:outline-none focus:border-[#3b4982] transition truncate cursor-pointer">
-                                <option value="ALL">Tất cả vai trò</option>
-                                <option value="PTV đang sinh hoạt">PTV đang sinh hoạt</option>
-                                <option value="Huynh trưởng BPT">Huynh trưởng BPT</option>
-                                <option value="Chức sắc - Chức việc">Chức sắc - Chức việc</option>
-                                <option value="Đã tạm ngưng SH">Đã tạm ngưng SH</option>
-                                <option value="Vai trò khác">Vai trò khác</option>
-                            </select>
-                        </div>
-
-                        <!-- 2. CẤP ĐÀO TẠO CAO NHẤT -->
-                        <div>
-                            <label class="block font-bold text-slate-600 mb-1 truncate" title="Cấp Đào Tạo Cao Nhất">
-                                <i class="fa-solid fa-graduation-cap text-[#3b4982] mr-0.5"></i> Cấp đào tạo
-                            </label>
-                            <select id="adminGradFilter" onchange="filterAdminDashboard()" class="w-full px-2 py-1.5 rounded-lg border border-[#e2d8c7] bg-white font-medium text-slate-700 focus:outline-none focus:border-[#3b4982] transition truncate cursor-pointer">
-                                <option value="ALL">Tất cả cấp</option>
-                                <option value="Cấp III">PTV Cấp III (Trung Châu)</option>
-                                <option value="Cấp II">PTV Cấp II (Cửu Long)</option>
-                                <option value="Cấp I">PTV Cấp I (Gò Kén)</option>
-                                <option value="Dự bị">PTV Dự Bị (Dương Đông)</option>
-                                <option value="Chưa tốt nghiệp">Chưa tốt nghiệp</option>
-                            </select>
-                        </div>
-
-                        <!-- 3. THÂM NIÊN SINH HOẠT -->
-                        <div>
-                            <label class="block font-bold text-slate-600 mb-1 truncate" title="Thâm Niên Sinh Hoạt">
-                                <i class="fa-solid fa-clock-rotate-left text-[#3b4982] mr-0.5"></i> Thâm niên
-                            </label>
-                            <select id="adminTenureFilter" onchange="filterAdminDashboard()" class="w-full px-2 py-1.5 rounded-lg border border-[#e2d8c7] bg-white font-medium text-slate-700 focus:outline-none focus:border-[#3b4982] transition truncate cursor-pointer">
-                                <option value="ALL">Tất cả thâm niên</option>
-                                <option value="Dưới 1 năm">Dưới 1 năm</option>
-                                <option value="1 - 3 năm">1 - 3 năm</option>
-                                <option value="3 - 5 năm">3 - 5 năm</option>
-                                <option value="5 - 10 năm">5 - 10 năm</option>
-                                <option value="Trên 10 năm">Trên 10 năm</option>
-                            </select>
-                        </div>
-
-                        <!-- 4. TRAI KỲ -->
-                        <div>
-                            <label class="block font-bold text-slate-600 mb-1 truncate" title="Thực Hành Trai Kỳ">
-                                <i class="fa-solid fa-leaf text-emerald-600 mr-0.5"></i> Trai kỳ
-                            </label>
-                            <select id="adminDietFilter" onchange="filterAdminDashboard()" class="w-full px-2 py-1.5 rounded-lg border border-[#e2d8c7] bg-white font-medium text-slate-700 focus:outline-none focus:border-[#3b4982] transition truncate cursor-pointer">
-                                <option value="ALL">Tất cả trai kỳ</option>
-                                <option value="Lục trai">Lục trai</option>
-                                <option value="Thập trai">Thập trai</option>
-                                <option value="Trường trai">Trường trai / Chay trường</option>
-                            </select>
-                        </div>
-
-                        <!-- 5. THỜI CÚNG HẰNG NGÀY -->
-                        <div>
-                            <label class="block font-bold text-slate-600 mb-1 truncate" title="Thời Cúng Hằng Ngày">
-                                <i class="fa-solid fa-hands-praying text-amber-600 mr-0.5"></i> Thời cúng
-                            </label>
-                            <select id="adminPracticeFilter" onchange="filterAdminDashboard()" class="w-full px-2 py-1.5 rounded-lg border border-[#e2d8c7] bg-white font-medium text-slate-700 focus:outline-none focus:border-[#3b4982] transition truncate cursor-pointer">
-                                <option value="ALL">Tất cả thời cúng</option>
-                                <option value="Đều đặn">Đều đặn mỗi ngày</option>
-                                <option value="2 - 3 thời">2 - 3 thời/tuần</option>
-                                <option value="Sóc Vọng">Sóc Vọng / Lễ Vía</option>
-                                <option value="Hiếm khi">Hiếm khi</option>
-                            </select>
-                        </div>
-
-                        <!-- 6. MỨC ĐỘ SINH HOẠT THƯỜNG XUYÊN -->
-                        <div>
-                            <label class="block font-bold text-slate-600 mb-1 truncate" title="Mức Độ Sinh Hoạt Phụng Sự">
-                                <i class="fa-solid fa-user-group text-blue-600 mr-0.5"></i> Mức độ SH
-                            </label>
-                            <select id="adminServiceFilter" onchange="filterAdminDashboard()" class="w-full px-2 py-1.5 rounded-lg border border-[#e2d8c7] bg-white font-medium text-slate-700 focus:outline-none focus:border-[#3b4982] transition truncate cursor-pointer">
-                                <option value="ALL">Tất cả mức độ</option>
-                                <option value="Trực tiếp">Trực tiếp thường xuyên</option>
-                                <option value="Hỗ trợ">Hỗ trợ kỳ trại, lễ</option>
-                                <option value="Tạm ngưng">Tạm ngưng sinh hoạt</option>
-                                <option value="Đã ngưng">Đã ngưng / Chuyển ĐV</option>
-                            </select>
+                            <h4 class="font-black text-[#3b4982] text-xs sm:text-sm">Bộ Lọc Đa Tiêu Chí Toàn Diện</h4>
+                            <p class="text-[11px] text-slate-500">Lọc tức thì đồng bộ Danh Sách Phiếu, Ý Kiến Phần 4, Bản Đồ Nhiệt và Biểu Đồ Thống Kê</p>
                         </div>
                     </div>
-
-                    <!-- TÌM KIẾM TỪ KHÓA TỰ DO -->
-                    <div class="relative">
-                        <input type="text" id="adminSearchInput" oninput="filterAdminDashboard()" placeholder="Tìm nhanh theo họ tên, số điện thoại, đơn vị, mã phiếu hoặc nội dung ý kiến..." class="w-full pl-9 pr-9 py-2 text-xs sm:text-sm rounded-xl border border-[#e2d8c7] bg-white focus:outline-none focus:border-[#3b4982] shadow-inner text-slate-800 font-medium">
-                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-                        <button type="button" onclick="clearAdminSearch()" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer text-xs" title="Xóa từ khóa tìm kiếm">
-                            <i class="fa-solid fa-xmark"></i>
+                    <div class="flex items-center gap-2 self-start sm:self-auto">
+                        <span id="adminFilteredStatsBadge" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-indigo-50 text-[#3b4982] border border-indigo-200">
+                            <i class="fa-solid fa-users text-[11px]"></i>
+                            <span id="adminFilteredCountText">Tất cả phiếu</span>
+                        </span>
+                        <button type="button" onclick="resetAdminFilters()" class="text-xs font-bold text-rose-600 hover:text-white bg-rose-50 hover:bg-rose-600 px-2.5 py-1 rounded-lg border border-rose-200 transition flex items-center gap-1 cursor-pointer" title="Đặt lại tất cả tiêu chí về mặc định">
+                            <i class="fa-solid fa-rotate-left text-[10px]"></i> Đặt lại
                         </button>
                     </div>
                 </div>
 
-                <!-- 4 KHỐI Ý KIẾN TỔNG HỢP (LÀM ĐƯỢC / CHƯA ĐƯỢC / THỰC TRẠNG / KIẾN NGHỊ) -->
-                <div id="adminFeedbackContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <!-- Dynamic feedback cards rendered here -->
-                </div>
-            </div>
+                <!-- 6 DROPDOWN TIÊU CHÍ -->
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 text-xs">
+                    <!-- 1. VAI TRÒ HIỆN NAY -->
+                    <div>
+                        <label class="block font-bold text-slate-600 mb-1 truncate" title="Vai Trò Hiện Nay">
+                            <i class="fa-solid fa-id-badge text-[#3b4982] mr-0.5"></i> Vai trò
+                        </label>
+                        <select id="adminRoleFilter" onchange="filterAdminDashboard()" class="w-full px-2 py-1.5 rounded-lg border border-[#e2d8c7] bg-white font-medium text-slate-700 focus:outline-none focus:border-[#3b4982] transition truncate cursor-pointer">
+                            <option value="ALL">Tất cả vai trò</option>
+                            <option value="PTV đang sinh hoạt">PTV đang sinh hoạt</option>
+                            <option value="Huynh trưởng BPT">Huynh trưởng BPT</option>
+                            <option value="Chức sắc - Chức việc">Chức sắc - Chức việc</option>
+                            <option value="Đã tạm ngưng SH">Đã tạm ngưng SH</option>
+                            <option value="Vai trò khác">Vai trò khác</option>
+                        </select>
+                    </div>
 
-            <!-- CHARTS GRID -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-                <div class="bg-white p-4 sm:p-5 rounded-2xl border border-[#e2d8c7] shadow-sm space-y-3 sm:space-y-4">
-                    <h4 class="font-black text-[#3b4982] text-sm sm:text-base border-b border-[#e2d8c7] pb-2 flex items-center gap-2">
-                        <i class="fa-solid fa-chart-column text-[#3b4982]"></i> Điểm Trung Bình Theo 4 Trụ Cột Đào Tạo
-                    </h4>
-                    <div class="h-60 sm:h-72 relative">
-                        <canvas id="avgScoreBarChart"></canvas>
+                    <!-- 2. CẤP ĐÀO TẠO CAO NHẤT -->
+                    <div>
+                        <label class="block font-bold text-slate-600 mb-1 truncate" title="Cấp Đào Tạo Cao Nhất">
+                            <i class="fa-solid fa-graduation-cap text-[#3b4982] mr-0.5"></i> Cấp đào tạo
+                        </label>
+                        <select id="adminGradFilter" onchange="filterAdminDashboard()" class="w-full px-2 py-1.5 rounded-lg border border-[#e2d8c7] bg-white font-medium text-slate-700 focus:outline-none focus:border-[#3b4982] transition truncate cursor-pointer">
+                            <option value="ALL">Tất cả cấp</option>
+                            <option value="Cấp III">PTV Cấp III (Trung Châu)</option>
+                            <option value="Cấp II">PTV Cấp II (Cửu Long)</option>
+                            <option value="Cấp I">PTV Cấp I (Gò Kén)</option>
+                            <option value="Dự bị">PTV Dự Bị (Dương Đông)</option>
+                            <option value="Chưa tốt nghiệp">Chưa tốt nghiệp</option>
+                        </select>
+                    </div>
+
+                    <!-- 3. THÂM NIÊN SINH HOẠT -->
+                    <div>
+                        <label class="block font-bold text-slate-600 mb-1 truncate" title="Thâm Niên Sinh Hoạt">
+                            <i class="fa-solid fa-clock-rotate-left text-[#3b4982] mr-0.5"></i> Thâm niên
+                        </label>
+                        <select id="adminTenureFilter" onchange="filterAdminDashboard()" class="w-full px-2 py-1.5 rounded-lg border border-[#e2d8c7] bg-white font-medium text-slate-700 focus:outline-none focus:border-[#3b4982] transition truncate cursor-pointer">
+                            <option value="ALL">Tất cả thâm niên</option>
+                            <option value="Dưới 1 năm">Dưới 1 năm</option>
+                            <option value="1 - 3 năm">1 - 3 năm</option>
+                            <option value="3 - 5 năm">3 - 5 năm</option>
+                            <option value="5 - 10 năm">5 - 10 năm</option>
+                            <option value="Trên 10 năm">Trên 10 năm</option>
+                        </select>
+                    </div>
+
+                    <!-- 4. TRAI KỲ -->
+                    <div>
+                        <label class="block font-bold text-slate-600 mb-1 truncate" title="Thực Hành Trai Kỳ">
+                            <i class="fa-solid fa-leaf text-emerald-600 mr-0.5"></i> Trai kỳ
+                        </label>
+                        <select id="adminDietFilter" onchange="filterAdminDashboard()" class="w-full px-2 py-1.5 rounded-lg border border-[#e2d8c7] bg-white font-medium text-slate-700 focus:outline-none focus:border-[#3b4982] transition truncate cursor-pointer">
+                            <option value="ALL">Tất cả trai kỳ</option>
+                            <option value="Lục trai">Lục trai</option>
+                            <option value="Thập trai">Thập trai</option>
+                            <option value="Trường trai">Trường trai / Chay trường</option>
+                        </select>
+                    </div>
+
+                    <!-- 5. THỜI CÚNG HẰNG NGÀY -->
+                    <div>
+                        <label class="block font-bold text-slate-600 mb-1 truncate" title="Thời Cúng Hằng Ngày">
+                            <i class="fa-solid fa-hands-praying text-amber-600 mr-0.5"></i> Thời cúng
+                        </label>
+                        <select id="adminPracticeFilter" onchange="filterAdminDashboard()" class="w-full px-2 py-1.5 rounded-lg border border-[#e2d8c7] bg-white font-medium text-slate-700 focus:outline-none focus:border-[#3b4982] transition truncate cursor-pointer">
+                            <option value="ALL">Tất cả thời cúng</option>
+                            <option value="Đều đặn">Đều đặn mỗi ngày</option>
+                            <option value="2 - 3 thời">2 - 3 thời/tuần</option>
+                            <option value="Sóc Vọng">Sóc Vọng / Lễ Vía</option>
+                            <option value="Hiếm khi">Hiếm khi</option>
+                        </select>
+                    </div>
+
+                    <!-- 6. MỨC ĐỘ SINH HOẠT THƯỜNG XUYÊN -->
+                    <div>
+                        <label class="block font-bold text-slate-600 mb-1 truncate" title="Mức Độ Sinh Hoạt Phụng Sự">
+                            <i class="fa-solid fa-user-group text-blue-600 mr-0.5"></i> Mức độ SH
+                        </label>
+                        <select id="adminServiceFilter" onchange="filterAdminDashboard()" class="w-full px-2 py-1.5 rounded-lg border border-[#e2d8c7] bg-white font-medium text-slate-700 focus:outline-none focus:border-[#3b4982] transition truncate cursor-pointer">
+                            <option value="ALL">Tất cả mức độ</option>
+                            <option value="Trực tiếp">Trực tiếp thường xuyên</option>
+                            <option value="Hỗ trợ">Hỗ trợ kỳ trại, lễ</option>
+                            <option value="Tạm ngưng">Tạm ngưng sinh hoạt</option>
+                            <option value="Đã ngưng">Đã ngưng / Chuyển ĐV</option>
+                        </select>
                     </div>
                 </div>
 
-                <div class="bg-white p-4 sm:p-5 rounded-2xl border border-[#e2d8c7] shadow-sm space-y-3 sm:space-y-4">
-                    <h4 class="font-black text-[#3b4982] text-sm sm:text-base border-b border-[#e2d8c7] pb-2 flex items-center gap-2">
-                        <i class="fa-solid fa-chart-pie text-[#3b4982]"></i> Cơ Cấu Người Phản Hồi Theo Vai Trò Hiện Nay
-                    </h4>
-                    <div class="h-60 sm:h-72 relative">
-                        <canvas id="rolePieChart"></canvas>
-                    </div>
+                <!-- TÌM KIẾM TỪ KHÓA TỰ DO -->
+                <div class="relative">
+                    <input type="text" id="adminSearchInput" oninput="filterAdminDashboard()" placeholder="Tìm nhanh theo họ tên, số điện thoại, đơn vị, mã phiếu hoặc nội dung ý kiến..." class="w-full pl-9 pr-9 py-2 text-xs sm:text-sm rounded-xl border border-[#e2d8c7] bg-[#fdfbf7] focus:bg-white focus:outline-none focus:border-[#3b4982] shadow-inner text-slate-800 font-medium">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                    <button type="button" onclick="clearAdminSearch()" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer text-xs" title="Xóa từ khóa tìm kiếm">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
                 </div>
             </div>
 
-            <!-- BẢNG DANH SÁCH CHI TIẾT CÁC PHIẾU KHẢO SÁT (DẠNG NGĂN XẾP: NGƯỜI MỚI NHẤT TRÊN CÙNG, ĐÁNH SỐ TỪ DƯỚI LÊN) -->
-            <div class="bg-white p-4 sm:p-6 rounded-2xl border border-[#e2d8c7] shadow-sm space-y-4">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#e2d8c7] pb-3">
+            <!-- 1. BẢNG DANH SÁCH CHI TIẾT CÁC PHIẾU KHẢO SÁT (DẠNG NGĂN XẾP: NGƯỜI MỚI NHẤT TRÊN CÙNG, ĐÁNH SỐ TỪ DƯỚI LÊN) -->
+            <div class="bg-white p-4 sm:p-5 rounded-2xl border border-[#e2d8c7] shadow-sm space-y-3.5">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#e2d8c7] pb-3">
                     <div class="flex items-center gap-2">
                         <span class="w-8 h-8 rounded-lg bg-[#3b4982] text-white flex items-center justify-center text-sm shadow">
                             <i class="fa-solid fa-layer-group"></i>
@@ -1996,6 +1966,104 @@
                             <!-- Render dynamically by JS -->
                         </tbody>
                     </table>
+                </div>
+            </div>
+
+            <!-- 2. KHO Ý KIẾN TỰ LUẬN & ĐÓNG GÓP THEO CHỦ ĐỀ (PHẦN 4 - Ý MỚI NHẤT LÊN ĐẦU THEO NGĂN XẾP) -->
+            <div class="bg-white p-4 sm:p-5 rounded-2xl border border-[#e2d8c7] shadow-sm space-y-3.5">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#e2d8c7] pb-3">
+                    <div>
+                        <h3 class="font-black text-[#3b4982] text-base sm:text-lg flex items-center gap-2">
+                            <i class="fa-solid fa-comments text-[#3b4982]"></i> Tổng Hợp Ý Kiến Đóng Góp Định Tính & Đánh Giá Đề Tài (Phần 4)
+                        </h3>
+                        <p class="text-xs text-slate-500">Tổng hợp các điểm làm tốt, điểm chưa tốt, thực trạng và giải pháp (Ý mới nhất xếp trên cùng)</p>
+                    </div>
+                </div>
+
+                <!-- 4 KHỐI Ý KIẾN TỔNG HỢP (LÀM ĐƯỢC / CHƯA ĐƯỢC / THỰC TRẠNG / KIẾN NGHỊ) -->
+                <div id="adminFeedbackContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Dynamic feedback cards rendered here -->
+                </div>
+            </div>
+
+            <!-- 3. BẢNG ĐÁNH GIÁ MA TRẬN KHUNG CHƯƠNG TRÌNH & PHÂN CẤP PTV (HEATMAP TÔ MÀU 1 -> 5 & HIGHLIGHTING CHÚ Ý) -->
+            <div class="bg-white p-4 sm:p-5 rounded-2xl border border-[#e2d8c7] shadow-sm space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#e2d8c7] pb-3">
+                    <div class="flex items-center gap-2">
+                        <span class="w-8 h-8 rounded-lg bg-[#3b4982] text-white flex items-center justify-center text-sm shadow">
+                            <i class="fa-solid fa-table-cells-large"></i>
+                        </span>
+                        <div>
+                            <h3 class="font-black text-[#3b4982] text-base sm:text-lg">Bản Đồ Nhiệt Đánh Giá Khung Chương Trình & Phân Cấp Phổ Tế Viên</h3>
+                            <p class="text-xs text-slate-500">Mức độ tương thích và điểm trung bình của 18 nội dung đào tạo (Tô màu trực quan thang điểm 1 -> 5)</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-1.5 flex-wrap text-[11px] font-bold">
+                        <span class="px-2 py-0.5 rounded bg-blue-100 text-blue-800 border border-blue-200">5: Rất Phù Hợp</span>
+                        <span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 border border-emerald-200">4: Phù Hợp</span>
+                        <span class="px-2 py-0.5 rounded bg-amber-100 text-amber-800 border border-amber-200">3: Phân Vân</span>
+                        <span class="px-2 py-0.5 rounded bg-rose-100 text-rose-800 border border-rose-200">1-2: Chưa Phù Hợp</span>
+                    </div>
+                </div>
+
+                <!-- MA TRẬN 18 NỘI DUNG CHƯƠNG TRÌNH -->
+                <div class="overflow-x-auto rounded-xl border border-[#e2d8c7]">
+                    <table class="w-full text-left text-xs sm:text-sm border-collapse">
+                        <thead class="bg-[#3b4982] text-white">
+                            <tr>
+                                <th class="p-3 font-bold text-center w-12">Mục</th>
+                                <th class="p-3 font-bold">Nội Dung Đào Tạo & Quy Định Phân Cấp</th>
+                                <th class="p-3 font-bold text-center w-28">Điểm TB</th>
+                                <th class="p-3 font-bold text-center w-36">Mức Phù Hợp</th>
+                                <th class="p-3 font-bold text-center w-36">Đánh Giá (>=4 / &le;3)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="programHeatmapTableBody" class="divide-y divide-[#e2d8c7] bg-white">
+                            <!-- Render dynamically by JS -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- KHỐI LIỆT KÊ NHỮNG PHẦN CHƯA PHÙ HỢP ĐỂ HIGHLIGHTING CHÚ Ý (&le; 3 ĐIỂM) -->
+                <div id="unsuitableAlertContainer" class="pt-2">
+                    <!-- Render dynamically by JS -->
+                </div>
+            </div>
+
+            <!-- 4. CHARTS GRID (HIỂN THỊ RÕ RÀNG TỪNG CON SỐ DỮ LIỆU) -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+                <!-- BIỂU ĐỒ CỘT: 4 TRỤ CỘT CÓ SỐ LIỆU RÕ RÀNG -->
+                <div class="bg-white p-4 sm:p-5 rounded-2xl border border-[#e2d8c7] shadow-sm space-y-3">
+                    <div class="flex items-center justify-between border-b border-[#e2d8c7] pb-2">
+                        <h4 class="font-black text-[#3b4982] text-sm sm:text-base flex items-center gap-2">
+                            <i class="fa-solid fa-chart-column text-[#3b4982]"></i> Điểm Trung Bình Theo 4 Trụ Cột Đào Tạo
+                        </h4>
+                        <span class="text-[11px] font-bold text-slate-500">Thang điểm 1 - 5</span>
+                    </div>
+                    <div class="h-60 sm:h-72 relative">
+                        <canvas id="avgScoreBarChart"></canvas>
+                    </div>
+                    <!-- PILL BADGES SỐ LIỆU TỪNG TRỤ CỘT -->
+                    <div id="pillarScoreBadges" class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2 border-t border-slate-100 text-xs">
+                        <!-- Dynamic badges rendered here -->
+                    </div>
+                </div>
+
+                <!-- BIỂU ĐỒ TRÒN: CƠ CẤU VAI TRÒ CÓ SỐ LIỆU VÀ PHẦN TRĂM RÕ RÀNG -->
+                <div class="bg-white p-4 sm:p-5 rounded-2xl border border-[#e2d8c7] shadow-sm space-y-3">
+                    <div class="flex items-center justify-between border-b border-[#e2d8c7] pb-2">
+                        <h4 class="font-black text-[#3b4982] text-sm sm:text-base flex items-center gap-2">
+                            <i class="fa-solid fa-chart-pie text-[#3b4982]"></i> Cơ Cấu Người Phản Hồi Theo Vai Trò
+                        </h4>
+                        <span class="text-[11px] font-bold text-slate-500">Số lượng &amp; Tỷ lệ %</span>
+                    </div>
+                    <div class="h-60 sm:h-72 relative">
+                        <canvas id="rolePieChart"></canvas>
+                    </div>
+                    <!-- STATS SUMMARY PILLS -->
+                    <div id="roleStatsBadges" class="flex flex-wrap items-center justify-center gap-1.5 pt-2 border-t border-slate-100 text-[11px]">
+                        <!-- Dynamic role badges rendered here -->
+                    </div>
                 </div>
             </div>
         </section>
@@ -4980,10 +5048,15 @@
             }
         }
 
-        // RENDER GLOBAL DASHBOARD
+        // RENDER GLOBAL DASHBOARD (ĐỒNG BỘ TOÀN DIỆN VỚI BỘ LỌC ĐA TIÊU CHÍ & HIỂN THỊ RÕ RÀNG SỐ LIỆU)
         function renderGlobalDashboard() {
             // Đảm bảo gán số thứ tự gốc từ dưới lên cho tất cả phiếu
             assignResponsesSTT(surveyResponses || []);
+
+            // Lấy danh sách phiếu đã lọc qua bộ lọc đa tiêu chí
+            const filtered = getFilteredAdminResponses();
+            const totalSurvey = (surveyResponses || []).length;
+            const filteredCount = filtered.length;
 
             // Update Hệ thống URL input & badge (nếu tồn tại)
             const gInput = document.getElementById('serverApiUrlInput');
@@ -4998,17 +5071,23 @@
                 gBadge.innerHTML = '<i class="fa-solid fa-circle-check text-emerald-600"></i> Máy chủ dữ liệu hoạt động';
             }
 
+            // 1. Thẻ Tổng lượt phản hồi (hiển thị rõ số lượng lọc / tổng)
             const totalCountEl = document.getElementById('totalResponsesCount');
-            if (totalCountEl) totalCountEl.innerText = surveyResponses.length;
+            if (totalCountEl) {
+                totalCountEl.innerHTML = filteredCount === totalSurvey
+                    ? `${totalSurvey}`
+                    : `<span class="text-indigo-600">${filteredCount}</span> <span class="text-xs text-slate-400 font-bold">/ ${totalSurvey}</span>`;
+            }
 
+            // 2. Tính toán điểm trung bình & tỷ lệ phù hợp theo danh sách ĐÃ LỌC
             let totalSum = 0;
             let totalCount = 0;
             const pillarSums = {};
             surveyPillars.forEach(p => { pillarSums[p.id] = { sum: 0, count: 0 }; });
             const rolesCount = {};
 
-            if (surveyResponses.length > 0) {
-                surveyResponses.forEach(r => {
+            if (filtered.length > 0) {
+                filtered.forEach(r => {
                     const role = r.role || 'Chưa xác định';
                     rolesCount[role] = (rolesCount[role] || 0) + 1;
 
@@ -5033,8 +5112,9 @@
             if (avgEl) avgEl.innerText = `${avgOverall} / 5.0`;
             if (fitEl) fitEl.innerText = `${fitRatioPercent}%`;
 
-            // Bar Chart - Trụ cột điểm trung bình (Tự động reset về 0 khi xóa dữ liệu)
+            // 3. Bar Chart - Trụ cột điểm trung bình (HIỂN THỊ RÕ RÀNG TỪNG CON SỐ DỮ LIỆU)
             const ctxBar = document.getElementById('avgScoreBarChart');
+            const pillarScoreBadgesEl = document.getElementById('pillarScoreBadges');
             if (ctxBar) {
                 if (avgChartObj) {
                     try { avgChartObj.destroy(); } catch(e){}
@@ -5044,6 +5124,26 @@
                     const d = pillarSums[p.id];
                     return (d && d.count > 0) ? parseFloat((d.sum / d.count).toFixed(2)) : 0;
                 });
+
+                // Custom plugin hiển thị số liệu điểm chính xác trên đầu mỗi cột
+                const customBarDataLabels = {
+                    id: 'customBarDataLabels',
+                    afterDatasetsDraw(chart) {
+                        const { ctx } = chart;
+                        chart.getDatasetMeta(0).data.forEach((bar, index) => {
+                            const val = barDataValues[index];
+                            if (val > 0) {
+                                ctx.save();
+                                ctx.fillStyle = '#1e293b';
+                                ctx.font = 'bold 12px sans-serif';
+                                ctx.textAlign = 'center';
+                                ctx.textBaseline = 'bottom';
+                                ctx.fillText(val.toFixed(2) + 'đ', bar.x, bar.y - 4);
+                                ctx.restore();
+                            }
+                        });
+                    }
+                };
 
                 avgChartObj = new Chart(ctxBar, {
                     type: 'bar',
@@ -5065,34 +5165,59 @@
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
+                        layout: {
+                            padding: { top: 22 }
+                        },
                         scales: {
                             y: {
                                 min: 0,
-                                max: 5,
+                                max: 5.2,
                                 ticks: { stepSize: 1, font: { size: 11, weight: 'bold' } },
                                 grid: { color: '#e2d8c7' }
                             },
                             x: {
-                                ticks: { font: { size: 11, weight: 'bold' } },
+                                ticks: { font: { size: 10, weight: 'bold' } },
                                 grid: { display: false }
                             }
                         },
                         plugins: {
                             legend: { display: false }
                         }
-                    }
+                    },
+                    plugins: [customBarDataLabels]
                 });
+
+                // Render 4 pill badges số liệu dưới biểu đồ cột
+                if (pillarScoreBadgesEl) {
+                    const colors = [
+                        { bg: 'bg-indigo-50', text: 'text-[#3b4982]', border: 'border-indigo-200' },
+                        { bg: 'bg-sky-50', text: 'text-sky-700', border: 'border-sky-200' },
+                        { bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-200' },
+                        { bg: 'bg-amber-50', text: 'text-amber-800', border: 'border-amber-200' }
+                    ];
+                    pillarScoreBadgesEl.innerHTML = surveyPillars.map((p, pIdx) => {
+                        const val = barDataValues[pIdx];
+                        const c = colors[pIdx];
+                        return `
+                            <div class="${c.bg} ${c.text} ${c.border} p-2 rounded-xl border flex flex-col items-center text-center shadow-2xs">
+                                <span class="font-bold text-[10px] uppercase truncate w-full">Trụ Cột ${p.code}</span>
+                                <strong class="text-sm font-black mt-0.5">${val > 0 ? val.toFixed(2) + ' / 5.0' : '--'}</strong>
+                            </div>
+                        `;
+                    }).join('');
+                }
             }
 
-            // Pie/Doughnut Chart - Cơ cấu vai trò người tham gia (Tự động reset khi xóa dữ liệu)
+            // 4. Pie/Doughnut Chart - Cơ cấu vai trò người tham gia (HIỂN THỊ RÕ RÀNG TỪNG CON SỐ & %)
             const ctxPie = document.getElementById('rolePieChart');
+            const roleStatsBadgesEl = document.getElementById('roleStatsBadges');
             if (ctxPie) {
                 if (roleChartObj) {
                     try { roleChartObj.destroy(); } catch(e){}
                     roleChartObj = null;
                 }
 
-                const hasData = surveyResponses.length > 0 && Object.keys(rolesCount).length > 0;
+                const hasData = filtered.length > 0 && Object.keys(rolesCount).length > 0;
                 const roleLabels = hasData ? Object.keys(rolesCount) : ['Chưa có dữ liệu'];
                 const roleDataValues = hasData ? Object.values(rolesCount) : [1];
                 const roleColors = hasData 
@@ -5116,26 +5241,68 @@
                         plugins: {
                             legend: {
                                 position: 'bottom',
-                                labels: { font: { size: 10, weight: 'bold' }, boxWidth: 12 }
+                                labels: {
+                                    font: { size: 10, weight: 'bold' },
+                                    boxWidth: 12,
+                                    generateLabels: function(chart) {
+                                        const data = chart.data;
+                                        if (!data.labels.length || !hasData) {
+                                            return Chart.defaults.plugins.legend.labels.generateLabels(chart);
+                                        }
+                                        return data.labels.map((label, i) => {
+                                            const val = data.datasets[0].data[i] || 0;
+                                            const pct = filtered.length > 0 ? Math.round((val / filtered.length) * 100) : 0;
+                                            return {
+                                                text: `${label}: ${val} (${pct}%)`,
+                                                fillStyle: data.datasets[0].backgroundColor[i],
+                                                strokeStyle: '#ffffff',
+                                                lineWidth: 1,
+                                                hidden: isNaN(val),
+                                                index: i
+                                            };
+                                        });
+                                    }
+                                }
                             },
                             tooltip: {
                                 callbacks: {
                                     label: function(context) {
                                         if (!hasData) return ' Chưa có phản hồi';
                                         const val = context.raw || 0;
-                                        const pct = surveyResponses.length > 0 ? Math.round((val / surveyResponses.length) * 100) : 0;
-                                        return ` ${val} người (${pct}%)`;
+                                        const pct = filtered.length > 0 ? Math.round((val / filtered.length) * 100) : 0;
+                                        return ` ${context.label}: ${val} người (${pct}%)`;
                                     }
                                 }
                             }
                         }
                     }
                 });
+
+                // Render role summary pills
+                if (roleStatsBadgesEl) {
+                    if (hasData) {
+                        roleStatsBadgesEl.innerHTML = Object.entries(rolesCount).map(([rName, rCount], rIdx) => {
+                            const pct = Math.round((rCount / filtered.length) * 100);
+                            const dotColor = roleColors[rIdx % roleColors.length];
+                            return `
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-50 border border-slate-200 text-slate-700">
+                                    <span class="w-2.5 h-2.5 rounded-full" style="background-color: ${dotColor}"></span>
+                                    <span class="font-semibold">${rName}:</span>
+                                    <strong class="font-black text-[#3b4982]">${rCount}</strong>
+                                    <span class="text-slate-400">(${pct}%)</span>
+                                </span>
+                            `;
+                        }).join('');
+                    } else {
+                        roleStatsBadgesEl.innerHTML = '<span class="text-slate-400 italic">Chưa có dữ liệu phản hồi phù hợp</span>';
+                    }
+                }
             }
 
-            // Render responses table and feedback cards
+            // Gọi render đồng bộ tất cả các bảng và cards
             renderAdminResponsesTable();
             renderAdminFeedbackCards();
+            renderProgramEvaluationHeatmap(filtered);
         }
 
         // GÁN SỐ THỨ TỰ GỐC THEO THỜI GIAN NỘP (TỪ DƯỚI LÊN: NGƯỜI ĐẦU TIÊN LÀ 1, NGƯỜI MỚI NHẤT LÀ N)
@@ -5223,8 +5390,7 @@
         }
 
         function filterAdminDashboard() {
-            renderAdminResponsesTable();
-            renderAdminFeedbackCards();
+            renderGlobalDashboard();
         }
 
         function clearAdminSearch() {
@@ -5578,7 +5744,10 @@
             const realList = [];
             const sugList = [];
 
-            filtered.forEach(r => {
+            // ĐẨY Ý MỚI NHẤT LÊN TRÊN CÙNG THEO DẠNG NGĂN XẾP (LIFO)
+            const stackList = [...filtered].reverse();
+
+            stackList.forEach(r => {
                 if (!r) return;
                 const authorInfo = {
                     name: r.name || 'Ẩn danh',
@@ -5689,6 +5858,224 @@
                     </div>
                 </div>
             `;
+        }
+
+        // RENDER BẢN ĐỒ NHIỆT ĐÁNH GIÁ KHUNG CHƯƠNG TRÌNH & PHÂN CẤP PTV (HEATMAP TÔ MÀU 1 -> 5 & HIGHLIGHTING CHÚ Ý)
+        function renderProgramEvaluationHeatmap(filtered) {
+            const tbody = document.getElementById('programHeatmapTableBody');
+            const alertContainer = document.getElementById('unsuitableAlertContainer');
+            if (!tbody) return;
+
+            const list = filtered || [];
+            const totalResp = list.length;
+
+            // Thống kê điểm số & lý do chưa phù hợp cho từng câu trong 18 câu hỏi Likert
+            const questionStats = allLikertQuestions.map((q, idx) => {
+                let sum = 0;
+                let count = 0;
+                let goodCount = 0; // >= 4
+                let badCount = 0;  // <= 3
+                const badReasons = [];
+
+                list.forEach(r => {
+                    const sc = (r.scores && r.scores[q.id] !== undefined && r.scores[q.id] !== null && r.scores[q.id] !== '') ? parseInt(r.scores[q.id], 10) : 0;
+                    if (sc >= 1 && sc <= 5) {
+                        sum += sc;
+                        count++;
+                        if (sc >= 4) {
+                            goodCount++;
+                        } else {
+                            badCount++;
+                            const rsn = (r.reasons && r.reasons[q.id]) ? r.reasons[q.id].trim() : '';
+                            if (rsn) {
+                                badReasons.push({
+                                    author: `${r.name || 'Ẩn danh'} (${r.role || 'PTV'}${r.unit ? ' • ' + r.unit : ''})`,
+                                    score: sc,
+                                    reason: rsn,
+                                    stt: r._stt || ''
+                                });
+                            }
+                        }
+                    }
+                });
+
+                const avg = count > 0 ? parseFloat((sum / count).toFixed(2)) : 0;
+                const pct = count > 0 ? Math.round((avg / 5) * 100) : 0;
+
+                return {
+                    q,
+                    idx: idx + 1,
+                    sum,
+                    count,
+                    goodCount,
+                    badCount,
+                    avg,
+                    pct,
+                    badReasons
+                };
+            });
+
+            if (totalResp === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="p-8 text-center text-slate-400 italic">
+                            <i class="fa-solid fa-inbox text-3xl mb-2 text-slate-300 block"></i>
+                            Chưa có dữ liệu phản hồi phù hợp để lập bản đồ nhiệt đánh giá khung chương trình.
+                        </td>
+                    </tr>
+                `;
+                if (alertContainer) alertContainer.innerHTML = '';
+                return;
+            }
+
+            // Render từng dòng trong Bản đồ nhiệt ma trận
+            tbody.innerHTML = questionStats.map(item => {
+                const avg = item.avg;
+                let badgeClass = '';
+                let barClass = '';
+                let textLevel = '';
+
+                if (avg >= 4.5) {
+                    badgeClass = 'bg-blue-600 text-white shadow-2xs';
+                    barClass = 'bg-blue-600';
+                    textLevel = 'Rất Phù Hợp';
+                } else if (avg >= 4.0) {
+                    badgeClass = 'bg-emerald-600 text-white shadow-2xs';
+                    barClass = 'bg-emerald-600';
+                    textLevel = 'Phù Hợp';
+                } else if (avg >= 3.5) {
+                    badgeClass = 'bg-teal-500 text-white shadow-2xs';
+                    barClass = 'bg-teal-500';
+                    textLevel = 'Tương Đối';
+                } else if (avg >= 3.0) {
+                    badgeClass = 'bg-amber-500 text-white shadow-2xs';
+                    barClass = 'bg-amber-500';
+                    textLevel = 'Phân Vân';
+                } else if (avg >= 2.0) {
+                    badgeClass = 'bg-orange-500 text-white shadow-2xs';
+                    barClass = 'bg-orange-500';
+                    textLevel = 'Chưa Phù Hợp';
+                } else if (avg > 0) {
+                    badgeClass = 'bg-rose-600 text-white shadow-2xs';
+                    barClass = 'bg-rose-600';
+                    textLevel = 'Rất Không Phù Hợp';
+                } else {
+                    badgeClass = 'bg-slate-300 text-slate-700';
+                    barClass = 'bg-slate-300';
+                    textLevel = 'Chưa có điểm';
+                }
+
+                const isProblematic = avg > 0 && (avg <= 3.49 || item.badCount > 0);
+
+                return `
+                    <tr class="hover:bg-slate-50/80 transition ${isProblematic ? 'bg-amber-50/30' : ''}">
+                        <td class="p-3 text-center font-bold text-slate-500 text-xs">
+                            <span class="inline-flex items-center justify-center w-7 h-7 rounded-lg ${isProblematic ? 'bg-amber-100 text-amber-900 border border-amber-300 font-black' : 'bg-slate-100 text-slate-700'}">
+                                ${item.idx}
+                            </span>
+                        </td>
+                        <td class="p-3 text-slate-800">
+                            <div class="font-bold text-xs sm:text-sm text-[#3b4982] flex items-center gap-1.5 flex-wrap">
+                                <span>${item.q.label}</span>
+                                ${item.badCount > 0 ? `<span class="px-1.5 py-0.2 rounded text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-300 shadow-2xs" title="${item.badCount} người đánh giá phân vân hoặc chưa phù hợp"><i class="fa-solid fa-triangle-exclamation mr-0.5 text-amber-600"></i>${item.badCount} ý kiến</span>` : ''}
+                            </div>
+                            <p class="text-[11px] text-slate-500 mt-0.5 line-clamp-2 leading-relaxed">${item.q.desc}</p>
+                        </td>
+                        <td class="p-3 text-center whitespace-nowrap">
+                            <span class="inline-block px-3 py-1 rounded-full font-black text-xs ${badgeClass}">
+                                ${item.avg > 0 ? item.avg.toFixed(2) + ' / 5.0' : '--'}
+                            </span>
+                            <div class="text-[10px] font-bold text-slate-500 mt-1">${textLevel}</div>
+                        </td>
+                        <td class="p-3 text-center">
+                            <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
+                                <div class="${barClass} h-2.5 rounded-full transition-all duration-500" style="width: ${item.pct}%"></div>
+                            </div>
+                            <span class="text-[10px] font-bold text-slate-600 mt-1 block">${item.pct}%</span>
+                        </td>
+                        <td class="p-3 text-center whitespace-nowrap text-xs">
+                            <span class="text-emerald-700 font-bold" title="Số lượt đánh giá >= 4 sao (Phù hợp & Rất phù hợp)"><i class="fa-solid fa-thumbs-up mr-0.5"></i>${item.goodCount}</span>
+                            <span class="text-slate-300 mx-1.5">|</span>
+                            <span class="${item.badCount > 0 ? 'text-rose-600 font-bold' : 'text-slate-400'}" title="Số lượt đánh giá <= 3 sao (Phân vân & Chưa phù hợp)"><i class="fa-solid fa-circle-exclamation mr-0.5"></i>${item.badCount}</span>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            // Render Khối Liệt Kê Những Phần Chưa Phù Hợp Để Highlighting Chú Ý (<= 3 điểm)
+            if (alertContainer) {
+                const problematicItems = questionStats.filter(item => item.badCount > 0 || (item.avg > 0 && item.avg < 3.5));
+
+                if (problematicItems.length === 0) {
+                    alertContainer.innerHTML = `
+                        <div class="p-4 bg-emerald-50 rounded-2xl border border-emerald-200 flex items-center gap-3 text-xs text-emerald-800">
+                            <span class="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center text-sm shadow-xs flex-shrink-0">
+                                <i class="fa-solid fa-circle-check"></i>
+                            </span>
+                            <div>
+                                <strong class="font-bold text-sm block">Đánh Giá Xuất Sắc! Không Có Phần Nào Bị Đánh Giá Chưa Phù Hợp</strong>
+                                <span class="text-emerald-700">Tất cả 18 nội dung chương trình đào tạo & phân cấp đều đạt mức độ phù hợp cao từ các phản hồi khảo sát.</span>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    alertContainer.innerHTML = `
+                        <div class="p-4 sm:p-5 bg-gradient-to-r from-rose-50/70 via-amber-50/40 to-rose-50/70 rounded-2xl border-2 border-rose-300 shadow-sm space-y-3">
+                            <div class="flex items-center justify-between gap-2 border-b border-rose-200/80 pb-2.5">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-8 h-8 rounded-xl bg-rose-600 text-white flex items-center justify-center text-sm shadow animate-pulse">
+                                        <i class="fa-solid fa-triangle-exclamation"></i>
+                                    </span>
+                                    <div>
+                                        <h4 class="font-black text-rose-950 text-xs sm:text-sm md:text-base uppercase tracking-wide">
+                                            DANH SÁCH CÁC PHẦN CHƯA PHÙ HỢP CẦN ĐẶC BIỆT CHÚ Ý &amp; HOÀN THIỆN (${problematicItems.length})
+                                        </h4>
+                                        <p class="text-[11px] sm:text-xs text-rose-800 font-medium">Tổng hợp các nội dung nhận điểm số phân vân (3 điểm) hoặc chưa phù hợp (&le; 2 điểm) kèm phản ánh chi tiết từ Huynh trưởng</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
+                                ${problematicItems.map(item => `
+                                    <div class="bg-white p-3.5 rounded-xl border border-rose-200 shadow-2xs space-y-2">
+                                        <div class="flex items-start justify-between gap-2">
+                                            <div>
+                                                <span class="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-rose-100 text-rose-800 border border-rose-200">
+                                                    Mục ${item.idx}
+                                                </span>
+                                                <h5 class="font-bold text-slate-800 text-xs sm:text-sm mt-1 leading-snug">
+                                                    ${item.q.label}
+                                                </h5>
+                                            </div>
+                                            <span class="px-2.5 py-1 rounded-lg text-xs font-black bg-rose-50 text-rose-700 border border-rose-200 whitespace-nowrap shadow-2xs">
+                                                TB: ${item.avg.toFixed(2)} / 5.0
+                                            </span>
+                                        </div>
+
+                                        <div class="space-y-1.5 pt-1.5 border-t border-slate-100">
+                                            <div class="text-[11px] font-bold text-rose-800 flex items-center justify-between">
+                                                <span><i class="fa-solid fa-comment-dots mr-1"></i> Lý do &amp; Điểm cần hoàn thiện (${item.badReasons.length} phản ánh):</span>
+                                                <span class="text-[10px] font-semibold text-slate-500">${item.badCount} người đánh giá &le; 3</span>
+                                            </div>
+                                            <div class="space-y-1.5 max-h-44 overflow-y-auto pr-1 text-xs">
+                                                ${item.badReasons.length > 0 ? item.badReasons.map(br => `
+                                                    <div class="bg-rose-50/50 p-2.5 rounded-xl border border-rose-100 text-slate-700 text-[11px] space-y-1">
+                                                        <p class="italic leading-relaxed">"${br.reason}"</p>
+                                                        <div class="flex items-center justify-between text-[10px] pt-0.5 border-t border-rose-100/60">
+                                                            <span class="font-bold text-rose-800">— ${br.author}</span>
+                                                            <span class="px-1.5 py-0.2 rounded font-black bg-white border border-rose-200 text-rose-700">${br.score} điểm</span>
+                                                        </div>
+                                                    </div>
+                                                `).join('') : '<p class="text-slate-400 italic text-[11px] p-1">Không có phản ánh văn bản bổ sung.</p>'}
+                                            </div>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                }
+            }
         }
 
         // SYNC ALL LOCAL RESPONSES TO Hệ thống
