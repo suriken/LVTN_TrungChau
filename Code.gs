@@ -42,24 +42,24 @@ var Q_KEYS = [
 var SHEET_HEADERS_EXPLICIT = [
   "Mã Phiếu", "Thời Gian Gửi", "Họ Và Tên", "Số Điện Thoại", "Vai Trò Hiện Nay",
   "Đơn Vị Sinh Hoạt", "Cấp PTV Cao Nhất", "Thâm Niên", "Khu Vực", "Điểm Đánh Giá TB",
-  "[C01] Điểm: Phân cấp 4 bậc", "[C01] Lý do điểm < 3",
-  "[C02] Điểm: Tiêu chuẩn nhập khóa", "[C02] Lý do điểm < 3",
-  "[C03] Điểm: Thời lượng khóa học", "[C03] Lý do điểm < 3",
-  "[C04] Điểm: Hình thức tổ chức (Hàm thụ & Trại)", "[C04] Lý do điểm < 3",
-  "[C05] Điểm: Tinh thần chấp nhận đào tạo & Tên khóa", "[C05] Lý do điểm < 3",
-  "[C06] Điểm: Tiêu chuẩn tốt nghiệp", "[C06] Lý do điểm < 3",
-  "[C07] Điểm: Khối I - Giáo lý & Lễ nghi", "[C07] Lý do điểm < 3",
-  "[C08] Điểm: Khối II - Truyền thống & Tổ chức", "[C08] Lý do điểm < 3",
-  "[C09] Điểm: Khối III - Kỹ năng Hướng dẫn sinh hoạt", "[C09] Lý do điểm < 3",
-  "[C10] Điểm: Khối IV - Kỹ năng Phục vụ Lễ nghi", "[C10] Lý do điểm < 3",
-  "[C11] Điểm: Khối V - Hành trì & Tu dưỡng", "[C11] Lý do điểm < 3",
-  "[C12] Điểm: Khối VI - Kỹ năng số & An toàn trẻ em", "[C12] Lý do điểm < 3",
-  "[C13] Điểm: Năng lực thực tế đầu ra", "[C13] Lý do điểm < 3",
-  "[C14] Điểm: Khả năng vận dụng tại Họ đạo", "[C14] Lý do điểm < 3",
-  "[C15] Điểm: Tinh thần gắn bó phụng sự lâu dài", "[C15] Lý do điểm < 3",
-  "[C16] Điểm: Phù hợp độ tuổi & Tâm sinh lý", "[C16] Lý do điểm < 3",
-  "[C17] Điểm: Đáp ứng nhu cầu thực tế Giáo hội", "[C17] Lý do điểm < 3",
-  "[C18] Điểm: Thích ứng bối cảnh xã hội & Tương lai", "[C18] Lý do điểm < 3",
+  "[C01] Điểm: Phân cấp 4 bậc", "[C01] Lý do điểm ≤ 3",
+  "[C02] Điểm: Tiêu chuẩn nhập khóa", "[C02] Lý do điểm ≤ 3",
+  "[C03] Điểm: Thời lượng khóa học", "[C03] Lý do điểm ≤ 3",
+  "[C04] Điểm: Hình thức tổ chức (Hàm thụ & Trại)", "[C04] Lý do điểm ≤ 3",
+  "[C05] Điểm: Tinh thần chấp nhận đào tạo & Tên khóa", "[C05] Lý do điểm ≤ 3",
+  "[C06] Điểm: Tiêu chuẩn tốt nghiệp", "[C06] Lý do điểm ≤ 3",
+  "[C07] Điểm: Khối I - Giáo lý & Lễ nghi", "[C07] Lý do điểm ≤ 3",
+  "[C08] Điểm: Khối II - Truyền thống & Tổ chức", "[C08] Lý do điểm ≤ 3",
+  "[C09] Điểm: Khối III - Kỹ năng Hướng dẫn sinh hoạt", "[C09] Lý do điểm ≤ 3",
+  "[C10] Điểm: Khối IV - Kỹ năng Phục vụ Lễ nghi", "[C10] Lý do điểm ≤ 3",
+  "[C11] Điểm: Khối V - Hành trì & Tu dưỡng", "[C11] Lý do điểm ≤ 3",
+  "[C12] Điểm: Khối VI - Kỹ năng số & An toàn trẻ em", "[C12] Lý do điểm ≤ 3",
+  "[C13] Điểm: Năng lực thực tế đầu ra", "[C13] Lý do điểm ≤ 3",
+  "[C14] Điểm: Khả năng vận dụng tại Họ đạo", "[C14] Lý do điểm ≤ 3",
+  "[C15] Điểm: Tinh thần gắn bó phụng sự lâu dài", "[C15] Lý do điểm ≤ 3",
+  "[C16] Điểm: Phù hợp độ tuổi & Tâm sinh lý", "[C16] Lý do điểm ≤ 3",
+  "[C17] Điểm: Đáp ứng nhu cầu thực tế Giáo hội", "[C17] Lý do điểm ≤ 3",
+  "[C18] Điểm: Thích ứng bối cảnh xã hội & Tương lai", "[C18] Lý do điểm ≤ 3",
   "Thực hành trai kỳ", "Duy trì thời cúng & Công phu", "Tình trạng phụng sự hiện nay", "Khó khăn / Rào cản lớn nhất",
   "Mặt làm được (Ưu điểm)", "Mặt chưa được (Hạn chế)", "Thực trạng PTV sau tốt nghiệp", "Đề xuất cải tiến chương trình"
 ];
@@ -475,13 +475,13 @@ function handleSubmitSurvey(data, sheet) {
     });
   }
 
-  // KIỂM TRA BẮT BUỘC NHẬP LÝ DO ĐỐI VỚI CÂU ĐÁNH GIÁ DƯỚI 3 ĐIỂM (ĐIỂM 1 HOẶC 2)
+  // KIỂM TRA BẮT BUỘC NHẬP LÝ DO ĐỐI VỚI CÂU ĐÁNH GIÁ TỪ 3 ĐIỂM TRỞ XUỐNG (ĐIỂM 1, 2 HOẶC 3)
   var reasons = data.reasons || {};
   var missingReasons = [];
   for (var k = 0; k < Q_KEYS.length; k++) {
     var qk = Q_KEYS[k];
     var val = parseFloat(scores[qk]);
-    if (val < 3) {
+    if (val <= 3) {
       var rText = (reasons[qk] || "").toString().trim();
       if (!rText) {
         missingReasons.push(qk);
@@ -493,7 +493,7 @@ function handleSubmitSurvey(data, sheet) {
     return createJsonResponse({
       success: false,
       result: "error",
-      message: "Có " + missingReasons.length + " câu đánh giá dưới 3 điểm nhưng chưa có lý do. Trường hợp điểm dưới 3, hệ thống BẮT BUỘC phải nhập lý do đánh giá chưa phù hợp & điểm cần cải thiện trước khi nộp phiếu!"
+      message: "Có " + missingReasons.length + " câu đánh giá từ 3 điểm trở xuống (≤ 3 điểm) nhưng chưa có lý do. Trường hợp điểm từ 3 trở xuống, hệ thống BẮT BUỘC phải nhập lý do giải trình & điểm cần cải thiện trước khi nộp phiếu!"
     });
   }
 

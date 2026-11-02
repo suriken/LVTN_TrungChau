@@ -3160,14 +3160,14 @@
                                     }).join('')}
                                 </div>
 
-                                <!-- EXPANDABLE REASON TEXTAREA WHEN SCORE < 3 (ĐIỂM 1 HOẶC 2) -->
-                                <div id="reason_container_${q.id}" class="hidden mt-3.5 p-4 bg-rose-50 border-2 border-rose-300 rounded-xl transition-all">
-                                    <div class="flex items-center gap-2 text-sm sm:text-base font-black text-rose-800 mb-2">
-                                        <i class="fa-solid fa-triangle-exclamation text-rose-600 text-base flex-shrink-0"></i>
-                                        <span>Lý do đánh giá chưa phù hợp & Điểm cần cải thiện (${q.label}):</span>
-                                        <span class="text-rose-600 font-black text-xs sm:text-sm">* (Bắt buộc)</span>
+                                <!-- EXPANDABLE REASON TEXTAREA WHEN SCORE <= 3 (ĐIỂM 1, 2 HOẶC 3) -->
+                                <div id="reason_container_${q.id}" class="hidden mt-3.5 p-4 bg-amber-50/90 border-2 border-amber-300 rounded-xl transition-all">
+                                    <div class="flex items-center gap-2 text-sm sm:text-base font-black text-amber-900 mb-2">
+                                        <i class="fa-solid fa-triangle-exclamation text-amber-600 text-base flex-shrink-0"></i>
+                                        <span>Lý do & Điểm cần hoàn thiện (${q.label}):</span>
+                                        <span class="text-rose-600 font-black text-xs sm:text-sm">* (Bắt buộc khi đánh giá ≤ 3 điểm)</span>
                                     </div>
-                                    <textarea id="reason_${q.id}" name="reason_${q.id}" oninput="handleReasonInput('${q.id}')" rows="2" class="w-full text-sm sm:text-base p-3.5 rounded-xl border border-rose-300 focus:ring-2 focus:ring-rose-500 bg-white placeholder-slate-400 outline-none leading-relaxed text-left transition" placeholder="Quý vị vui lòng nêu rõ lý do đánh giá chưa phù hợp (Bắt buộc phải nhập khi đánh giá dưới 3 điểm)..."></textarea>
+                                    <textarea id="reason_${q.id}" name="reason_${q.id}" oninput="handleReasonInput('${q.id}')" rows="2" class="w-full text-sm sm:text-base p-3.5 rounded-xl border border-amber-300 focus:ring-2 focus:ring-amber-500 bg-white placeholder-slate-400 outline-none leading-relaxed text-left transition" placeholder="Quý vị vui lòng nêu rõ lý do hoặc điểm cần hoàn thiện thêm (Bắt buộc phải nhập khi đánh giá từ 3 điểm trở xuống)..."></textarea>
                                 </div>
                             </div>
                         `).join('')}
@@ -3232,7 +3232,7 @@
                 cardEl.classList.remove('ring-4', 'ring-rose-500', 'animate-pulse');
             }
 
-            if (val < 3) {
+            if (val <= 3) {
                 container.classList.remove('hidden');
                 if (shouldFocus && textarea && !textarea.value.trim()) {
                     setTimeout(() => textarea.focus(), 100);
@@ -3630,7 +3630,7 @@
                         total += val;
                         count++;
 
-                        if (val < 3) {
+                        if (val <= 3) {
                             const reasonEl = document.getElementById(`reason_${q.id}`);
                             const reasonText = reasonEl ? reasonEl.value.trim() : '';
                             if (!reasonText) {
@@ -3659,7 +3659,7 @@
                     return;
                 }
 
-                // BẮT BUỘC NHẬP LÝ DO ĐỐI VỚI TẤT CẢ CÁC CÂU CÓ ĐIỂM DƯỚI 3 (ĐIỂM 1 HOẶC 2)
+                // BẮT BUỘC NHẬP LÝ DO ĐỐI VỚI TẤT CẢ CÁC CÂU CÓ ĐIỂM TỪ 3 TRỞ XUỐNG (ĐIỂM 1, 2 HOẶC 3)
                 if (missingReasons.length > 0) {
                     const firstItem = missingReasons[0];
                     const firstEl = firstItem.el || document.getElementById(`reason_${firstItem.q.id}`);
@@ -3674,8 +3674,8 @@
                     });
 
                     const alertMsg = missingReasons.length === 1
-                        ? `Quý vị đã đánh giá ${firstItem.val} điểm cho câu: "${firstItem.q.label}". Trường hợp điểm dưới 3, quý vị BẮT BUỘC phải nhập lý do đánh giá chưa phù hợp & điểm cần cải thiện trước khi nộp phiếu!`
-                        : `Có ${missingReasons.length} câu đánh giá dưới 3 điểm nhưng chưa nhập lý do (đầu tiên là câu: "${firstItem.q.label}"). Vui lòng nhập đầy đủ lý do giải trình trước khi nộp phiếu!`;
+                        ? `Quý vị đã đánh giá ${firstItem.val} điểm cho câu: "${firstItem.q.label}". Trường hợp điểm từ 3 trở xuống (≤ 3 điểm), quý vị BẮT BUỘC phải nhập lý do giải trình & điểm cần hoàn thiện trước khi nộp phiếu!`
+                        : `Có ${missingReasons.length} câu đánh giá từ 3 điểm trở xuống (≤ 3 điểm) nhưng chưa nhập lý do (đầu tiên là câu: "${firstItem.q.label}"). Vui lòng nhập đầy đủ lý do giải trình trước khi nộp phiếu!`;
 
                     showSubmitAlert(alertMsg, firstEl || cardEl);
                     if (firstEl) {
@@ -5160,7 +5160,7 @@
                         <div class="p-2.5 rounded-xl border border-slate-200 bg-white flex items-start justify-between gap-2.5 text-xs hover:bg-slate-50 transition">
                             <div class="flex-grow">
                                 <span class="font-bold text-slate-800 leading-snug">${q.label}</span>
-                                ${reason ? `<div class="text-rose-600 italic mt-0.5 font-semibold">⚠️ Lý do < 3đ: ${reason}</div>` : ''}
+                                ${reason ? `<div class="text-amber-800 bg-amber-50 px-2 py-0.5 rounded border border-amber-200 italic mt-1 font-semibold text-[11px]"><i class="fa-solid fa-triangle-exclamation mr-1 text-amber-600"></i>Lý do (≤ 3đ): ${reason}</div>` : ''}
                                 ${rawScore === 0 ? `<div class="text-amber-700 font-medium italic mt-0.5 text-[11px]"><i class="fa-solid fa-circle-info mr-1"></i>Phiếu nộp từ phiên bản trước khi bổ sung câu hỏi này (hoặc chưa ghi nhận điểm).</div>` : ''}
                             </div>
                             <div class="flex-shrink-0">
@@ -5500,7 +5500,7 @@
             allLikertQuestions.forEach((q, idx) => {
                 const num = String(idx + 1).padStart(2, '0');
                 likertHeaders.push(`"[C${num}] Điểm - ${q.label}"`);
-                likertHeaders.push(`"[C${num}] Lý do điểm < 3"`);
+                likertHeaders.push(`"[C${num}] Lý do điểm ≤ 3"`);
             });
 
             // Header columns chuẩn hóa 54 cột tường minh

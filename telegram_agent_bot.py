@@ -46,7 +46,8 @@ def load_config():
     config = {
         "telegram_bot_token": os.environ.get("TELEGRAM_BOT_TOKEN", ""),
         "telegram_chat_id": os.environ.get("TELEGRAM_CHAT_ID", ""),
-        "gemini_api_key": os.environ.get("GEMINI_API_KEY", "")
+        "gemini_api_key": os.environ.get("GEMINI_API_KEY", ""),
+        "gemini_model": os.environ.get("GEMINI_MODEL", "gemini-3.8-flash")
     }
 
     if CONFIG_FILE.exists():
@@ -193,11 +194,11 @@ def tool_run_terminal(command: str) -> str:
         return f"Lỗi thực thi lệnh: {e}"
 
 # ==============================================================================
-# AGENT XỬ LÝ PROMPT VỚI GOOGLE GEMINI 3.8
+# AGENT XỬ LÝ PROMPT VỚI GOOGLE GEMINI (HỖ TRỢ AUTO-RETRY & AUTO-FALLBACK)
 # ==============================================================================
 
-def execute_mobile_prompt(prompt: str, gemini_api_key: str, status_callback=None) -> str:
-    """Sử dụng Gemini 3.8 Flash với Function Calling để tự động sửa code và kiểm thử"""
+def execute_mobile_prompt(prompt: str, gemini_api_key: str, model_name: str = "gemini-3.8-flash", status_callback=None) -> str:
+    """Sử dụng Google Gemini với Function Calling, tự động thử lại khi 503 hoặc chuyển model dự phòng"""
     try:
         from google import genai
         from google.genai import types
@@ -236,26 +237,44 @@ Nhiệm vụ của bạn khi nhận yêu cầu từ người dùng qua điện t
    - Đảm bảo tính sẵn sàng để deploy
 """
 
-    if status_callback:
-        status_callback("🧠 Gemini 3.8 đang phân tích yêu cầu và duyệt mã nguồn...")
+    # Danh sách model ưu tiên (mô hình người dùng chọn đứng đầu, sau đó là các bản dự phòng)
+    models_to_try = [model_name]
+    for alt in ["gemini-3.8-flash", "gemini-3.5-flash", "gemini-flash-latest", "gemini-2.5-pro", "gemini-pro-latest"]:
+        if alt not in models_to_try:
+            models_to_try.append(alt)
 
-    try:
-        chat = client.chats.create(
-            model="gemini-3.8-flash",
-            config=types.GenerateContentConfig(
-                system_instruction=system_instruction,
-                temperature=0.2,
-                tools=tools
-            )
-        )
+    last_error_msg = ""
+    for target_model in models_to_try:
+        if status_callback:
+            status_callback(f"🧠 Đang gọi mô hình `{target_model}` để phân tích yêu cầu...")
 
-        resp = chat.send_message(f"Yêu cầu từ người quản trị qua iPhone: {prompt}")
-        final_text = resp.text or "Đã thực hiện xong các chỉnh sửa theo yêu cầu."
-        return final_text
-    except Exception as e:
-        print(f"[!] Lỗi khi gọi Gemini: {e}")
-        traceback.print_exc()
-        return f"Lỗi trong quá trình xử lý AI: {str(e)}"
+        for attempt in range(1, 3):
+            try:
+                chat = client.chats.create(
+                    model=target_model,
+                    config=types.GenerateContentConfig(
+                        system_instruction=system_instruction,
+                        temperature=0.2,
+                        tools=tools
+                    )
+                )
+
+                resp = chat.send_message(f"Yêu cầu từ người quản trị qua iPhone: {prompt}")
+                final_text = resp.text or "Đã thực hiện xong các chỉnh sửa theo yêu cầu."
+                return f"*(Mô hình: `{target_model}`)*\n\n{final_text}"
+            except Exception as e:
+                err_str = str(e)
+                last_error_msg = err_str
+                print(f"[!] Thử lần {attempt} với `{target_model}` thất bại: {err_str}")
+                if "503" in err_str or "UNAVAILABLE" in err_str or "high demand" in err_str.lower():
+                    if status_callback and attempt < 2:
+                        status_callback(f"⏳ `{target_model}` đang có lượng truy cập cao (503). Đang tự động thử lại...")
+                    time.sleep(3)
+                    continue
+                else:
+                    break
+
+    return f"❌ Không thể hoàn thành yêu cầu qua các mô hình AI. Chi tiết lỗi cuối cùng: {last_error_msg}"
 
 # ==============================================================================
 # HÀM TỰ ĐỘNG GIT COMMIT, PUSH & TRIGGER DEPLOY
@@ -453,8 +472,10 @@ def run_bot():
                 def update_cb(msg):
                     bot.send_message(chat_id, msg)
 
+                selected_model = config.get("gemini_model", "gemini-3.8-flash")
+
                 # 1. Chạy AI code agent
-                agent_report = execute_mobile_prompt(text, gemini_key, status_callback=update_cb)
+                agent_report = execute_mobile_prompt(text, gemini_key, model_name=selected_model, status_callback=update_cb)
 
                 # 2. Tự động commit, push & deploy nếu có thay đổi
                 deploy_report = check_and_deploy_changes(text)
