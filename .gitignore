@@ -3,3 +3,5 @@ __pycache__/
 stress_test_report.json
 .clasprc.json
 *.local
+telegram_config.json
+.env
