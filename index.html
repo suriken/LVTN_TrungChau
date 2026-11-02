@@ -3161,13 +3161,13 @@
                                 </div>
 
                                 <!-- EXPANDABLE REASON TEXTAREA WHEN SCORE <= 3 (ĐIỂM 1, 2 HOẶC 3) -->
-                                <div id="reason_container_${q.id}" class="hidden mt-3.5 p-4 bg-amber-50/90 border-2 border-amber-300 rounded-xl transition-all">
-                                    <div class="flex items-center gap-2 text-sm sm:text-base font-black text-amber-900 mb-2">
-                                        <i class="fa-solid fa-triangle-exclamation text-amber-600 text-base flex-shrink-0"></i>
-                                        <span>Lý do & Điểm cần hoàn thiện (${q.label}):</span>
-                                        <span class="text-rose-600 font-black text-xs sm:text-sm">* (Bắt buộc khi đánh giá ≤ 3 điểm)</span>
+                                <div id="reason_container_${q.id}" class="hidden mt-3.5 p-4 rounded-xl transition-all">
+                                    <div id="reason_title_${q.id}" class="flex items-center gap-2 text-sm sm:text-base font-black mb-2">
+                                        <i id="reason_icon_${q.id}" class="fa-solid fa-scale-balanced text-amber-600 text-base flex-shrink-0"></i>
+                                        <span id="reason_label_${q.id}">Lý do (${q.label}):</span>
+                                        <span id="reason_badge_${q.id}" class="text-amber-700 font-bold text-xs sm:text-sm">* (Bắt buộc)</span>
                                     </div>
-                                    <textarea id="reason_${q.id}" name="reason_${q.id}" oninput="handleReasonInput('${q.id}')" rows="2" class="w-full text-sm sm:text-base p-3.5 rounded-xl border border-amber-300 focus:ring-2 focus:ring-amber-500 bg-white placeholder-slate-400 outline-none leading-relaxed text-left transition" placeholder="Quý vị vui lòng nêu rõ lý do hoặc điểm cần hoàn thiện thêm (Bắt buộc phải nhập khi đánh giá từ 3 điểm trở xuống)..."></textarea>
+                                    <textarea id="reason_${q.id}" name="reason_${q.id}" oninput="handleReasonInput('${q.id}')" rows="2" class="w-full text-sm sm:text-base p-3.5 rounded-xl outline-none leading-relaxed text-left transition" placeholder="Quý vị vui lòng nêu rõ lý do..."></textarea>
                                 </div>
                             </div>
                         `).join('')}
@@ -3224,6 +3224,10 @@
         function handleScoreChange(qId, val, shouldFocus = true) {
             const container = document.getElementById(`reason_container_${qId}`);
             const textarea = document.getElementById(`reason_${qId}`);
+            const titleEl = document.getElementById(`reason_title_${qId}`);
+            const iconEl = document.getElementById(`reason_icon_${qId}`);
+            const labelEl = document.getElementById(`reason_label_${qId}`);
+            const badgeEl = document.getElementById(`reason_badge_${qId}`);
             if (!container) return;
 
             // Xóa viền đỏ cảnh báo nếu câu này vừa được chọn điểm
@@ -3234,6 +3238,41 @@
 
             if (val <= 3) {
                 container.classList.remove('hidden');
+
+                // Lấy thông tin nhãn câu hỏi
+                const qObj = allLikertQuestions ? allLikertQuestions.find(item => item.id === qId) : null;
+                const qLabel = qObj ? qObj.label : qId;
+
+                if (val === 3) {
+                    // Khi chọn 3 - Phân vân: chỉ ghi "Lý do", KHÔNG ghi "điểm cần hoàn thiện / cải thiện"
+                    container.className = "mt-3.5 p-4 rounded-xl transition-all bg-amber-50/90 border-2 border-amber-300";
+                    if (titleEl) titleEl.className = "flex items-center gap-2 text-sm sm:text-base font-black mb-2 text-amber-900";
+                    if (iconEl) iconEl.className = "fa-solid fa-scale-balanced text-amber-600 text-base flex-shrink-0";
+                    if (labelEl) labelEl.innerText = `Lý do (${qLabel}):`;
+                    if (badgeEl) {
+                        badgeEl.className = "text-amber-700 font-bold text-xs sm:text-sm";
+                        badgeEl.innerText = "* (Bắt buộc)";
+                    }
+                    if (textarea) {
+                        textarea.className = "w-full text-sm sm:text-base p-3.5 rounded-xl border border-amber-300 focus:ring-2 focus:ring-amber-500 bg-white placeholder-slate-400 outline-none leading-relaxed text-left transition";
+                        textarea.placeholder = "Quý vị vui lòng nêu rõ lý do phân vân ở mục này...";
+                    }
+                } else {
+                    // Khi chọn < 3 (Điểm 1 hoặc 2): hiển thị "Lý do đánh giá chưa phù hợp & Điểm cần cải thiện"
+                    container.className = "mt-3.5 p-4 rounded-xl transition-all bg-rose-50/90 border-2 border-rose-300";
+                    if (titleEl) titleEl.className = "flex items-center gap-2 text-sm sm:text-base font-black mb-2 text-rose-900";
+                    if (iconEl) iconEl.className = "fa-solid fa-triangle-exclamation text-rose-600 text-base flex-shrink-0";
+                    if (labelEl) labelEl.innerText = `Lý do đánh giá chưa phù hợp & Điểm cần cải thiện (${qLabel}):`;
+                    if (badgeEl) {
+                        badgeEl.className = "text-rose-600 font-black text-xs sm:text-sm";
+                        badgeEl.innerText = "* (Bắt buộc)";
+                    }
+                    if (textarea) {
+                        textarea.className = "w-full text-sm sm:text-base p-3.5 rounded-xl border border-rose-300 focus:ring-2 focus:ring-rose-500 bg-white placeholder-slate-400 outline-none leading-relaxed text-left transition";
+                        textarea.placeholder = "Quý vị vui lòng nêu rõ lý do chưa phù hợp & điểm cần cải thiện...";
+                    }
+                }
+
                 if (shouldFocus && textarea && !textarea.value.trim()) {
                     setTimeout(() => textarea.focus(), 100);
                 }
@@ -3673,9 +3712,16 @@
                         }
                     });
 
-                    const alertMsg = missingReasons.length === 1
-                        ? `Quý vị đã đánh giá ${firstItem.val} điểm cho câu: "${firstItem.q.label}". Trường hợp điểm từ 3 trở xuống (≤ 3 điểm), quý vị BẮT BUỘC phải nhập lý do giải trình & điểm cần hoàn thiện trước khi nộp phiếu!`
-                        : `Có ${missingReasons.length} câu đánh giá từ 3 điểm trở xuống (≤ 3 điểm) nhưng chưa nhập lý do (đầu tiên là câu: "${firstItem.q.label}"). Vui lòng nhập đầy đủ lý do giải trình trước khi nộp phiếu!`;
+                    let alertMsg = "";
+                    if (missingReasons.length === 1) {
+                        if (firstItem.val === 3) {
+                            alertMsg = `Quý vị đã đánh giá 3 điểm (Phân vân) cho câu: "${firstItem.q.label}". Vui lòng nhập Lý do giải trình trước khi nộp phiếu!`;
+                        } else {
+                            alertMsg = `Quý vị đã đánh giá ${firstItem.val} điểm cho câu: "${firstItem.q.label}". Trường hợp điểm dưới 3, quý vị BẮT BUỘC phải nhập lý do đánh giá chưa phù hợp & điểm cần cải thiện trước khi nộp phiếu!`;
+                        }
+                    } else {
+                        alertMsg = `Có ${missingReasons.length} câu đánh giá từ 3 điểm trở xuống (≤ 3 điểm) nhưng chưa nhập lý do (đầu tiên là câu: "${firstItem.q.label}"). Vui lòng nhập đầy đủ lý do giải trình trước khi nộp phiếu!`;
+                    }
 
                     showSubmitAlert(alertMsg, firstEl || cardEl);
                     if (firstEl) {

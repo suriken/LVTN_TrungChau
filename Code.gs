@@ -493,7 +493,7 @@ function handleSubmitSurvey(data, sheet) {
     return createJsonResponse({
       success: false,
       result: "error",
-      message: "Có " + missingReasons.length + " câu đánh giá từ 3 điểm trở xuống (≤ 3 điểm) nhưng chưa có lý do. Trường hợp điểm từ 3 trở xuống, hệ thống BẮT BUỘC phải nhập lý do giải trình & điểm cần cải thiện trước khi nộp phiếu!"
+      message: "Có " + missingReasons.length + " câu đánh giá từ 3 điểm trở xuống (≤ 3 điểm) nhưng chưa có lý do. Trường hợp điểm từ 3 trở xuống, hệ thống BẮT BUỘC phải nhập lý do trước khi nộp phiếu!"
     });
   }
 

@@ -183,7 +183,10 @@ def tool_run_terminal(command: str) -> str:
             if b in command.lower():
                 return f"Lỗi: Lệnh bị từ chối vì lý do an toàn!"
         
-        res = subprocess.run(command, cwd=REPO_DIR, shell=True, capture_output=True, text=True, timeout=30)
+        res = subprocess.run(
+            command, cwd=REPO_DIR, shell=True, capture_output=True,
+            text=True, encoding="utf-8", errors="replace", timeout=30
+        )
         output = res.stdout
         if res.stderr:
             output += "\nSTDERR:\n" + res.stderr
@@ -239,7 +242,14 @@ Nhiệm vụ của bạn khi nhận yêu cầu từ người dùng qua điện t
 
     # Danh sách model ưu tiên (mô hình người dùng chọn đứng đầu, sau đó là các bản dự phòng)
     models_to_try = [model_name]
-    for alt in ["gemini-3.8-flash", "gemini-3.5-flash", "gemini-flash-latest", "gemini-2.5-pro", "gemini-pro-latest"]:
+    for alt in [
+        "gemini-3.8-flash",
+        "gemini-3.5-flash-lite",
+        "gemini-3.1-flash-lite",
+        "gemini-flash-lite-latest",
+        "gemini-3.5-flash",
+        "gemini-flash-latest"
+    ]:
         if alt not in models_to_try:
             models_to_try.append(alt)
 
@@ -266,11 +276,18 @@ Nhiệm vụ của bạn khi nhận yêu cầu từ người dùng qua điện t
                 err_str = str(e)
                 last_error_msg = err_str
                 print(f"[!] Thử lần {attempt} với `{target_model}` thất bại: {err_str}")
+
+                # Quá tải tạm thời (503) -> thử lại
                 if "503" in err_str or "UNAVAILABLE" in err_str or "high demand" in err_str.lower():
                     if status_callback and attempt < 2:
                         status_callback(f"⏳ `{target_model}` đang có lượng truy cập cao (503). Đang tự động thử lại...")
                     time.sleep(3)
                     continue
+                # Hết hạn ngạch (429) -> chuyển ngay sang model kế tiếp
+                elif "429" in err_str or "RESOURCE_EXHAUSTED" in err_str or "quota" in err_str.lower():
+                    if status_callback:
+                        status_callback(f"⚠️ `{target_model}` đạt giới hạn lượt gọi ngày (429). Đang tự động chuyển sang mô hình Flash-Lite dự phòng...")
+                    break
                 else:
                     break
 
@@ -284,7 +301,7 @@ def check_and_deploy_changes(prompt_summary: str) -> str:
     """Kiểm tra thay đổi git, commit và push lên origin main"""
     try:
         # 1. Kiểm tra git status
-        status_res = subprocess.run(["git", "status", "--porcelain"], cwd=REPO_DIR, capture_output=True, text=True)
+        status_res = subprocess.run(["git", "status", "--porcelain"], cwd=REPO_DIR, capture_output=True, text=True, encoding="utf-8", errors="replace")
         changes = status_res.stdout.strip()
         
         if not changes:
@@ -295,7 +312,7 @@ def check_and_deploy_changes(prompt_summary: str) -> str:
             subprocess.run([
                 "node", "-e",
                 "const fs = require('fs'); const html = fs.readFileSync('index.html', 'utf8'); const scripts = html.match(/<script[\\s\\S]*?<\\/script>/gi) || []; scripts.forEach(s => new Function(s.replace(/<script[^>]*>|<\\/script>/gi, ''))); console.log('Syntax OK');"
-            ], cwd=REPO_DIR, check=True, capture_output=True)
+            ], cwd=REPO_DIR, check=True, capture_output=True, encoding="utf-8", errors="replace")
         except Exception as e:
             return f"⚠️ Cảnh báo cú pháp JavaScript trong index.html có lỗi! Hủy thao tác đẩy code lên máy chủ để tránh hỏng hệ thống.\nChi tiết: {e}"
 
@@ -307,12 +324,12 @@ def check_and_deploy_changes(prompt_summary: str) -> str:
         subprocess.run(["git", "commit", "-m", commit_msg], cwd=REPO_DIR, check=True)
 
         # 5. Git push
-        push_res = subprocess.run(["git", "push", "origin", "main"], cwd=REPO_DIR, capture_output=True, text=True)
+        push_res = subprocess.run(["git", "push", "origin", "main"], cwd=REPO_DIR, capture_output=True, text=True, encoding="utf-8", errors="replace")
         if push_res.returncode != 0:
             return f"❌ Lỗi khi git push lên GitHub:\n{push_res.stderr}"
 
         # Lấy commit hash vừa push
-        rev_res = subprocess.run(["git", "rev-parse", "--short", "HEAD"], cwd=REPO_DIR, capture_output=True, text=True)
+        rev_res = subprocess.run(["git", "rev-parse", "--short", "HEAD"], cwd=REPO_DIR, capture_output=True, text=True, encoding="utf-8", errors="replace")
         commit_hash = rev_res.stdout.strip()
 
         return (
@@ -440,15 +457,15 @@ def run_bot():
                     continue
 
                 elif text == "/status":
-                    res = subprocess.run(["git", "status", "--short"], cwd=REPO_DIR, capture_output=True, text=True)
-                    rev = subprocess.run(["git", "log", "-1", "--oneline"], cwd=REPO_DIR, capture_output=True, text=True)
+                    res = subprocess.run(["git", "status", "--short"], cwd=REPO_DIR, capture_output=True, text=True, encoding="utf-8", errors="replace")
+                    rev = subprocess.run(["git", "log", "-1", "--oneline"], cwd=REPO_DIR, capture_output=True, text=True, encoding="utf-8", errors="replace")
                     st_text = res.stdout.strip() or "(Không có file nào bị sửa đổi)"
                     reply = f"📊 **TRẠNG THÁI HỆ THỐNG:**\n• Commit gần nhất: `{rev.stdout.strip()}`\n• Thay đổi chưa commit:\n```\n{st_text}\n```"
                     bot.send_message(chat_id, reply)
                     continue
 
                 elif text == "/log":
-                    rev = subprocess.run(["git", "log", "-5", "--oneline"], cwd=REPO_DIR, capture_output=True, text=True)
+                    rev = subprocess.run(["git", "log", "-5", "--oneline"], cwd=REPO_DIR, capture_output=True, text=True, encoding="utf-8", errors="replace")
                     bot.send_message(chat_id, f"📜 **5 COMMIT GẦN NHẤT:**\n```\n{rev.stdout.strip()}\n```")
                     continue
 
