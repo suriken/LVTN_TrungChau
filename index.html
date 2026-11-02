@@ -27,26 +27,33 @@
             text-rendering: optimizeLegibility;
         }
 
-        /* Tối ưu căn chỉnh dòng & chống chữ rớt lẻ (Text balance & pretty) */
+        /* Tối ưu căn chỉnh dòng & chống nhảy chữ (Text balance, pretty & natural wrapping) */
         h1, h2, h3, h4, h5, .text-balance {
             text-wrap: balance;
+            word-break: normal;
         }
-        p, .text-pretty {
+        p, label, span, .text-pretty {
             text-wrap: pretty;
+            word-break: normal;
         }
 
-        /* Tối ưu căn đều văn bản chống giãn cách từ bất thường trên thiết bị hẹp */
-        .text-justify {
-            text-align: justify;
-            text-justify: inter-word;
-            text-align-last: left;
-            word-spacing: normal;
-            letter-spacing: normal;
+        /* Chống lỗi nhảy chữ, giãn chữ bất thường trên textarea & ô nhập liệu */
+        textarea, input, select {
+            text-align: left !important;
+            word-spacing: normal !important;
+            letter-spacing: normal !important;
         }
-        @media (max-width: 640px) {
-            .mobile-align-clean {
-                text-align: left !important;
-                text-align-last: left !important;
+
+        /* Căn đều tự nhiên trên màn hình lớn, tự động căn trái an toàn trên di động */
+        .text-justify {
+            text-align: left;
+            word-spacing: normal;
+        }
+        @media (min-width: 768px) {
+            .text-justify {
+                text-align: justify;
+                text-justify: inter-word;
+                text-align-last: left;
             }
         }
 
@@ -348,13 +355,13 @@
 
                 <div class="prose max-w-none text-slate-800 leading-relaxed text-[15px] sm:text-base md:text-[17px] space-y-3.5 sm:space-y-4">
                     <p class="font-extrabold text-[#3b4982] text-base sm:text-lg">Kính gửi Quý Chức sắc, Chức việc, Quý Huynh Trưởng và Phổ Tế Viên!</p>
-                    <p class="text-justify leading-relaxed">
+                    <p class="text-left sm:text-justify leading-relaxed">
                         Chương trình đào tạo Phổ Tế Viên là nền tảng cốt lõi trong công tác huấn luyện và phát triển lực lượng nhân sự giáo hóa con em nhà Đạo cũng như phụng sự Giáo hội. Để có cơ sở khoa học và thực tiễn cho đề tài nghiên cứu luận văn, khảo sát này được thực hiện nhằm thu thập ý kiến đánh giá khách quan về tính phù hợp, tính thiết thực và những điểm cần cải tiến trong khung chương trình hiện hành.
                     </p>
-                    <p class="text-justify leading-relaxed">
+                    <p class="text-left sm:text-justify leading-relaxed">
                         Trong quá trình thực hiện khảo sát, kính mong Quý vị dành sự quan tâm và đối chiếu, so sánh đa chiều giữa Chương trình đào tạo Phổ Tế Viên hiện nay với độ tuổi, tâm sinh lý tự nhiên của thanh thiếu niên; nhu cầu củng cố và phát triển nguồn nhân lực giáo hóa của Giáo hội tại các Họ đạo cơ sở; cùng tình hình bối cảnh hiện tại và xu thế phát triển tương lai của xã hội.
                     </p>
-                    <p class="text-justify leading-relaxed">
+                    <p class="text-left sm:text-justify leading-relaxed">
                         Sự đóng góp chân thành và quý báu của Quý vị sẽ giúp tác giả có thêm dữ liệu thực tiễn đề xuất giải pháp nâng cao chất lượng đào tạo Phổ Tế Viên đáp ứng tốt nhất yêu cầu phát triển của Giáo Hội và Xã Hội trong giai đoạn mới.
                     </p>
                 </div>
@@ -1490,7 +1497,9 @@
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-base sm:text-lg font-black text-slate-900 mb-2">19. Mức độ thực hành trai kỳ hiện nay *</label>
+                            <label class="block text-sm sm:text-base font-black text-slate-900 mb-2 leading-snug">
+                                19. Mức độ thực hành trai kỳ hiện nay <span class="text-rose-600 font-black">*</span>
+                            </label>
                             <select id="respDiet" required onchange="saveSurveyDraft(); updateSurveyProgress();" class="w-full px-3 py-2 text-xs sm:text-sm rounded-xl border border-[#e2d8c7] focus:outline-none focus:border-[#3b4982] bg-white transition">
                                 <option value="">-- Chọn mức độ trai kỳ --</option>
                                 <option value="Lục trai">Lục trai</option>
@@ -1500,7 +1509,9 @@
                         </div>
 
                         <div>
-                            <label class="block text-base sm:text-lg font-black text-slate-900 mb-2">20. Duy trì thời cúng & công phu hằng ngày *</label>
+                            <label class="block text-sm sm:text-base font-black text-slate-900 mb-2 leading-snug">
+                                20. Duy trì thời cúng & công phu hằng ngày <span class="text-rose-600 font-black">*</span>
+                            </label>
                             <select id="respPractice" required onchange="saveSurveyDraft(); updateSurveyProgress();" class="w-full px-3 py-2 text-xs sm:text-sm rounded-xl border border-[#e2d8c7] focus:outline-none focus:border-[#3b4982] bg-white transition">
                                 <option value="">-- Chọn tình trạng cúng kính --</option>
                                 <option value="Đều đặn mỗi ngày">Đều đặn hằng ngày tại Thánh thất hoặc Thiên bàn tư gia</option>
@@ -1511,7 +1522,9 @@
                         </div>
 
                         <div>
-                            <label class="block text-base sm:text-lg font-black text-slate-900 mb-2">21. Tình trạng tham gia phụng sự tại Họ đạo / GĐHĐ hiện nay *</label>
+                            <label class="block text-sm sm:text-base font-black text-slate-900 mb-2 leading-snug">
+                                21. Tình trạng tham gia phụng sự tại Họ đạo / GĐHĐ hiện nay <span class="text-rose-600 font-black">*</span>
+                            </label>
                             <select id="respServiceStatus" required onchange="saveSurveyDraft(); updateSurveyProgress();" class="w-full px-3 py-2 text-xs sm:text-sm rounded-xl border border-[#e2d8c7] focus:outline-none focus:border-[#3b4982] bg-white transition">
                                 <option value="">-- Chọn tình trạng phụng sự --</option>
                                 <option value="Trực tiếp phụ trách thường xuyên">Đang trực tiếp phụ trách, hướng dẫn sinh hoạt con em nhà Đạo thường xuyên</option>
@@ -1522,7 +1535,9 @@
                         </div>
 
                         <div>
-                            <label class="block text-base sm:text-lg font-black text-slate-900 mb-2">22. Khó khăn / Rào cản lớn nhất gặp phải trong tu học & phụng sự *</label>
+                            <label class="block text-sm sm:text-base font-black text-slate-900 mb-2 leading-snug">
+                                22. Khó khăn / Rào cản lớn nhất gặp phải trong tu học & phụng sự <span class="text-rose-600 font-black">*</span>
+                            </label>
                             <select id="respChallenge" required onchange="saveSurveyDraft(); updateSurveyProgress();" class="w-full px-3.5 py-2.5 text-sm sm:text-base rounded-xl border border-[#e2d8c7] focus:outline-none focus:border-[#3b4982] bg-white transition">
                                 <option value="">-- Chọn khó khăn lớn nhất --</option>
                                 <option value="Áp lực mưu sinh & quỹ thời gian hạn hẹp">Áp lực công việc mưu sinh, học tập và quỹ thời gian gia đình</option>
@@ -1553,50 +1568,42 @@
                     <div class="space-y-4">
                         <!-- 23. MẶT ĐƯỢC -->
                         <div>
-                            <label class="block text-base sm:text-lg font-black text-emerald-900 mb-2 flex items-center justify-between gap-2">
-                                <span class="flex items-center gap-2">
-                                    <i class="fa-solid fa-circle-check text-emerald-600"></i>
-                                    <span>23. Những mặt LÀM ĐƯỢC (Ưu điểm nổi bật của chương trình đào tạo & PTV):</span>
-                                    <span class="text-rose-600 font-black text-base">*</span>
-                                </span>
+                            <label class="block text-sm sm:text-base font-black text-emerald-900 mb-2 leading-snug">
+                                <i class="fa-solid fa-circle-check text-emerald-600 mr-1.5 align-middle"></i>
+                                <span>23. Những mặt LÀM ĐƯỢC (Ưu điểm nổi bật của chương trình đào tạo & PTV):</span>
+                                <span class="text-rose-600 font-black text-base ml-1">*</span>
                             </label>
-                            <textarea id="respAdvantages" oninput="handleTextareaInput('respAdvantages')" rows="2" class="w-full text-sm sm:text-base p-3.5 rounded-xl border border-[#e2d8c7] focus:outline-none focus:border-[#3b4982] bg-[#fbf9f5] placeholder-slate-400 leading-relaxed transition text-justify" placeholder="Ví dụ: Giúp củng cố đức tin, trang bị lễ nghi bài bản, tinh thần kỷ luật trại huấn luyện tốt..."></textarea>
+                            <textarea id="respAdvantages" oninput="handleTextareaInput('respAdvantages')" rows="2" class="w-full text-sm sm:text-base p-3.5 rounded-xl border border-[#e2d8c7] focus:outline-none focus:border-[#3b4982] bg-[#fbf9f5] placeholder-slate-400 leading-relaxed transition text-left" placeholder="Ví dụ: Giúp củng cố đức tin, trang bị lễ nghi bài bản, tinh thần kỷ luật trại huấn luyện tốt..."></textarea>
                         </div>
 
                         <!-- 24. MẶT CHƯA ĐƯỢC -->
                         <div>
-                            <label class="block text-base sm:text-lg font-black text-amber-900 mb-2 flex items-center justify-between gap-2">
-                                <span class="flex items-center gap-2">
-                                    <i class="fa-solid fa-triangle-exclamation text-amber-600"></i>
-                                    <span>24. Những mặt CHƯA LÀM ĐƯỢC (Hạn chế, bất cập hoặc nội dung chưa thực tế):</span>
-                                    <span class="text-rose-600 font-black text-base">*</span>
-                                </span>
+                            <label class="block text-sm sm:text-base font-black text-amber-900 mb-2 leading-snug">
+                                <i class="fa-solid fa-triangle-exclamation text-amber-600 mr-1.5 align-middle"></i>
+                                <span>24. Những mặt CHƯA LÀM ĐƯỢC (Hạn chế, bất cập hoặc nội dung chưa thực tế):</span>
+                                <span class="text-rose-600 font-black text-base ml-1">*</span>
                             </label>
-                            <textarea id="respDisadvantages" oninput="handleTextareaInput('respDisadvantages')" rows="2" class="w-full text-sm sm:text-base p-3.5 rounded-xl border border-[#e2d8c7] focus:outline-none focus:border-[#3b4982] bg-[#fbf9f5] placeholder-slate-400 leading-relaxed transition text-justify" placeholder="Ví dụ: Nặng lý thuyết, thiếu kỹ năng sư phạm hiện đại, thời gian hàm thụ quá gấp, thiếu công nghệ số..."></textarea>
+                            <textarea id="respDisadvantages" oninput="handleTextareaInput('respDisadvantages')" rows="2" class="w-full text-sm sm:text-base p-3.5 rounded-xl border border-[#e2d8c7] focus:outline-none focus:border-[#3b4982] bg-[#fbf9f5] placeholder-slate-400 leading-relaxed transition text-left" placeholder="Ví dụ: Nặng lý thuyết, thiếu kỹ năng sư phạm hiện đại, thời gian hàm thụ quá gấp, thiếu công nghệ số..."></textarea>
                         </div>
 
                         <!-- 25. THỰC TRẠNG PTV HIỆN NAY -->
                         <div>
-                            <label class="block text-base sm:text-lg font-black text-[#2e3a68] mb-2 flex items-center justify-between gap-2">
-                                <span class="flex items-center gap-2">
-                                    <i class="fa-solid fa-users-line text-[#3b4982]"></i>
-                                    <span>25. THỰC TRẠNG của Phổ Tế Viên sau khi tốt nghiệp hiện nay:</span>
-                                    <span class="text-rose-600 font-black text-base">*</span>
-                                </span>
+                            <label class="block text-sm sm:text-base font-black text-[#2e3a68] mb-2 leading-snug">
+                                <i class="fa-solid fa-users-line text-[#3b4982] mr-1.5 align-middle"></i>
+                                <span>25. THỰC TRẠNG của Phổ Tế Viên sau khi tốt nghiệp hiện nay:</span>
+                                <span class="text-rose-600 font-black text-base ml-1">*</span>
                             </label>
-                            <textarea id="respReality" oninput="handleTextareaInput('respReality')" rows="2" class="w-full text-sm sm:text-base p-3.5 rounded-xl border border-[#e2d8c7] focus:outline-none focus:border-[#3b4982] bg-[#fbf9f5] placeholder-slate-400 leading-relaxed transition text-justify" placeholder="Ví dụ: Tỷ lệ tiếp tục gắn bó phụng sự tại Họ đạo, sự nhiệt huyết, khó khăn khi hòa nhập với việc đạo..."></textarea>
+                            <textarea id="respReality" oninput="handleTextareaInput('respReality')" rows="2" class="w-full text-sm sm:text-base p-3.5 rounded-xl border border-[#e2d8c7] focus:outline-none focus:border-[#3b4982] bg-[#fbf9f5] placeholder-slate-400 leading-relaxed transition text-left" placeholder="Ví dụ: Tỷ lệ tiếp tục gắn bó phụng sự tại Họ đạo, sự nhiệt huyết, khó khăn khi hòa nhập với việc đạo..."></textarea>
                         </div>
 
                         <!-- 26. ĐỀ XUẤT CẢI TIẾN -->
                         <div>
-                            <label class="block text-base sm:text-lg font-black text-blue-900 mb-2 flex items-center justify-between gap-2">
-                                <span class="flex items-center gap-2">
-                                    <i class="fa-solid fa-lightbulb text-amber-500"></i>
-                                    <span>26. Quý vị có ĐỀ XUẤT, KIẾN NGHỊ GÌ để cải tiến và phát triển chương trình?</span>
-                                    <span class="text-rose-600 font-black text-base">*</span>
-                                </span>
+                            <label class="block text-sm sm:text-base font-black text-blue-900 mb-2 leading-snug">
+                                <i class="fa-solid fa-lightbulb text-amber-500 mr-1.5 align-middle"></i>
+                                <span>26. Quý vị có ĐỀ XUẤT, KIẾN NGHỊ GÌ để cải tiến và phát triển chương trình?</span>
+                                <span class="text-rose-600 font-black text-base ml-1">*</span>
                             </label>
-                            <textarea id="respSuggestions" oninput="handleTextareaInput('respSuggestions')" rows="3" class="w-full text-sm sm:text-base p-3.5 rounded-xl border border-[#e2d8c7] focus:outline-none focus:border-[#3b4982] bg-[#fbf9f5] placeholder-slate-400 leading-relaxed transition text-justify" placeholder="Kính xin quý vị nêu những sáng kiến, đề xuất cụ thể gửi đến Hội Thánh và Ban Phụ trách GĐHĐ..."></textarea>
+                            <textarea id="respSuggestions" oninput="handleTextareaInput('respSuggestions')" rows="3" class="w-full text-sm sm:text-base p-3.5 rounded-xl border border-[#e2d8c7] focus:outline-none focus:border-[#3b4982] bg-[#fbf9f5] placeholder-slate-400 leading-relaxed transition text-left" placeholder="Kính xin quý vị nêu những sáng kiến, đề xuất cụ thể gửi đến Hội Thánh và Ban Phụ trách GĐHĐ..."></textarea>
                         </div>
                     </div>
                 </div>
@@ -1624,7 +1631,7 @@
                     <i class="fa-solid fa-clipboard-question"></i>
                 </div>
                 <h3 class="text-base sm:text-xl font-black text-[#3b4982]">Chưa Có Kết Quả Khảo Sát Hiện Hành</h3>
-                <p class="text-xs sm:text-sm text-slate-600 leading-relaxed text-justify sm:text-center">
+                <p class="text-xs sm:text-sm text-slate-600 leading-relaxed text-center">
                     Quý vị chưa hoàn thành phiếu khảo sát cho phiên làm việc này. Xin vui lòng vào <strong>Tab 2 (Bảng Khảo Sát)</strong>, trả lời đầy đủ các câu hỏi và bấm <strong>"Hoàn Thành & Gửi Phiếu"</strong> để hệ thống ghi nhận và hiển thị bảng phân tích kết quả cá nhân của Quý vị.
                 </p>
                 <div class="pt-2">
@@ -1643,7 +1650,7 @@
                         <i class="fa-solid fa-circle-check"></i>
                     </div>
                     <h2 id="personalThankYouTitle" class="text-base sm:text-xl font-black text-[#3b4982] text-center tracking-tight">Cảm Ơn Quý Vị Đã Hoàn Thành Khảo Sát!</h2>
-                    <p id="personalThankYouDesc" class="text-xs sm:text-sm text-slate-600 max-w-2xl mx-auto text-justify sm:text-center leading-relaxed" style="text-wrap: balance;">
+                    <p id="personalThankYouDesc" class="text-xs sm:text-sm text-slate-600 max-w-2xl mx-auto text-center leading-relaxed">
                         Ý kiến đóng góp quý báu của Quý vị đã được ghi nhận và lưu trữ an toàn trên hệ thống.<br class="hidden sm:inline"> Dữ liệu này là cơ sở thực tiễn quan trọng giúp tác giả hoàn thiện đề tài luận văn tốt nghiệp PTV Cấp III.
                     </p>
                     <div class="flex flex-wrap items-center justify-center gap-2.5 pt-1">
@@ -1696,7 +1703,7 @@
                                 </div>
                                 <div class="pt-1">
                                     <span class="font-bold text-slate-600 block mb-1 text-xs sm:text-sm">Nhận định sơ bộ:</span>
-                                    <p id="personalEvaluationComment" class="text-xs sm:text-sm italic text-slate-700 bg-white p-3 rounded-xl border border-[#e2d8c7] leading-relaxed text-justify">--</p>
+                                    <p id="personalEvaluationComment" class="text-xs sm:text-sm italic text-slate-700 bg-white p-3 rounded-xl border border-[#e2d8c7] leading-relaxed text-left">--</p>
                                 </div>
                             </div>
                         </div>
@@ -3117,7 +3124,7 @@
                             <span>Trụ Cột ${pillar.code}</span>
                         </div>
                         <h4 class="font-black text-[#222b4f] text-lg sm:text-xl md:text-2xl mt-1.5 leading-snug">${pillar.title}</h4>
-                        <p class="text-[15.5px] sm:text-base text-slate-700 mt-1.5 leading-relaxed text-justify sm:text-left">${pillar.desc}</p>
+                        <p class="text-[15.5px] sm:text-base text-slate-700 mt-1.5 leading-relaxed text-left">${pillar.desc}</p>
                     </div>
 
                     <div class="space-y-4 sm:space-y-6">
@@ -3132,7 +3139,7 @@
                                 </div>
 
                                 <!-- NỘI DUNG CÂU HỎI (TRẢI RỘNG 100% CHIỀU NGANG TRÊN MOBILE, TỐI ƯU KHOẢNG TRỐNG VÀ CỠ CHỮ TO RÕ) -->
-                                <div class="text-[16px] sm:text-[17px] md:text-lg text-slate-800 font-normal leading-relaxed text-justify sm:text-left w-full">${q.desc}</div>
+                                <div class="text-[16px] sm:text-[17px] md:text-lg text-slate-800 font-normal leading-relaxed text-left w-full">${q.desc}</div>
 
                                 <!-- 5 COLOR LIKERT BUTTONS (KÍCH THƯỚC Ô BẰNG NHAU 100%, ĐỐI XỨNG CÂN BẰNG) -->
                                 <div class="grid grid-cols-5 gap-1.5 sm:gap-2.5 pt-1.5 text-center w-full max-w-full items-stretch">
@@ -3160,7 +3167,7 @@
                                         <span>Lý do đánh giá chưa phù hợp & Điểm cần cải thiện (${q.label}):</span>
                                         <span class="text-rose-600 font-black text-xs sm:text-sm">* (Bắt buộc)</span>
                                     </div>
-                                    <textarea id="reason_${q.id}" name="reason_${q.id}" oninput="handleReasonInput('${q.id}')" rows="2" class="w-full text-sm sm:text-base p-3.5 rounded-xl border border-rose-300 focus:ring-2 focus:ring-rose-500 bg-white placeholder-slate-400 outline-none leading-relaxed text-justify sm:text-left transition" placeholder="Quý vị vui lòng nêu rõ lý do đánh giá chưa phù hợp (Bắt buộc phải nhập khi đánh giá dưới 3 điểm)..."></textarea>
+                                    <textarea id="reason_${q.id}" name="reason_${q.id}" oninput="handleReasonInput('${q.id}')" rows="2" class="w-full text-sm sm:text-base p-3.5 rounded-xl border border-rose-300 focus:ring-2 focus:ring-rose-500 bg-white placeholder-slate-400 outline-none leading-relaxed text-left transition" placeholder="Quý vị vui lòng nêu rõ lý do đánh giá chưa phù hợp (Bắt buộc phải nhập khi đánh giá dưới 3 điểm)..."></textarea>
                                 </div>
                             </div>
                         `).join('')}
@@ -4204,7 +4211,7 @@
                                                         ${item.score} điểm: ${item.score === 1 ? 'Rất không phù hợp' : 'Không phù hợp'}
                                                     </span>
                                                 </div>
-                                                <p class="text-xs text-slate-600 leading-relaxed text-justify sm:text-left">${item.desc}</p>
+                                                <p class="text-xs text-slate-600 leading-relaxed text-left">${item.desc}</p>
                                                 ${item.reason ? `
                                                     <div class="text-xs p-2.5 bg-rose-50/80 rounded-lg text-rose-900 border border-rose-200 leading-relaxed">
                                                         <strong class="font-bold text-rose-950"><i class="fa-solid fa-pen mr-1"></i>Lý do chưa phù hợp & Điểm cần cải thiện:</strong>
@@ -4241,7 +4248,7 @@
                                                         3 điểm: Phân vân
                                                     </span>
                                                 </div>
-                                                <p class="text-xs text-slate-600 leading-relaxed text-justify sm:text-left">${item.desc}</p>
+                                                <p class="text-xs text-slate-600 leading-relaxed text-left">${item.desc}</p>
                                                 <div class="text-[11px] text-amber-900 font-medium italic pt-0.5">
                                                     ℹ️ Mức độ phù hợp trung bình, cần cân nhắc hoàn thiện nội dung và phương pháp tổ chức để tạo sự thuyết phục cao hơn.
                                                 </div>
@@ -4466,7 +4473,7 @@
                                     ${pa.pillar.title}
                                 </h4>
                             </div>
-                            <p class="text-xs text-slate-600 mt-1 leading-relaxed text-justify sm:text-left">${pa.pillar.desc}</p>
+                            <p class="text-xs text-slate-600 mt-1 leading-relaxed text-left">${pa.pillar.desc}</p>
                         </div>
                         <div class="flex items-center gap-2 self-end sm:self-auto flex-shrink-0">
                             <span class="px-3 py-1 bg-blue-50 border border-blue-200 rounded-xl text-xs sm:text-sm font-black text-[#3b4982]">
@@ -4529,7 +4536,7 @@
                                             <span>${scoreLabel}</span>
                                         </span>
                                     </div>
-                                    <p class="text-xs text-slate-600 leading-relaxed text-justify sm:text-left">${q.desc}</p>
+                                    <p class="text-xs text-slate-600 leading-relaxed text-left">${q.desc}</p>
                                     ${q.reason ? `
                                         <div class="p-2.5 bg-rose-50 rounded-lg border border-rose-200 text-xs text-rose-900 leading-relaxed mt-1">
                                             <strong class="font-bold text-rose-950 block"><i class="fa-solid fa-pen mr-1 text-rose-600"></i>Lý do chưa phù hợp & Điểm cần cải thiện:</strong>

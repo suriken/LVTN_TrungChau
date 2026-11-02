@@ -193,18 +193,21 @@ def tool_run_terminal(command: str) -> str:
         return f"Lỗi thực thi lệnh: {e}"
 
 # ==============================================================================
-# AGENT XỬ LÝ PROMPT VỚI GOOGLE GEMINI 2.5
+# AGENT XỬ LÝ PROMPT VỚI GOOGLE GEMINI 3.8
 # ==============================================================================
 
 def execute_mobile_prompt(prompt: str, gemini_api_key: str, status_callback=None) -> str:
-    """Sử dụng Gemini 2.5 với Function Calling để tự động sửa code và kiểm thử"""
+    """Sử dụng Gemini 3.8 Flash với Function Calling để tự động sửa code và kiểm thử"""
     try:
         from google import genai
         from google.genai import types
     except ImportError:
         return "Lỗi: Chưa cài đặt thư viện `google-genai`. Vui lòng chạy `pip install google-genai`."
 
-    client = genai.Client(api_key=gemini_api_key)
+    client = genai.Client(
+        api_key=gemini_api_key,
+        http_options=types.HttpOptions(client_args={"verify": False})
+    )
 
     tools = [
         tool_list_files,
@@ -234,11 +237,11 @@ Nhiệm vụ của bạn khi nhận yêu cầu từ người dùng qua điện t
 """
 
     if status_callback:
-        status_callback("🧠 Gemini đang phân tích yêu cầu và duyệt mã nguồn...")
+        status_callback("🧠 Gemini 3.8 đang phân tích yêu cầu và duyệt mã nguồn...")
 
     try:
         chat = client.chats.create(
-            model="gemini-flash-latest",
+            model="gemini-3.8-flash",
             config=types.GenerateContentConfig(
                 system_instruction=system_instruction,
                 temperature=0.2,
@@ -363,7 +366,16 @@ def run_bot():
 
                 chat_id = str(message["chat"]["id"])
                 user_name = message["from"].get("first_name", "User")
-                text = message.get("text", "").strip()
+                text = (message.get("text") or message.get("caption") or "").strip()
+
+                # Nếu người dùng gửi ảnh không kèm chữ hoặc caption
+                if not text and message.get("photo"):
+                    bot.send_message(
+                        chat_id,
+                        "📸 Đã nhận ảnh từ Quý Huynh/Tỷ!\n"
+                        "Quý vị vui lòng gửi kèm tin nhắn văn bản mô tả yêu cầu cần sửa đổi nhé."
+                    )
+                    continue
 
                 if not text:
                     continue
