@@ -1743,10 +1743,6 @@
                 
                 <!-- ACTION BUTTONS -->
                 <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto justify-start lg:justify-end">
-                    <button type="button" onclick="upgradeBackendSheet()" class="px-3.5 py-2 sm:px-4 sm:py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-1.5 shadow cursor-pointer active:scale-98" title="Đồng bộ & nâng cấp bảng tính hệ thống lên 54 cột (thêm câu 16, 17, 18)">
-                        <i class="fa-solid fa-table-columns"></i>
-                        <span>Nâng Cấp Bảng Tính 54 Cột</span>
-                    </button>
                     <button type="button" onclick="exportToCSV()" class="px-3.5 py-2 sm:px-4 sm:py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-1.5 shadow cursor-pointer active:scale-98">
                         <i class="fa-solid fa-file-excel"></i>
                         <span>Xuất File Excel (CSV)</span>
@@ -1811,43 +1807,135 @@
                 </div>
             </div>
 
-            <!-- Hệ thống LIVE SYNC CONFIGURATION CARD -->
-            <div class="bg-white p-4 sm:p-6 rounded-2xl border border-emerald-300 shadow-sm space-y-4 bg-gradient-to-r from-emerald-50/40 via-white to-emerald-50/40">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-emerald-200/80 pb-3">
-                    <div class="flex items-center gap-2.5">
-                        <span class="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center text-sm shadow">
-                            <i class="fa-solid fa-file-excel"></i>
-                        </span>
-                        <div>
-                            <h3 class="font-black text-emerald-900 text-sm sm:text-base">Cổng Kết Nối Máy Chủ Dữ Liệu Trung Tâm</h3>
-                            <p class="text-xs text-slate-600">Dữ liệu khảo sát được tự động mã hóa và bảo lưu an toàn tại máy chủ dữ liệu trung tâm</p>
-                        </div>
+            <!-- TỔNG HỢP Ý KIẾN ĐÁNH GIÁ (PHẦN 4) ĐƯA LÊN TRÊN CÙNG KÈM BỘ LỌC ĐA TIÊU CHÍ TOÀN DIỆN -->
+            <div class="bg-white p-4 sm:p-6 rounded-2xl border border-[#e2d8c7] shadow-sm space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#e2d8c7] pb-3">
+                    <div>
+                        <h3 class="font-black text-[#3b4982] text-base sm:text-lg flex items-center gap-2">
+                            <i class="fa-solid fa-comments text-[#3b4982]"></i> Tổng Hợp Ý Kiến Đóng Góp Định Tính & Đánh Giá Đề Tài (Phần 4)
+                        </h3>
+                        <p class="text-xs text-slate-500">Lọc và tổng hợp các điểm làm tốt, điểm chưa tốt, thực trạng và giải pháp cho đề tài luận văn</p>
                     </div>
-                    <span id="serverApiStatusBadge" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-emerald-100 text-emerald-800 border border-emerald-300">
-                        <i class="fa-solid fa-circle-check text-emerald-600"></i> Máy chủ dữ liệu hoạt động
+                    <span id="adminFilteredStatsBadge" class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-indigo-50 text-[#3b4982] border border-indigo-200 self-start sm:self-auto">
+                        <i class="fa-solid fa-users text-[11px]"></i>
+                        <span id="adminFilteredCountText">Tất cả phiếu</span>
                     </span>
                 </div>
 
-                <div class="space-y-2">
-                    <label class="block text-xs sm:text-sm font-bold text-slate-700">Cổng kết nối API Máy chủ (Endpoint):</label>
-                    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-                        <input type="url" id="serverApiUrlInput" placeholder="URL Cổng API bảo mật của hệ thống..." class="flex-grow px-3.5 py-2.5 text-xs sm:text-sm rounded-xl border border-emerald-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white shadow-inner font-mono text-slate-800">
-                        <button type="button" onclick="saveServerApiUrl()" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs sm:text-sm shadow transition flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap">
-                            <i class="fa-solid fa-floppy-disk"></i>
-                            <span>Lưu Kết Nối</span>
+                <!-- BỘ LỌC ĐA TIÊU CHÍ (VAI TRÒ, CẤP ĐÀO TẠO, THÂM NIÊN, TRAI KỲ, THỜI CÚNG, MỨC ĐỘ SH) -->
+                <div class="bg-gradient-to-r from-slate-50 via-white to-slate-50 p-3.5 sm:p-4 rounded-xl border border-[#e2d8c7] space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+                            <i class="fa-solid fa-filter text-[#3b4982]"></i> Bộ Lọc Đa Tiêu Chí:
+                        </span>
+                        <button type="button" onclick="resetAdminFilters()" class="text-xs font-bold text-rose-600 hover:text-rose-800 underline flex items-center gap-1 cursor-pointer">
+                            <i class="fa-solid fa-rotate-left text-[10px]"></i> Đặt lại tất cả
                         </button>
-                        <button type="button" onclick="testServerConnection()" class="px-4 py-2.5 bg-[#3b4982] hover:bg-[#2c3765] text-white font-bold rounded-xl text-xs sm:text-sm shadow transition flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap" title="Gửi thử một bản ghi test lên Hệ thống">
-                            <i class="fa-solid fa-paper-plane"></i>
-                            <span>Kiểm Tra (Ping)</span>
-                        </button>
-                        <button type="button" onclick="resetDefaultServerApiUrl()" class="px-3.5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs sm:text-sm border border-slate-300 transition flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap" title="Khôi phục URL mặc định">
-                            <i class="fa-solid fa-rotate-left"></i>
-                            <span class="hidden sm:inline">Mặc Định</span>
+                    </div>
+
+                    <!-- 6 DROPDOWN TIÊU CHÍ -->
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 text-xs">
+                        <!-- 1. VAI TRÒ HIỆN NAY -->
+                        <div>
+                            <label class="block font-bold text-slate-600 mb-1 truncate" title="Vai Trò Hiện Nay">
+                                <i class="fa-solid fa-id-badge text-[#3b4982] mr-0.5"></i> Vai trò
+                            </label>
+                            <select id="adminRoleFilter" onchange="filterAdminDashboard()" class="w-full px-2 py-1.5 rounded-lg border border-[#e2d8c7] bg-white font-medium text-slate-700 focus:outline-none focus:border-[#3b4982] transition truncate cursor-pointer">
+                                <option value="ALL">Tất cả vai trò</option>
+                                <option value="PTV đang sinh hoạt">PTV đang sinh hoạt</option>
+                                <option value="Huynh trưởng BPT">Huynh trưởng BPT</option>
+                                <option value="Chức sắc - Chức việc">Chức sắc - Chức việc</option>
+                                <option value="Đã tạm ngưng SH">Đã tạm ngưng SH</option>
+                                <option value="Vai trò khác">Vai trò khác</option>
+                            </select>
+                        </div>
+
+                        <!-- 2. CẤP ĐÀO TẠO CAO NHẤT -->
+                        <div>
+                            <label class="block font-bold text-slate-600 mb-1 truncate" title="Cấp Đào Tạo Cao Nhất">
+                                <i class="fa-solid fa-graduation-cap text-[#3b4982] mr-0.5"></i> Cấp đào tạo
+                            </label>
+                            <select id="adminGradFilter" onchange="filterAdminDashboard()" class="w-full px-2 py-1.5 rounded-lg border border-[#e2d8c7] bg-white font-medium text-slate-700 focus:outline-none focus:border-[#3b4982] transition truncate cursor-pointer">
+                                <option value="ALL">Tất cả cấp</option>
+                                <option value="Cấp III">PTV Cấp III (Trung Châu)</option>
+                                <option value="Cấp II">PTV Cấp II (Cửu Long)</option>
+                                <option value="Cấp I">PTV Cấp I (Gò Kén)</option>
+                                <option value="Dự bị">PTV Dự Bị (Dương Đông)</option>
+                                <option value="Chưa tốt nghiệp">Chưa tốt nghiệp</option>
+                            </select>
+                        </div>
+
+                        <!-- 3. THÂM NIÊN SINH HOẠT -->
+                        <div>
+                            <label class="block font-bold text-slate-600 mb-1 truncate" title="Thâm Niên Sinh Hoạt">
+                                <i class="fa-solid fa-clock-rotate-left text-[#3b4982] mr-0.5"></i> Thâm niên
+                            </label>
+                            <select id="adminTenureFilter" onchange="filterAdminDashboard()" class="w-full px-2 py-1.5 rounded-lg border border-[#e2d8c7] bg-white font-medium text-slate-700 focus:outline-none focus:border-[#3b4982] transition truncate cursor-pointer">
+                                <option value="ALL">Tất cả thâm niên</option>
+                                <option value="Dưới 1 năm">Dưới 1 năm</option>
+                                <option value="1 - 3 năm">1 - 3 năm</option>
+                                <option value="3 - 5 năm">3 - 5 năm</option>
+                                <option value="5 - 10 năm">5 - 10 năm</option>
+                                <option value="Trên 10 năm">Trên 10 năm</option>
+                            </select>
+                        </div>
+
+                        <!-- 4. TRAI KỲ -->
+                        <div>
+                            <label class="block font-bold text-slate-600 mb-1 truncate" title="Thực Hành Trai Kỳ">
+                                <i class="fa-solid fa-leaf text-emerald-600 mr-0.5"></i> Trai kỳ
+                            </label>
+                            <select id="adminDietFilter" onchange="filterAdminDashboard()" class="w-full px-2 py-1.5 rounded-lg border border-[#e2d8c7] bg-white font-medium text-slate-700 focus:outline-none focus:border-[#3b4982] transition truncate cursor-pointer">
+                                <option value="ALL">Tất cả trai kỳ</option>
+                                <option value="Lục trai">Lục trai</option>
+                                <option value="Thập trai">Thập trai</option>
+                                <option value="Trường trai">Trường trai / Chay trường</option>
+                            </select>
+                        </div>
+
+                        <!-- 5. THỜI CÚNG HẰNG NGÀY -->
+                        <div>
+                            <label class="block font-bold text-slate-600 mb-1 truncate" title="Thời Cúng Hằng Ngày">
+                                <i class="fa-solid fa-hands-praying text-amber-600 mr-0.5"></i> Thời cúng
+                            </label>
+                            <select id="adminPracticeFilter" onchange="filterAdminDashboard()" class="w-full px-2 py-1.5 rounded-lg border border-[#e2d8c7] bg-white font-medium text-slate-700 focus:outline-none focus:border-[#3b4982] transition truncate cursor-pointer">
+                                <option value="ALL">Tất cả thời cúng</option>
+                                <option value="Đều đặn">Đều đặn mỗi ngày</option>
+                                <option value="2 - 3 thời">2 - 3 thời/tuần</option>
+                                <option value="Sóc Vọng">Sóc Vọng / Lễ Vía</option>
+                                <option value="Hiếm khi">Hiếm khi</option>
+                            </select>
+                        </div>
+
+                        <!-- 6. MỨC ĐỘ SINH HOẠT THƯỜNG XUYÊN -->
+                        <div>
+                            <label class="block font-bold text-slate-600 mb-1 truncate" title="Mức Độ Sinh Hoạt Phụng Sự">
+                                <i class="fa-solid fa-user-group text-blue-600 mr-0.5"></i> Mức độ SH
+                            </label>
+                            <select id="adminServiceFilter" onchange="filterAdminDashboard()" class="w-full px-2 py-1.5 rounded-lg border border-[#e2d8c7] bg-white font-medium text-slate-700 focus:outline-none focus:border-[#3b4982] transition truncate cursor-pointer">
+                                <option value="ALL">Tất cả mức độ</option>
+                                <option value="Trực tiếp">Trực tiếp thường xuyên</option>
+                                <option value="Hỗ trợ">Hỗ trợ kỳ trại, lễ</option>
+                                <option value="Tạm ngưng">Tạm ngưng sinh hoạt</option>
+                                <option value="Đã ngưng">Đã ngưng / Chuyển ĐV</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- TÌM KIẾM TỪ KHÓA TỰ DO -->
+                    <div class="relative">
+                        <input type="text" id="adminSearchInput" oninput="filterAdminDashboard()" placeholder="Tìm nhanh theo họ tên, số điện thoại, đơn vị, mã phiếu hoặc nội dung ý kiến..." class="w-full pl-9 pr-9 py-2 text-xs sm:text-sm rounded-xl border border-[#e2d8c7] bg-white focus:outline-none focus:border-[#3b4982] shadow-inner text-slate-800 font-medium">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                        <button type="button" onclick="clearAdminSearch()" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer text-xs" title="Xóa từ khóa tìm kiếm">
+                            <i class="fa-solid fa-xmark"></i>
                         </button>
                     </div>
                 </div>
 
-                
+                <!-- 4 KHỐI Ý KIẾN TỔNG HỢP (LÀM ĐƯỢC / CHƯA ĐƯỢC / THỰC TRẠNG / KIẾN NGHỊ) -->
+                <div id="adminFeedbackContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Dynamic feedback cards rendered here -->
+                </div>
             </div>
 
             <!-- CHARTS GRID -->
@@ -1871,23 +1959,22 @@
                 </div>
             </div>
 
-            <!-- BẢNG DANH SÁCH CHI TIẾT CÁC PHIẾU KHẢO SÁT ĐÃ THU THẬP -->
+            <!-- BẢNG DANH SÁCH CHI TIẾT CÁC PHIẾU KHẢO SÁT (DẠNG NGĂN XẾP: NGƯỜI MỚI NHẤT TRÊN CÙNG, ĐÁNH SỐ TỪ DƯỚI LÊN) -->
             <div class="bg-white p-4 sm:p-6 rounded-2xl border border-[#e2d8c7] shadow-sm space-y-4">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#e2d8c7] pb-3">
                     <div class="flex items-center gap-2">
                         <span class="w-8 h-8 rounded-lg bg-[#3b4982] text-white flex items-center justify-center text-sm shadow">
-                            <i class="fa-solid fa-table-list"></i>
+                            <i class="fa-solid fa-layer-group"></i>
                         </span>
                         <div>
-                            <h3 class="font-black text-[#3b4982] text-base sm:text-lg">Danh Sách Phiếu Khảo Sát Đã Gửi</h3>
-                            <p class="text-xs text-slate-500">Tra cứu, xem chi tiết đánh giá của từng Huynh trưởng</p>
+                            <h3 class="font-black text-[#3b4982] text-base sm:text-lg">Danh Sách Phiếu Khảo Sát Đã Gửi (Dạng Ngăn Xếp)</h3>
+                            <p class="text-xs text-slate-500">Người nộp sau cùng đưa lên trên cùng • Đánh số thứ tự từ dưới đếm lên</p>
                         </div>
                     </div>
-                    <div class="relative w-full sm:w-72">
-                        <input type="text" id="adminSearchInput" oninput="filterAdminDashboard()" placeholder="Tìm theo tên, đơn vị, vai trò..." class="w-full pl-3.5 pr-8 py-2 text-xs sm:text-sm rounded-xl border border-[#e2d8c7] focus:outline-none focus:border-[#3b4982] bg-[#fbf9f5]">
-                        <button type="button" onclick="clearAdminSearch()" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer text-xs" title="Xóa tìm kiếm">
-                            <i class="fa-solid fa-xmark"></i>
-                        </button>
+                    <div class="flex items-center gap-2">
+                        <span id="adminFilteredCountBadge" class="px-3 py-1 rounded-full text-xs font-black bg-indigo-50 text-[#3b4982] border border-indigo-200">
+                            0 / 0 phiếu
+                        </span>
                     </div>
                 </div>
 
@@ -1895,10 +1982,12 @@
                     <table class="w-full text-left text-xs sm:text-sm border-collapse">
                         <thead class="bg-[#3b4982] text-white">
                             <tr>
+                                <th class="p-3 font-bold text-center w-14" title="Số thứ tự đếm từ dưới lên trên">STT</th>
                                 <th class="p-3 font-bold">Mã Phiếu</th>
                                 <th class="p-3 font-bold">Thời Gian</th>
                                 <th class="p-3 font-bold">Họ Và Tên</th>
                                 <th class="p-3 font-bold">Vai Trò & Đơn Vị</th>
+                                <th class="p-3 font-bold">Cấp & Tu Học</th>
                                 <th class="p-3 font-bold text-center">Điểm TB</th>
                                 <th class="p-3 font-bold text-center">Thao Tác</th>
                             </tr>
@@ -1907,20 +1996,6 @@
                             <!-- Render dynamically by JS -->
                         </tbody>
                     </table>
-                </div>
-            </div>
-
-            <!-- KHO Ý KIẾN TỰ LUẬN & ĐÓNG GÓP THEO CHỦ ĐỀ -->
-            <div class="bg-white p-4 sm:p-6 rounded-2xl border border-[#e2d8c7] shadow-sm space-y-4">
-                <div class="border-b border-[#e2d8c7] pb-3">
-                    <h3 class="font-black text-[#3b4982] text-base sm:text-lg flex items-center gap-2">
-                        <i class="fa-solid fa-comments text-[#3b4982]"></i> Tổng Hợp Ý Kiến Đóng Góp Định Tính (Phần 4)
-                    </h3>
-                    <p class="text-xs text-slate-500">Toàn bộ ý kiến phân tích thực trạng và giải pháp cho đề tài luận văn</p>
-                </div>
-
-                <div id="adminFeedbackContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <!-- Dynamic feedback cards rendered here -->
                 </div>
             </div>
         </section>
@@ -4907,7 +4982,10 @@
 
         // RENDER GLOBAL DASHBOARD
         function renderGlobalDashboard() {
-            // Update Hệ thống URL input & badge
+            // Đảm bảo gán số thứ tự gốc từ dưới lên cho tất cả phiếu
+            assignResponsesSTT(surveyResponses || []);
+
+            // Update Hệ thống URL input & badge (nếu tồn tại)
             const gInput = document.getElementById('serverApiUrlInput');
             const gBadge = document.getElementById('serverApiStatusBadge');
             const effectiveUrl = getEffectiveBackendUrl();
@@ -5060,22 +5138,87 @@
             renderAdminFeedbackCards();
         }
 
-        // LỌC DỮ LIỆU BẢNG QUẢN TRỊ & Ý KIẾN THEO TỪ KHÓA TÌM KIẾM
+        // GÁN SỐ THỨ TỰ GỐC THEO THỜI GIAN NỘP (TỪ DƯỚI LÊN: NGƯỜI ĐẦU TIÊN LÀ 1, NGƯỜI MỚI NHẤT LÀ N)
+        function assignResponsesSTT(list) {
+            if (!Array.isArray(list)) return [];
+            list.forEach((item, index) => {
+                if (item) {
+                    item._stt = index + 1; // 1-based index (người đầu tiên nộp là 1)
+                }
+            });
+            return list;
+        }
+
+        // LỌC DỮ LIỆU BẢNG QUẢN TRỊ & Ý KIẾN THEO ĐA TIÊU CHÍ (VAI TRÒ, CẤP, THÂM NIÊN, TRAI KỲ, THỜI CÚNG, PHỤNG SỰ, TỪ KHÓA)
         function getFilteredAdminResponses() {
             const searchInput = document.getElementById('adminSearchInput');
             const query = searchInput ? searchInput.value.trim().toLowerCase() : '';
-            if (!query) return surveyResponses || [];
+
+            const roleFilter = document.getElementById('adminRoleFilter')?.value || 'ALL';
+            const gradFilter = document.getElementById('adminGradFilter')?.value || 'ALL';
+            const tenureFilter = document.getElementById('adminTenureFilter')?.value || 'ALL';
+            const dietFilter = document.getElementById('adminDietFilter')?.value || 'ALL';
+            const practiceFilter = document.getElementById('adminPracticeFilter')?.value || 'ALL';
+            const serviceFilter = document.getElementById('adminServiceFilter')?.value || 'ALL';
+
+            // Đảm bảo mọi bản ghi đều có số thứ tự nộp _stt
+            assignResponsesSTT(surveyResponses || []);
 
             return (surveyResponses || []).filter(r => {
                 if (!r) return false;
-                const name = (r.name || '').toLowerCase();
-                const unit = (r.unit || '').toLowerCase();
-                const role = (r.role || '').toLowerCase();
-                const id = (r.id || '').toLowerCase();
-                const phone = (r.phone || '').toLowerCase();
-                const gradLevel = (r.gradLevel || '').toLowerCase();
-                const tenure = (r.tenure || '').toLowerCase();
-                return name.includes(query) || unit.includes(query) || role.includes(query) || id.includes(query) || phone.includes(query) || gradLevel.includes(query) || tenure.includes(query);
+
+                // 1. Lọc từ khóa tìm kiếm
+                if (query) {
+                    const fullText = [
+                        r.name, r.unit, r.role, r.id, r.phone, r.gradLevel, r.tenure,
+                        r.diet, r.practice, r.serviceStatus, r.challenge,
+                        r.advantages, r.disadvantages, r.reality, r.suggestions
+                    ].filter(Boolean).join(' ').toLowerCase();
+
+                    if (!fullText.includes(query)) return false;
+                }
+
+                // 2. Lọc vai trò hiện nay
+                if (roleFilter !== 'ALL') {
+                    const role = (r.role || '').toLowerCase();
+                    if (!role.includes(roleFilter.toLowerCase())) return false;
+                }
+
+                // 3. Lọc cấp đào tạo cao nhất
+                if (gradFilter !== 'ALL') {
+                    const grad = (r.gradLevel || '').toLowerCase();
+                    if (!grad.includes(gradFilter.toLowerCase())) return false;
+                }
+
+                // 4. Lọc thâm niên sinh hoạt
+                if (tenureFilter !== 'ALL') {
+                    const tenure = (r.tenure || '').toLowerCase();
+                    if (!tenure.includes(tenureFilter.toLowerCase())) return false;
+                }
+
+                // 5. Lọc trai kỳ
+                if (dietFilter !== 'ALL') {
+                    const diet = (r.diet || '').toLowerCase();
+                    if (dietFilter === 'Trường trai') {
+                        if (!diet.includes('trường') && !diet.includes('chay')) return false;
+                    } else {
+                        if (!diet.includes(dietFilter.toLowerCase())) return false;
+                    }
+                }
+
+                // 6. Lọc thời cúng hằng ngày
+                if (practiceFilter !== 'ALL') {
+                    const practice = (r.practice || '').toLowerCase();
+                    if (!practice.includes(practiceFilter.toLowerCase())) return false;
+                }
+
+                // 7. Lọc mức độ sinh hoạt / phụng sự
+                if (serviceFilter !== 'ALL') {
+                    const service = (r.serviceStatus || '').toLowerCase();
+                    if (!service.includes(serviceFilter.toLowerCase())) return false;
+                }
+
+                return true;
             });
         }
 
@@ -5090,50 +5233,95 @@
             filterAdminDashboard();
         }
 
-        // RENDER ADMIN RESPONSES TABLE
+        function resetAdminFilters() {
+            const searchInput = document.getElementById('adminSearchInput');
+            if (searchInput) searchInput.value = '';
+
+            const filterIds = ['adminRoleFilter', 'adminGradFilter', 'adminTenureFilter', 'adminDietFilter', 'adminPracticeFilter', 'adminServiceFilter'];
+            filterIds.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = 'ALL';
+            });
+
+            filterAdminDashboard();
+            showToast("Đã đặt lại toàn bộ tiêu chí lọc về mặc định!", "info");
+        }
+
+        // RENDER ADMIN RESPONSES TABLE (DẠNG NGĂN XẾP: NGƯỜI SAU CÙNG LÊN TRÊN CÙNG, ĐÁNH SỐ TỪ DƯỚI LÊN)
         function renderAdminResponsesTable() {
             const tbody = document.getElementById('adminResponsesTableBody');
             if (!tbody) return;
 
             const filtered = getFilteredAdminResponses();
+            const total = (surveyResponses || []).length;
+
+            // Cập nhật huy hiệu số lượng trên bảng & bộ lọc
+            const badgeEl = document.getElementById('adminFilteredCountBadge');
+            const countTextEl = document.getElementById('adminFilteredCountText');
+            if (badgeEl) {
+                badgeEl.innerText = `${filtered.length} / ${total} phiếu`;
+            }
+            if (countTextEl) {
+                countTextEl.innerText = filtered.length === total ? `Tất cả ${total} phiếu` : `Lọc ${filtered.length}/${total} phiếu`;
+            }
 
             if (filtered.length === 0) {
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="6" class="p-8 text-center text-slate-500 italic">
+                        <td colspan="8" class="p-8 text-center text-slate-500 italic">
                             <i class="fa-solid fa-inbox text-3xl mb-2 text-slate-300 block"></i>
-                            ${surveyResponses.length === 0 ? "Chưa có phiếu khảo sát nào được ghi nhận." : "Không tìm thấy phiếu nào phù hợp với từ khóa tìm kiếm."}
+                            ${total === 0 ? "Chưa có phiếu khảo sát nào được ghi nhận." : "Không tìm thấy phiếu nào phù hợp với các tiêu chí lọc đã chọn."}
                         </td>
                     </tr>
                 `;
                 return;
             }
 
-            tbody.innerHTML = filtered.map(r => `
-                <tr class="hover:bg-slate-50/80 transition">
-                    <td class="p-3 font-mono font-bold text-[#3b4982] text-xs">${r.id}</td>
-                    <td class="p-3 text-slate-600 text-xs whitespace-nowrap">${r.timestamp || '--'}</td>
-                    <td class="p-3 font-bold text-slate-800">${r.name || 'Ẩn danh'}</td>
-                    <td class="p-3 text-slate-700">
-                        <span class="font-semibold">${r.role || '--'}</span>
-                        <span class="text-slate-400 mx-1">•</span>
-                        <span class="text-slate-500">${r.unit || '--'}</span>
-                    </td>
-                    <td class="p-3 text-center">
-                        <span class="inline-block px-2.5 py-0.5 rounded-full font-black text-xs ${r.avgScore >= 4 ? 'bg-emerald-100 text-emerald-800' : (r.avgScore >= 3 ? 'bg-amber-100 text-amber-800' : 'bg-rose-100 text-rose-800')}">
-                            ${r.avgScore ? r.avgScore.toFixed(2) : '--'}
-                        </span>
-                    </td>
-                    <td class="p-3 text-center whitespace-nowrap">
-                        <button type="button" onclick="viewResponseDetail('${r.id}')" class="px-2.5 py-1 bg-[#3b4982]/10 hover:bg-[#3b4982] text-[#3b4982] hover:text-white rounded-lg text-xs font-bold transition mr-1 cursor-pointer" title="Xem toàn bộ nội dung đánh giá">
-                            <i class="fa-solid fa-eye mr-1"></i> Xem
-                        </button>
-                        <button type="button" onclick="openDeleteSingleModal('${r.id}')" class="px-2.5 py-1 bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white rounded-lg text-xs font-bold transition cursor-pointer" title="Xóa phiếu này">
-                            <i class="fa-solid fa-trash-can"></i>
-                        </button>
-                    </td>
-                </tr>
-            `).join('');
+            // DẠNG NGĂN XẾP: Người nộp sau cùng được đưa lên trên cùng (reverse array)
+            const stackList = [...filtered].reverse();
+
+            tbody.innerHTML = stackList.map((r, idx) => {
+                // ĐÁNH SỐ THỨ TỰ TỪ DƯỚI ĐẾM LÊN:
+                // Người đầu tiên nộp (dưới cùng bảng gốc) là #1, người sau cùng (trên cùng) là #N
+                const stt = r._stt || (total - idx);
+
+                return `
+                    <tr class="hover:bg-slate-50/80 transition">
+                        <td class="p-3 text-center">
+                            <span class="inline-flex items-center justify-center min-w-[28px] h-7 px-1.5 rounded-lg bg-indigo-50 text-[#3b4982] font-black text-xs border border-indigo-200 shadow-2xs" title="Số thứ tự nộp (từ dưới đếm lên: người đầu tiên nộp là #1, người mới nhất là #${total})">
+                                #${stt}
+                            </span>
+                        </td>
+                        <td class="p-3 font-mono font-bold text-[#3b4982] text-xs">${r.id}</td>
+                        <td class="p-3 text-slate-600 text-xs whitespace-nowrap">${r.timestamp || '--'}</td>
+                        <td class="p-3 font-bold text-slate-800">
+                            <div>${r.name || 'Ẩn danh'}</div>
+                            ${r.phone ? `<div class="text-[11px] text-slate-400 font-normal"><i class="fa-solid fa-phone text-[10px] mr-1"></i>${r.phone}</div>` : ''}
+                        </td>
+                        <td class="p-3 text-slate-700">
+                            <span class="font-semibold text-slate-800">${r.role || '--'}</span>
+                            <div class="text-[11px] text-slate-500">${r.unit || '--'}</div>
+                        </td>
+                        <td class="p-3 text-slate-700">
+                            <span class="inline-block px-2 py-0.5 rounded text-[11px] font-semibold bg-slate-100 text-slate-700">${r.gradLevel || 'Chưa TN'}</span>
+                            <div class="text-[11px] text-slate-500 mt-0.5">${r.diet ? r.diet : ''} ${r.tenure ? '• ' + r.tenure : ''}</div>
+                        </td>
+                        <td class="p-3 text-center">
+                            <span class="inline-block px-2.5 py-0.5 rounded-full font-black text-xs ${r.avgScore >= 4 ? 'bg-emerald-100 text-emerald-800' : (r.avgScore >= 3 ? 'bg-amber-100 text-amber-800' : 'bg-rose-100 text-rose-800')}">
+                                ${r.avgScore ? r.avgScore.toFixed(2) : '--'}
+                            </span>
+                        </td>
+                        <td class="p-3 text-center whitespace-nowrap">
+                            <button type="button" onclick="viewResponseDetail('${r.id}')" class="px-2.5 py-1 bg-[#3b4982]/10 hover:bg-[#3b4982] text-[#3b4982] hover:text-white rounded-lg text-xs font-bold transition mr-1 cursor-pointer" title="Xem toàn bộ nội dung đánh giá">
+                                <i class="fa-solid fa-eye mr-1"></i> Xem
+                            </button>
+                            <button type="button" onclick="openDeleteSingleModal('${r.id}')" class="px-2.5 py-1 bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white rounded-lg text-xs font-bold transition cursor-pointer" title="Xóa phiếu này">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
         }
 
         // VIEW RESPONSE DETAIL MODAL
@@ -5367,14 +5555,23 @@
             openDeleteSingleModal(respId);
         }
 
-        // RENDER ADMIN FEEDBACK CARDS (CHIA THEO 4 NHÓM Ý KIẾN & TỰ ĐỘNG LỌC THEO TỪ KHÓA)
+        // RENDER ADMIN FEEDBACK CARDS (CHIA THEO 4 NHÓM Ý KIẾN & TỰ ĐỘNG LỌC THEO ĐA TIÊU CHÍ)
         function renderAdminFeedbackCards() {
             const container = document.getElementById('adminFeedbackContainer');
             if (!container) return;
 
             const searchInput = document.getElementById('adminSearchInput');
             const query = searchInput ? searchInput.value.trim() : '';
+
+            const roleFilter = document.getElementById('adminRoleFilter')?.value || 'ALL';
+            const gradFilter = document.getElementById('adminGradFilter')?.value || 'ALL';
+            const tenureFilter = document.getElementById('adminTenureFilter')?.value || 'ALL';
+            const dietFilter = document.getElementById('adminDietFilter')?.value || 'ALL';
+            const practiceFilter = document.getElementById('adminPracticeFilter')?.value || 'ALL';
+            const serviceFilter = document.getElementById('adminServiceFilter')?.value || 'ALL';
+
             const filtered = getFilteredAdminResponses();
+            const total = (surveyResponses || []).length;
 
             const advList = [];
             const disList = [];
@@ -5383,79 +5580,112 @@
 
             filtered.forEach(r => {
                 if (!r) return;
-                const author = `${r.name || 'Ẩn danh'} (${r.role || 'PTV'}${r.unit ? ' • ' + r.unit : ''})`;
-                if (r.advantages && r.advantages.trim()) advList.push({ author, text: r.advantages });
-                if (r.disadvantages && r.disadvantages.trim()) disList.push({ author, text: r.disadvantages });
-                if (r.reality && r.reality.trim()) realList.push({ author, text: r.reality });
-                if (r.suggestions && r.suggestions.trim()) sugList.push({ author, text: r.suggestions });
+                const authorInfo = {
+                    name: r.name || 'Ẩn danh',
+                    role: r.role || '',
+                    unit: r.unit || '',
+                    grad: r.gradLevel || '',
+                    tenure: r.tenure || '',
+                    diet: r.diet || '',
+                    service: r.serviceStatus || '',
+                    stt: r._stt || ''
+                };
+
+                if (r.advantages && r.advantages.trim()) advList.push({ ...authorInfo, text: r.advantages });
+                if (r.disadvantages && r.disadvantages.trim()) disList.push({ ...authorInfo, text: r.disadvantages });
+                if (r.reality && r.reality.trim()) realList.push({ ...authorInfo, text: r.reality });
+                if (r.suggestions && r.suggestions.trim()) sugList.push({ ...authorInfo, text: r.suggestions });
             });
 
-            const filterNotice = query
-                ? `<div class="col-span-1 md:col-span-2 p-2.5 bg-amber-50 rounded-xl border border-amber-200 text-xs font-semibold text-amber-800 flex items-center justify-between">
-                     <span><i class="fa-solid fa-filter mr-1.5 text-amber-600"></i> Đang lọc ý kiến theo từ khóa: <strong class="text-amber-900 font-bold">"${query}"</strong> (Hiển thị ${filtered.length}/${surveyResponses.length} phiếu)</span>
-                     <button type="button" onclick="clearAdminSearch()" class="text-rose-600 hover:text-rose-800 underline font-bold cursor-pointer">Xóa bộ lọc</button>
+            // Xây dựng danh sách tiêu chí đang áp dụng lọc
+            const activeFilterLabels = [];
+            if (query) activeFilterLabels.push(`Từ khóa: "${query}"`);
+            if (roleFilter !== 'ALL') activeFilterLabels.push(`Vai trò: ${roleFilter}`);
+            if (gradFilter !== 'ALL') activeFilterLabels.push(`Cấp: ${gradFilter}`);
+            if (tenureFilter !== 'ALL') activeFilterLabels.push(`Thâm niên: ${tenureFilter}`);
+            if (dietFilter !== 'ALL') activeFilterLabels.push(`Trai kỳ: ${dietFilter}`);
+            if (practiceFilter !== 'ALL') activeFilterLabels.push(`Thời cúng: ${practiceFilter}`);
+            if (serviceFilter !== 'ALL') activeFilterLabels.push(`Phụng sự: ${serviceFilter}`);
+
+            const hasActiveFilters = activeFilterLabels.length > 0;
+
+            const filterNotice = hasActiveFilters
+                ? `<div class="col-span-1 md:col-span-2 p-3 bg-indigo-50/80 rounded-xl border border-indigo-200 text-xs text-indigo-900 flex flex-wrap items-center justify-between gap-2 shadow-2xs">
+                     <div class="flex items-center gap-1.5 flex-wrap">
+                         <span class="font-bold flex items-center gap-1 text-[#3b4982]">
+                             <i class="fa-solid fa-filter"></i> Đang lọc:
+                         </span>
+                         ${activeFilterLabels.map(lbl => `<span class="px-2 py-0.5 rounded-md bg-white border border-indigo-200 text-[11px] font-semibold text-indigo-800 shadow-2xs">${lbl}</span>`).join('')}
+                         <span class="text-slate-500 font-medium ml-1">(${filtered.length}/${total} phiếu)</span>
+                     </div>
+                     <button type="button" onclick="resetAdminFilters()" class="text-rose-600 hover:text-rose-800 font-bold underline cursor-pointer text-xs ml-auto">
+                         <i class="fa-solid fa-rotate-left mr-0.5"></i> Xóa lọc
+                     </button>
                    </div>`
                 : '';
 
+            // Hàm render 1 card ý kiến chi tiết
+            const renderFeedbackCard = (item, themeColor) => `
+                <div class="bg-white p-3 rounded-xl border border-slate-200/80 shadow-2xs space-y-2 hover:border-${themeColor}-300 transition">
+                    <p class="text-slate-800 italic leading-relaxed text-xs sm:text-sm">"${item.text}"</p>
+                    <div class="flex flex-wrap items-center justify-between gap-1.5 pt-1.5 border-t border-slate-100 text-[11px]">
+                        <div class="flex items-center gap-1.5 flex-wrap">
+                            ${item.stt ? `<span class="px-1.5 py-0.2 rounded font-black text-[10px] bg-slate-100 text-[#3b4982]">#${item.stt}</span>` : ''}
+                            <span class="font-bold text-slate-800">${item.name}</span>
+                            ${item.role ? `<span class="text-slate-500">(${item.role}${item.unit ? ' • ' + item.unit : ''})</span>` : ''}
+                        </div>
+                        <div class="flex items-center gap-1 flex-wrap text-[10px]">
+                            ${item.grad ? `<span class="px-1.5 py-0.5 rounded bg-blue-50 text-[#3b4982] font-semibold border border-blue-100">${item.grad}</span>` : ''}
+                            ${item.tenure ? `<span class="px-1.5 py-0.5 rounded bg-slate-50 text-slate-600 border border-slate-200">${item.tenure}</span>` : ''}
+                            ${item.diet ? `<span class="px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 font-semibold border border-emerald-100">${item.diet}</span>` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+
             container.innerHTML = `
                 ${filterNotice}
-                <!-- 1. MẶT LÀM ĐƯỢC -->
+                <!-- 1. MẶT LÀM ĐƯỢC (ĐIỂM LÀM TỐT) -->
                 <div class="bg-emerald-50/70 p-4 rounded-2xl border border-emerald-200 space-y-2.5">
                     <div class="font-black text-emerald-900 text-xs sm:text-sm uppercase flex items-center justify-between">
                         <span><i class="fa-solid fa-circle-check text-emerald-600 mr-1.5"></i> 23. Những Mặt Làm Được (${advList.length})</span>
+                        <span class="text-[11px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">Điểm làm tốt</span>
                     </div>
-                    <div class="space-y-2 max-h-56 overflow-y-auto pr-1 text-xs">
-                        ${advList.length > 0 ? advList.map(item => `
-                            <div class="bg-white p-2.5 rounded-xl border border-emerald-100 shadow-2xs">
-                                <p class="text-slate-700 italic leading-relaxed">"${item.text}"</p>
-                                <span class="text-[10px] font-bold text-emerald-700 block text-right mt-1">— ${item.author}</span>
-                            </div>
-                        `).join('') : '<p class="text-slate-400 italic text-xs">Không có ý kiến nào phù hợp với bộ lọc.</p>'}
+                    <div class="space-y-2.5 max-h-72 overflow-y-auto pr-1 text-xs">
+                        ${advList.length > 0 ? advList.map(item => renderFeedbackCard(item, 'emerald')).join('') : '<p class="text-slate-400 italic text-xs p-2">Không có ý kiến nào phù hợp với bộ lọc hiện tại.</p>'}
                     </div>
                 </div>
 
-                <!-- 2. MẶT CHƯA ĐƯỢC -->
+                <!-- 2. MẶT CHƯA ĐƯỢC (ĐIỂM CHƯA TỐT / CẦN HOÀN THIỆN) -->
                 <div class="bg-amber-50/70 p-4 rounded-2xl border border-amber-200 space-y-2.5">
                     <div class="font-black text-amber-900 text-xs sm:text-sm uppercase flex items-center justify-between">
                         <span><i class="fa-solid fa-triangle-exclamation text-amber-600 mr-1.5"></i> 24. Mặt Chưa Làm Được (${disList.length})</span>
+                        <span class="text-[11px] font-bold text-amber-800 bg-amber-100 px-2 py-0.5 rounded-full">Điểm chưa tốt</span>
                     </div>
-                    <div class="space-y-2 max-h-56 overflow-y-auto pr-1 text-xs">
-                        ${disList.length > 0 ? disList.map(item => `
-                            <div class="bg-white p-2.5 rounded-xl border border-amber-100 shadow-2xs">
-                                <p class="text-slate-700 italic leading-relaxed">"${item.text}"</p>
-                                <span class="text-[10px] font-bold text-amber-700 block text-right mt-1">— ${item.author}</span>
-                            </div>
-                        `).join('') : '<p class="text-slate-400 italic text-xs">Không có ý kiến nào phù hợp với bộ lọc.</p>'}
+                    <div class="space-y-2.5 max-h-72 overflow-y-auto pr-1 text-xs">
+                        ${disList.length > 0 ? disList.map(item => renderFeedbackCard(item, 'amber')).join('') : '<p class="text-slate-400 italic text-xs p-2">Không có ý kiến nào phù hợp với bộ lọc hiện tại.</p>'}
                     </div>
                 </div>
 
-                <!-- 3. THỰC TRẠNG PTV -->
+                <!-- 3. THỰC TRẠNG PTV HIỆN NAY -->
                 <div class="bg-blue-50/70 p-4 rounded-2xl border border-blue-200 space-y-2.5">
                     <div class="font-black text-[#3b4982] text-xs sm:text-sm uppercase flex items-center justify-between">
                         <span><i class="fa-solid fa-users-line text-[#3b4982] mr-1.5"></i> 25. Thực Trạng PTV Hiện Nay (${realList.length})</span>
+                        <span class="text-[11px] font-bold text-[#3b4982] bg-blue-100 px-2 py-0.5 rounded-full">Thực trạng</span>
                     </div>
-                    <div class="space-y-2 max-h-56 overflow-y-auto pr-1 text-xs">
-                        ${realList.length > 0 ? realList.map(item => `
-                            <div class="bg-white p-2.5 rounded-xl border border-blue-100 shadow-2xs">
-                                <p class="text-slate-700 italic leading-relaxed">"${item.text}"</p>
-                                <span class="text-[10px] font-bold text-[#3b4982] block text-right mt-1">— ${item.author}</span>
-                            </div>
-                        `).join('') : '<p class="text-slate-400 italic text-xs">Không có ý kiến nào phù hợp với bộ lọc.</p>'}
+                    <div class="space-y-2.5 max-h-72 overflow-y-auto pr-1 text-xs">
+                        ${realList.length > 0 ? realList.map(item => renderFeedbackCard(item, 'blue')).join('') : '<p class="text-slate-400 italic text-xs p-2">Không có ý kiến nào phù hợp với bộ lọc hiện tại.</p>'}
                     </div>
                 </div>
 
-                <!-- 4. KIẾN NGHỊ & ĐỀ XUẤT -->
+                <!-- 4. KIẾN NGHỊ & ĐỀ XUẤT CẢI TIẾN -->
                 <div class="bg-indigo-50/70 p-4 rounded-2xl border border-indigo-200 space-y-2.5">
                     <div class="font-black text-indigo-900 text-xs sm:text-sm uppercase flex items-center justify-between">
                         <span><i class="fa-solid fa-lightbulb text-indigo-600 mr-1.5"></i> 26. Kiến Nghị & Đề Xuất (${sugList.length})</span>
+                        <span class="text-[11px] font-bold text-indigo-800 bg-indigo-100 px-2 py-0.5 rounded-full">Giải pháp</span>
                     </div>
-                    <div class="space-y-2 max-h-56 overflow-y-auto pr-1 text-xs">
-                        ${sugList.length > 0 ? sugList.map(item => `
-                            <div class="bg-white p-2.5 rounded-xl border border-indigo-100 shadow-2xs">
-                                <p class="text-slate-700 italic leading-relaxed">"${item.text}"</p>
-                                <span class="text-[10px] font-bold text-indigo-800 block text-right mt-1">— ${item.author}</span>
-                            </div>
-                        `).join('') : '<p class="text-slate-400 italic text-xs">Không có ý kiến nào phù hợp với bộ lọc.</p>'}
+                    <div class="space-y-2.5 max-h-72 overflow-y-auto pr-1 text-xs">
+                        ${sugList.length > 0 ? sugList.map(item => renderFeedbackCard(item, 'indigo')).join('') : '<p class="text-slate-400 italic text-xs p-2">Không có ý kiến nào phù hợp với bộ lọc hiện tại.</p>'}
                     </div>
                 </div>
             `;
