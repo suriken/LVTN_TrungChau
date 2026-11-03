@@ -1,0 +1,28 @@
+# Cloudflare Assets Ignore File
+# Ngăn chặn việc tải lên các tệp mã nguồn backend, tài liệu và cấu hình thành file tĩnh công khai
+
+_worker.js
+cloudflare-worker-proxy.js
+Code.gs
+schema.sql
+telegram_agent_bot.py
+telegram_config.json
+telegram_config.example.json
+stress_test_100_users.py
+stress_test_runner.html
+start_telegram_bot.bat
+test_cases_100.json
+test_backend_fuzz.py
+wrangler.toml
+wrangler.json
+appsscript.json
+.clasp.json
+.claspignore
+.git*
+.github
+.gemini
+__pycache__
+*.md
+*.docx
+*.pdf
+Note.txt

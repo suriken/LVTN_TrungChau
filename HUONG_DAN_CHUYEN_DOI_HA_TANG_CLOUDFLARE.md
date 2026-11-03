@@ -202,3 +202,4 @@ export default {
 5. Bấm **Add Custom Domain**.
 
 Xong! Web báo cáo mới của bạn sẽ chạy 24/7 tại `https://baocao.monnguyen.dev`, tốc độ load trang dưới 0.1 giây, không bao giờ phải đợi 1 phút khởi động như Render nữa!
+
