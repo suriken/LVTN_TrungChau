@@ -68,3 +68,4 @@ Tệp `index.html` là Single-Page Application (SPA) All-in-One, không phụ th
 
 3. **Kiểm tra cú pháp trước khi commit:**
    - Luôn chạy: `node -e "const fs = require('fs'); const content = fs.readFileSync('index.html', 'utf8'); ... new Function(allJs);"` để đảm bảo không có lỗi cú pháp JavaScript trước khi đẩy lên Git.
+

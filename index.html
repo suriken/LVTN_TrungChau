@@ -3874,13 +3874,15 @@
 
         let currentSurveyId = sessionStorage.getItem("ptv_current_survey_id") || null;
 
-        // API Gateway & Backend Configuration
-        const CLOUDFLARE_WORKER_URL = "";
+        // API Gateway & Backend Configuration (Cloudflare D1 Hybrid Engine + Google Sheets Fallback)
+        const CLOUDFLARE_WORKER_URL = (typeof window !== 'undefined' && window.location && (window.location.hostname.includes("monnguyen.dev") || window.location.hostname.includes("workers.dev")))
+            ? "/api"
+            : "https://lvtn-trungchau.dinhthaonguyen1992.workers.dev/api";
         const DEFAULT_SERVER_API_URL = atob("aHR0cHM6Ly9zY3JpcHQuZ29vZ2xlLmNvbS9tYWNyb3Mvcy9BS2Z5Y2J3dmluNlhHb3RjcU93cXlOb3dIeWhXNmVGNjZ5TEJ1VDQ0UTdtNWdfaXZTbC1PYlJDTE8tR2ZZSkFxc0pqa1EwS0IxUS9leGVj");
         
         function getEffectiveBackendUrl() {
             let url = localStorage.getItem("ptv_server_endpoint_url");
-            if (url && (url.includes("AKfycbyCDNnEs7") || url.includes("workers.dev"))) {
+            if (url && url.includes("AKfycbyCDNnEs7")) {
                 try { localStorage.removeItem("ptv_server_endpoint_url"); } catch(e){}
                 url = null;
             }
@@ -3889,10 +3891,10 @@
             }
             if (url && typeof url === "string") {
                 url = url.trim();
-                if (!url.startsWith("http://") && !url.startsWith("https://")) {
+                if (!url.startsWith("/") && !url.startsWith("http://") && !url.startsWith("https://")) {
                     url = "https://" + url;
                 }
-                if (url.endsWith("/")) {
+                if (url.endsWith("/") && url !== "/") {
                     url = url.slice(0, -1);
                 }
             }
