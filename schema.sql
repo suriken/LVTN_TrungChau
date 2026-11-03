@@ -30,3 +30,4 @@ CREATE TABLE IF NOT EXISTS surveys (
 
 CREATE INDEX IF NOT EXISTS idx_surveys_created_at ON surveys(created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_surveys_role ON surveys(role);
+

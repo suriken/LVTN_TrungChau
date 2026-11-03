@@ -234,7 +234,7 @@
                 </div>
 
                 <button onclick="switchTab('dashboard'); onNavClickMobile();" id="tabDashBtn" class="w-full px-3 py-2.5 rounded-xl transition flex items-center gap-3 text-slate-700 hover:bg-[#ede7da] text-xs sm:text-sm font-medium">
-                    <i class="fa-solid fa-chart-pie w-5 text-center text-sm"></i>
+                    <i class="fa-solid fa-chart-pie w-5 text-center text-[#3b4982] text-sm"></i>
                     <span>4. Dashboard Quản Trị</span>
                 </button>
             </div>
@@ -5182,15 +5182,16 @@
             }
         }
 
-        async function fetchResponsesFromBackend() {
+        async function fetchResponsesFromBackend(silent = false) {
             const targetUrl = getEffectiveBackendUrl();
             if (!targetUrl || targetUrl.trim() === '') {
-                showToast("Chưa cấu hình cổng API máy chủ!", "warning");
                 return;
             }
-            showToast("Đang cập nhật dữ liệu mới nhất từ máy chủ...", "info");
+            if (!silent) {
+                showToast("Đang cập nhật dữ liệu mới nhất từ máy chủ...", "info");
+            }
             try {
-                let response;
+                let response = null;
                 try {
                     response = await fetch(targetUrl, {
                         method: "POST",
@@ -5198,31 +5199,58 @@
                         body: JSON.stringify({ action: "getResponses" })
                     });
                     if (!response.ok && targetUrl !== DEFAULT_SERVER_API_URL) {
-                        throw new Error("HTTP status " + response.status);
+                        response = null;
                     }
                 } catch (proxyErr) {
-                    console.warn("Kênh chính gặp cảnh báo, chuyển sang kênh dự phòng Google Apps Script:", proxyErr);
-                    response = await fetch(DEFAULT_SERVER_API_URL, {
-                        method: "POST",
-                        headers: { "Content-Type": "text/plain;charset=utf-8" },
-                        body: JSON.stringify({ action: "getResponses" })
-                    });
+                    response = null;
                 }
 
-                const result = await response.json();
-                if (result && result.success && Array.isArray(result.responses)) {
-                    surveyResponses = result.responses;
+                if (!response && DEFAULT_SERVER_API_URL && targetUrl !== DEFAULT_SERVER_API_URL) {
                     try {
-                        localStorage.setItem("ptv_survey_responses", JSON.stringify(surveyResponses));
-                    } catch(e){}
+                        response = await fetch(DEFAULT_SERVER_API_URL, {
+                            method: "POST",
+                            headers: { "Content-Type": "text/plain;charset=utf-8" },
+                            body: JSON.stringify({ action: "getResponses" })
+                        });
+                    } catch (e) {
+                        response = null;
+                    }
+                }
+
+                if (response && response.ok) {
+                    const text = await response.text();
+                    let result = null;
+                    try {
+                        result = JSON.parse(text);
+                    } catch(e) {}
+
+                    if (result && result.success && Array.isArray(result.responses)) {
+                        surveyResponses = result.responses;
+                        try {
+                            localStorage.setItem("ptv_survey_responses", JSON.stringify(surveyResponses));
+                        } catch(e){}
+                        renderGlobalDashboard();
+                        showToast(`Đã tải dữ liệu mới nhất (${surveyResponses.length} phiếu)!`, "success");
+                        return;
+                    }
+                }
+
+                // Nếu máy chủ chưa phản hồi nhưng trong máy đã có dữ liệu lưu trữ
+                if (surveyResponses && surveyResponses.length > 0) {
                     renderGlobalDashboard();
-                    showToast(`Đã tải dữ liệu mới nhất (${surveyResponses.length} phiếu)!`, "success");
-                } else {
-                    showToast("Không thể tải dữ liệu: " + (result.message || "Lỗi không xác định"), "warning");
+                    if (!silent) {
+                        showToast(`Đang hiển thị dữ liệu đã lưu (${surveyResponses.length} phiếu)`, "info");
+                    }
+                } else if (!silent) {
+                    showToast("Chưa có phản hồi từ máy chủ dữ liệu!", "warning");
                 }
             } catch(err) {
-                console.error("Lỗi khi tải từ Hệ thống:", err);
-                showToast("Lỗi kết nối tới máy chủ dữ liệu!", "warning");
+                console.warn("Lỗi khi tải từ Hệ thống:", err);
+                if (surveyResponses && surveyResponses.length > 0) {
+                    renderGlobalDashboard();
+                } else if (!silent) {
+                    showToast("Đang sử dụng chế độ lưu ngoại tuyến", "info");
+                }
             }
         }
 
