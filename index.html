@@ -7,6 +7,12 @@
     <!-- Favicon -->
     <link rel="icon" type="image/jpeg" href="https://i.postimg.cc/jdZBPB5c/IMG-3726.jpg">
     <link rel="apple-touch-icon" href="https://i.postimg.cc/jdZBPB5c/IMG-3726.jpg">
+    <!-- Web App Manifest cho System Notification & PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#3b4982">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Khảo Sát PTV">
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
@@ -2344,6 +2350,33 @@
     <button id="scrollToTopBtn" onclick="scrollToTop()" class="fixed right-3.5 sm:right-5 bottom-4 sm:bottom-5 z-40 w-11 h-11 rounded-full bg-[#3b4982] hover:bg-[#2e3a68] text-white shadow-2xl flex items-center justify-center transition-all duration-300 opacity-0 pointer-events-none hover:scale-110 active:scale-95 border-2 border-amber-300/80 cursor-pointer" title="Cuộn lên đầu trang">
         <i class="fa-solid fa-arrow-up text-sm sm:text-base"></i>
     </button>
+
+    <!-- POPUP HỎI QUYỀN THÔNG BÁO MÀN HÌNH CHỜ (SYSTEM LOCK SCREEN NOTIFICATION PROMPT) -->
+    <div id="systemNotifPrompt" class="fixed top-20 right-4 sm:right-6 z-50 max-w-sm w-auto hidden transform transition-all duration-300 ease-out translate-y-[-10px] opacity-0">
+        <div class="bg-white/95 backdrop-blur-md rounded-2xl p-4 shadow-2xl border-2 border-[#3b4982]/30 ring-4 ring-[#3b4982]/10 space-y-2.5">
+            <div class="flex items-start gap-3">
+                <span class="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#3b4982] to-[#252f54] text-white flex items-center justify-center text-base flex-shrink-0 shadow-md">
+                    🔔
+                </span>
+                <div class="text-xs text-slate-700 leading-snug">
+                    <h5 class="font-bold text-slate-900 text-sm">Nhắc nhở qua màn hình chờ</h5>
+                    <p class="text-slate-500 mt-0.5">Nhận lời nhắc lịch sự vào 19h & 21h trên màn hình khóa điện thoại/máy tính nếu bạn lỡ bận chưa hoàn thành.</p>
+                </div>
+                <button type="button" onclick="dismissNotifPrompt()" class="text-slate-400 hover:text-slate-600 p-1 cursor-pointer" title="Đóng">
+                    <i class="fa-solid fa-xmark text-xs"></i>
+                </button>
+            </div>
+            <div class="flex items-center gap-2 pt-1">
+                <button type="button" onclick="requestSystemNotificationPermission()" class="flex-1 py-2 px-3 rounded-xl bg-gradient-to-r from-[#3b4982] to-[#252f54] hover:from-[#2e3a68] hover:to-[#1a223f] text-white text-xs font-bold transition shadow-sm cursor-pointer flex items-center justify-center gap-1.5 active:scale-98">
+                    <i class="fa-solid fa-bell text-xs"></i>
+                    <span>Bật Nhắc Nhở</span>
+                </button>
+                <button type="button" onclick="dismissNotifPrompt()" class="py-2 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-semibold transition cursor-pointer active:scale-98">
+                    Để sau
+                </button>
+            </div>
+        </div>
+    </div>
 
     <!-- SURVEY INACTIVITY / ABANDONMENT REMINDER BANNER (NHẮC NHỞ NGƯỜI DÙNG CHƯA HOÀN THÀNH KHẢO SÁT) -->
     <div id="surveyInactivityReminder" class="fixed bottom-5 left-4 right-4 sm:left-auto sm:right-6 sm:bottom-6 z-50 max-w-md w-auto hidden transform transition-all duration-500 ease-out translate-y-8 opacity-0">
@@ -7133,10 +7166,106 @@
             }
         });
 
-        // ==================== HỆ THỐNG NHẮC NHỞ LỊCH SỰ BUỔI TỐI (19H & 21H) ====================
+        // ==================== HỆ THỐNG NHẮC NHỞ LỊCH SỰ BUỔI TỐI (19H & 21H) - HỖ TRỢ SYSTEM LOCK SCREEN PUSH ====================
         let scheduledEveningTimer = null;
         let reminderSnoozeUntil = 0;
         let pageInitialLoadTimestamp = Date.now();
+
+        // 1. Gửi thông báo hệ thống trực tiếp lên Màn hình chờ (Lock Screen Notification)
+        function triggerSystemLockScreenNotification(title, body) {
+            if (!("Notification" in window)) return;
+            if (Notification.permission !== "granted") return;
+
+            const options = {
+                body: body,
+                icon: "https://i.postimg.cc/jdZBPB5c/IMG-3726.jpg",
+                badge: "https://i.postimg.cc/jdZBPB5c/IMG-3726.jpg",
+                tag: "ptv-evening-reminder",
+                renotify: true,
+                requireInteraction: true,
+                vibrate: [200, 100, 200],
+                data: {
+                    url: window.location.href
+                }
+            };
+
+            if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+                navigator.serviceWorker.ready.then(reg => {
+                    reg.showNotification(title, options);
+                }).catch(() => {
+                    createNativeNotification(title, options);
+                });
+            } else {
+                createNativeNotification(title, options);
+            }
+        }
+
+        function createNativeNotification(title, options) {
+            try {
+                const notif = new Notification(title, options);
+                notif.onclick = function() {
+                    window.focus();
+                    this.close();
+                };
+            } catch(e) {
+                console.warn("Native Notification notice:", e);
+            }
+        }
+
+        // 2. Yêu cầu cấp quyền thông báo màn hình chờ
+        function requestSystemNotificationPermission() {
+            if (!("Notification" in window)) {
+                showToast("Trình duyệt không hỗ trợ thông báo hệ thống.", "info");
+                dismissNotifPrompt();
+                return;
+            }
+
+            Notification.requestPermission().then(permission => {
+                dismissNotifPrompt();
+                if (permission === "granted") {
+                    showToast("Đã bật thông báo màn hình chờ thành công (19h & 21h)!", "success");
+                    // Gửi thử 1 thông báo để người dùng thấy ngay trên màn hình chờ
+                    setTimeout(() => {
+                        triggerSystemLockScreenNotification(
+                            "Khảo Sát Đề Tài PTV Trung Châu 1",
+                            "Bạn ơi! Hình như bạn quên chưa nhập xong khảo sát đúng không? Cố gắng hỗ trợ mình nhé 🙏"
+                        );
+                    }, 1000);
+                } else if (permission === "denied") {
+                    showToast("Bạn đã chặn thông báo. Hãy cho phép trong cài đặt trình duyệt để nhận lời nhắc nhé.", "warning");
+                }
+            }).catch(e => {
+                console.warn("Request permission error:", e);
+                dismissNotifPrompt();
+            });
+        }
+
+        function dismissNotifPrompt() {
+            const promptEl = document.getElementById('systemNotifPrompt');
+            if (promptEl) {
+                promptEl.classList.remove('translate-y-0', 'opacity-100');
+                promptEl.classList.add('translate-y-[-10px]', 'opacity-0');
+                setTimeout(() => promptEl.classList.add('hidden'), 350);
+            }
+            localStorage.setItem("ptv_notif_prompt_dismissed", Date.now().toString());
+        }
+
+        function checkAndPromptSystemNotification() {
+            if (!("Notification" in window)) return;
+            if (Notification.permission === "default") {
+                const dismissed = localStorage.getItem("ptv_notif_prompt_dismissed");
+                if (!dismissed || (Date.now() - parseInt(dismissed)) > (24 * 60 * 60 * 1000)) {
+                    const promptEl = document.getElementById('systemNotifPrompt');
+                    if (promptEl) {
+                        promptEl.classList.remove('hidden');
+                        setTimeout(() => {
+                            promptEl.classList.remove('translate-y-[-10px]', 'opacity-0');
+                            promptEl.classList.add('translate-y-0', 'opacity-100');
+                        }, 50);
+                    }
+                }
+            }
+        }
 
         function checkSurveyCompletionStatus() {
             // 1. Nếu đang ở trang Quản trị Admin -> không cần nhắc
@@ -7304,13 +7433,31 @@
 
                 if (!localStorage.getItem(slotKey)) {
                     localStorage.setItem(slotKey, Date.now().toString());
+
+                    // 1. ĐẨY THÔNG BÁO TRỰC TIẾP LÊN MÀN HÌNH CHỜ (SYSTEM LOCK SCREEN PUSH)
+                    triggerSystemLockScreenNotification(
+                        "Khảo Sát Đề Tài PTV Trung Châu 1",
+                        "Bạn ơi! Hình như bạn quên chưa nhập xong khảo sát đúng không? Cố gắng hỗ trợ mình nhé 🙏"
+                    );
+
+                    // 2. Đồng thời hiển thị thẻ nhắc nhở nhẹ nhàng nếu tab đang mở
                     showSurveyInactivityReminder(true);
                 }
             }
         }
 
         function initSurveyInactivityTracker() {
-            // Kiểm tra nhẹ nhàng mỗi 5 phút một lần để đón đúng khung 19h hoặc 21h tối, không làm phiền liên tục
+            // Đăng ký Service Worker cho System Push Notification
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('./sw.js').catch(err => {
+                    console.log('SW register info:', err);
+                });
+            }
+
+            // Gợi ý cấp quyền thông báo màn hình chờ sau 12 giây khi mở trang
+            setTimeout(checkAndPromptSystemNotification, 12000);
+
+            // Kiểm tra nhẹ nhàng mỗi 5 phút một lần để đón đúng khung 19h hoặc 21h tối
             if (scheduledEveningTimer) clearInterval(scheduledEveningTimer);
             scheduledEveningTimer = setInterval(checkScheduledEveningReminder, 5 * 60 * 1000);
             checkScheduledEveningReminder();

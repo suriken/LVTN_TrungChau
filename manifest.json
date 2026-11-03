@@ -1,0 +1,21 @@
+{
+  "name": "Khảo Sát Đề Tài PTV Trung Châu 1",
+  "short_name": "Khảo Sát PTV",
+  "description": "Ứng dụng khảo sát và đánh giá đề tài Luận văn tốt nghiệp PTV Cấp III",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#3b4982",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3135/3135715.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3135/3135715.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
