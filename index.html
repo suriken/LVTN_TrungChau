@@ -7133,54 +7133,10 @@
             }
         });
 
-        // ==================== HỆ THỐNG NHẮC NHỞ KHẢO SÁT CHƯA HOÀN THÀNH (INACTIVITY & EVENING 19H / 21H) ====================
-        let inactivityReminderTimer = null;
+        // ==================== HỆ THỐNG NHẮC NHỞ LỊCH SỰ BUỔI TỐI (19H & 21H) ====================
         let scheduledEveningTimer = null;
         let reminderSnoozeUntil = 0;
-        let tabHiddenTimestamp = 0;
         let pageInitialLoadTimestamp = Date.now();
-        let tabBlinkInterval = null;
-        const originalDocumentTitle = document.title || "Khảo Sát Đề Tài PTV Trung Châu 1";
-        const INACTIVITY_IDLE_DELAY = 75000; // 75 giây không thao tác
-
-        function playGentleReminderChime() {
-            try {
-                const AudioContext = window.AudioContext || window.webkitAudioContext;
-                if (!AudioContext) return;
-                const ctx = new AudioContext();
-                if (ctx.state === 'suspended') {
-                    ctx.resume();
-                }
-                const osc = ctx.createOscillator();
-                const gain = ctx.createGain();
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(587.33, ctx.currentTime); // D5
-                osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.15); // A5
-                gain.gain.setValueAtTime(0.06, ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
-                osc.connect(gain);
-                gain.connect(ctx.destination);
-                osc.start();
-                osc.stop(ctx.currentTime + 0.5);
-            } catch(e) {}
-        }
-
-        function startTabTitleNotification(message = "🔔 Bạn ơi! Khảo sát còn dở dang...") {
-            if (tabBlinkInterval) return;
-            let showMsg = false;
-            tabBlinkInterval = setInterval(() => {
-                document.title = showMsg ? message : originalDocumentTitle;
-                showMsg = !showMsg;
-            }, 1200);
-        }
-
-        function stopTabTitleNotification() {
-            if (tabBlinkInterval) {
-                clearInterval(tabBlinkInterval);
-                tabBlinkInterval = null;
-            }
-            document.title = originalDocumentTitle;
-        }
 
         function checkSurveyCompletionStatus() {
             // 1. Nếu đang ở trang Quản trị Admin -> không cần nhắc
@@ -7232,7 +7188,7 @@
             };
         }
 
-        function showSurveyInactivityReminder(force = false, context = 'idle') {
+        function showSurveyInactivityReminder(force = false) {
             if (!force && Date.now() < reminderSnoozeUntil) return;
 
             const status = checkSurveyCompletionStatus();
@@ -7251,35 +7207,22 @@
             if (textEl) textEl.innerText = `${status.answered} / ${status.total} mục (${status.percent}%)`;
             if (barEl) barEl.style.width = `${status.percent}%`;
 
-            if (context === 'evening') {
-                if (iconEl) iconEl.innerHTML = '🌙';
-                if (titleEl) {
-                    titleEl.innerHTML = `<span>Lời Nhắn Buổi Tối Từ Tác Giả Đề Tài</span><span class="inline-block w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>`;
-                }
-                if (subTitleEl) {
-                    subTitleEl.innerText = 'Nhắc nhở lịch sự khung 19h00 / 21h00 • Khóa PTV Cấp III';
-                }
-                if (msgEl) {
-                    msgEl.innerHTML = `
-                        <div class="font-bold text-slate-800 text-xs sm:text-sm leading-relaxed">
-                            &ldquo;Bạn ơi! Hình như bạn quên chưa nhập xong khảo sát đúng không? Cố gắng hỗ trợ mình nhé 🙏&rdquo;
-                        </div>
-                        <div class="text-[11px] text-amber-800/80 mt-1.5 font-medium flex items-center gap-1.5">
-                            <i class="fa-regular fa-moon text-amber-600"></i> Buổi tối thư thả, bạn dành giúp mình 2 - 3 phút để hoàn tất nhé!
-                        </div>
-                    `;
-                }
-            } else {
-                if (iconEl) iconEl.innerHTML = '👋';
-                if (titleEl) {
-                    titleEl.innerHTML = `<span>Lời Nhắn Từ Tác Giả Đề Tài</span><span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>`;
-                }
-                if (subTitleEl) {
-                    subTitleEl.innerText = 'Khóa đào tạo PTV Cấp III - Trung Châu 1';
-                }
-                if (msgEl) {
-                    msgEl.innerHTML = `&ldquo;Bạn ơi! Hình như bạn quên chưa nhập xong khảo sát đúng không? Cố gắng hỗ trợ mình nhé 🙏&rdquo;`;
-                }
+            if (iconEl) iconEl.innerHTML = '🌙';
+            if (titleEl) {
+                titleEl.innerHTML = `<span>Lời Nhắn Buổi Tối Từ Tác Giả Đề Tài</span><span class="inline-block w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>`;
+            }
+            if (subTitleEl) {
+                subTitleEl.innerText = 'Nhắc nhở nhẹ nhàng khung 19h00 / 21h00 • Khóa PTV Cấp III';
+            }
+            if (msgEl) {
+                msgEl.innerHTML = `
+                    <div class="font-bold text-slate-800 text-xs sm:text-sm leading-relaxed">
+                        &ldquo;Bạn ơi! Hình như bạn quên chưa nhập xong khảo sát đúng không? Cố gắng hỗ trợ mình nhé 🙏&rdquo;
+                    </div>
+                    <div class="text-[11px] text-amber-800/80 mt-1.5 font-medium flex items-center gap-1.5">
+                        <i class="fa-regular fa-moon text-amber-600"></i> Buổi tối thư thả, bạn dành giúp mình 2 - 3 phút để hoàn tất nhé!
+                    </div>
+                `;
             }
 
             reminderEl.classList.remove('hidden');
@@ -7287,13 +7230,6 @@
                 reminderEl.classList.remove('translate-y-8', 'opacity-0');
                 reminderEl.classList.add('translate-y-0', 'opacity-100');
             }, 30);
-
-            if (context === 'evening') {
-                playGentleReminderChime();
-                if (document.hidden) {
-                    startTabTitleNotification("🔔 Bạn ơi! Khảo sát còn dở dang...");
-                }
-            }
         }
 
         function hideSurveyInactivityReminder() {
@@ -7304,18 +7240,15 @@
             setTimeout(() => {
                 reminderEl.classList.add('hidden');
             }, 500);
-            stopTabTitleNotification();
         }
 
-        function dismissSurveyReminder(minutes = 15) {
+        function dismissSurveyReminder(minutes = 60) {
             hideSurveyInactivityReminder();
             reminderSnoozeUntil = Date.now() + (minutes * 60 * 1000);
-            stopTabTitleNotification();
         }
 
         function continueSurveyFromReminder() {
             hideSurveyInactivityReminder();
-            stopTabTitleNotification();
             switchTab('form');
             setTimeout(() => {
                 scrollToFirstUnansweredQuestion();
@@ -7356,9 +7289,9 @@
             const status = checkSurveyCompletionStatus();
             if (status.completed) return;
 
-            // Người dùng đã mở web để đó một khoảng thời gian (>= 3 phút) hoặc đã điền dở
+            // Chỉ nhắc nếu người dùng đã mở web để đó một khoảng thời gian (>= 5 phút) hoặc đã điền dở
             const timeOpenMs = Date.now() - pageInitialLoadTimestamp;
-            const isIdleOrStarted = timeOpenMs >= (3 * 60 * 1000) || status.hasStarted;
+            const isIdleOrStarted = timeOpenMs >= (5 * 60 * 1000) || status.hasStarted;
             if (!isIdleOrStarted) return;
 
             const now = new Date();
@@ -7371,65 +7304,16 @@
 
                 if (!localStorage.getItem(slotKey)) {
                     localStorage.setItem(slotKey, Date.now().toString());
-                    showSurveyInactivityReminder(true, 'evening');
+                    showSurveyInactivityReminder(true);
                 }
             }
         }
 
         function initSurveyInactivityTracker() {
-            const resetInactivityTimer = () => {
-                if (inactivityReminderTimer) clearTimeout(inactivityReminderTimer);
-                inactivityReminderTimer = setTimeout(() => {
-                    const status = checkSurveyCompletionStatus();
-                    if (!status.completed && (currentActiveTab === 'form' || status.hasStarted)) {
-                        showSurveyInactivityReminder(false, 'idle');
-                    }
-                }, INACTIVITY_IDLE_DELAY);
-            };
-
-            // Lắng nghe tương tác người dùng để reset đồng hồ và tắt thông báo tab nếu có
-            ['mousemove', 'keydown', 'scroll', 'touchstart', 'click'].forEach(evt => {
-                window.addEventListener(evt, () => {
-                    resetInactivityTimer();
-                    stopTabTitleNotification();
-                }, { passive: true });
-            });
-
-            // Lắng nghe khi người dùng chuyển sang tab khác rồi quay lại (Tab visibility return)
-            document.addEventListener('visibilitychange', () => {
-                if (document.visibilityState === 'hidden') {
-                    tabHiddenTimestamp = Date.now();
-                } else if (document.visibilityState === 'visible') {
-                    stopTabTitleNotification();
-                    const awayDuration = tabHiddenTimestamp > 0 ? (Date.now() - tabHiddenTimestamp) : 0;
-                    if (awayDuration > 35000) { // Đã rời đi hơn 35 giây rồi quay lại
-                        const status = checkSurveyCompletionStatus();
-                        if (!status.completed) {
-                            showSurveyInactivityReminder(false, 'tab-return');
-                        }
-                    }
-                    resetInactivityTimer();
-                    // Khi người dùng quay lại tab, kiểm tra luôn lịch 19h / 21h
-                    checkScheduledEveningReminder();
-                }
-            });
-
-            // Cảnh báo trình duyệt trước khi đóng tab nếu phiếu đang làm dở
-            window.addEventListener('beforeunload', (e) => {
-                const status = checkSurveyCompletionStatus();
-                if (!status.completed && status.hasStarted) {
-                    e.preventDefault();
-                    e.returnValue = 'Bạn ơi! Bạn chưa hoàn thành nộp phiếu khảo sát. Bạn có chắc chắn muốn rời đi?';
-                    return e.returnValue;
-                }
-            });
-
-            // Khởi chạy kiểm tra định kỳ mỗi 30 giây cho lịch nhắc 19h và 21h tối
+            // Kiểm tra nhẹ nhàng mỗi 5 phút một lần để đón đúng khung 19h hoặc 21h tối, không làm phiền liên tục
             if (scheduledEveningTimer) clearInterval(scheduledEveningTimer);
-            scheduledEveningTimer = setInterval(checkScheduledEveningReminder, 30000);
+            scheduledEveningTimer = setInterval(checkScheduledEveningReminder, 5 * 60 * 1000);
             checkScheduledEveningReminder();
-
-            resetInactivityTimer();
         }
 
         window.onload = function() {
