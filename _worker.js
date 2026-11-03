@@ -112,7 +112,7 @@ export default {
         const action = url.searchParams.get("action") || "getResponses";
         if (action === "getResponses" && db) {
           try {
-            const { results } = await db.prepare("SELECT raw_json FROM surveys ORDER BY created_at DESC").all();
+            const { results } = await db.prepare("SELECT raw_json FROM surveys ORDER BY created_at ASC").all();
             const responses = (results || []).map(r => {
               try { return JSON.parse(r.raw_json); } catch(e) { return null; }
             }).filter(Boolean);
@@ -234,7 +234,7 @@ export default {
         if (action === "getResponses") {
           if (db) {
             try {
-              const { results } = await db.prepare("SELECT raw_json FROM surveys ORDER BY created_at DESC").all();
+              const { results } = await db.prepare("SELECT raw_json FROM surveys ORDER BY created_at ASC").all();
               let responses = (results || []).map(r => {
                 try { return JSON.parse(r.raw_json); } catch(e) { return null; }
               }).filter(Boolean);
@@ -313,7 +313,7 @@ export default {
             let responses = [];
             if (db) {
               try {
-                const { results } = await db.prepare("SELECT raw_json FROM surveys ORDER BY created_at DESC").all();
+                const { results } = await db.prepare("SELECT raw_json FROM surveys ORDER BY created_at ASC").all();
                 responses = (results || []).map(r => {
                   try { return JSON.parse(r.raw_json); } catch(e) { return null; }
                 }).filter(Boolean);

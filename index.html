@@ -5616,9 +5616,33 @@
             renderProgramEvaluationHeatmap(filtered);
         }
 
+        // CHUẨN HÓA VÀ PARSE THỜI GIAN ĐỂ SẮP XẾP CHÍNH XÁC
+        function parseResponseTimestamp(ts) {
+            if (!ts) return 0;
+            if (typeof ts === 'number') return ts;
+            const str = String(ts).trim();
+            const match = str.match(/(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?[\s,]+(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+            if (match) {
+                const h = parseInt(match[1], 10);
+                const m = parseInt(match[2], 10);
+                const s = match[3] ? parseInt(match[3], 10) : 0;
+                const d = parseInt(match[4], 10);
+                const mo = parseInt(match[5], 10) - 1;
+                const y = parseInt(match[6], 10);
+                return new Date(y, mo, d, h, m, s).getTime();
+            }
+            const parsed = Date.parse(str);
+            return isNaN(parsed) ? 0 : parsed;
+        }
+
         // GÁN SỐ THỨ TỰ GỐC THEO THỜI GIAN NỘP (TỪ DƯỚI LÊN: NGƯỜI ĐẦU TIÊN LÀ 1, NGƯỜI MỚI NHẤT LÀ N)
         function assignResponsesSTT(list) {
             if (!Array.isArray(list)) return [];
+            list.sort((a, b) => {
+                const tA = parseResponseTimestamp(a?.timestamp || a?.created_at);
+                const tB = parseResponseTimestamp(b?.timestamp || b?.created_at);
+                return tA - tB;
+            });
             list.forEach((item, index) => {
                 if (item) {
                     item._stt = index + 1; // 1-based index (người đầu tiên nộp là 1)
