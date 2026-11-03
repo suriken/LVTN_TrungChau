@@ -41,6 +41,13 @@
             font-family: inherit !important;
         }
 
+        /* Đảm bảo icon của tab sidebar đang active luôn sáng rõ màu trắng */
+        #sidebarContent button.bg-\[\#3b4982\] i,
+        #sidebarContent button.bg-\[\#3b4982\] span,
+        nav button.bg-\[\#3b4982\] i {
+            color: #ffffff !important;
+        }
+
         /* Căn đều tự nhiên trên màn hình lớn, tự động căn trái an toàn trên di động */
         .text-justify {
             text-align: left;
@@ -226,14 +233,9 @@
                     BÁO CÁO & DASHBOARD
                 </div>
 
-                <button onclick="switchTab('dashboard'); onNavClickMobile();" id="tabDashBtn" class="w-full px-3 py-2.5 rounded-xl transition flex items-center justify-between gap-2 text-slate-700 hover:bg-[#ede7da] text-xs sm:text-sm font-medium">
-                    <div class="flex items-center gap-3">
-                        <i class="fa-solid fa-chart-pie w-5 text-center text-[#3b4982] text-sm"></i>
-                        <span>4. Dashboard Quản Trị</span>
-                    </div>
-                    <span class="text-[10px] font-black text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded border border-amber-300 flex items-center gap-1">
-                        <i class="fa-solid fa-lock text-[9px]"></i> Mật Khẩu
-                    </span>
+                <button onclick="switchTab('dashboard'); onNavClickMobile();" id="tabDashBtn" class="w-full px-3 py-2.5 rounded-xl transition flex items-center gap-3 text-slate-700 hover:bg-[#ede7da] text-xs sm:text-sm font-medium">
+                    <i class="fa-solid fa-chart-pie w-5 text-center text-sm"></i>
+                    <span>4. Dashboard Quản Trị</span>
                 </button>
             </div>
         </div>
