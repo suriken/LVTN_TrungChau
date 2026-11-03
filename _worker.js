@@ -298,13 +298,16 @@ export default {
           }
         }
 
-        // C. XÁC THỰC QUẢN TRỊ (LOGIN)
+        // C. XÁC THỰC QUẢN TRỊ (LOGIN) SIÊU TỐC
         if (action === "login") {
-          const u = (payload.username || "").trim();
+          const u = (payload.username || "").trim().toLowerCase();
           const p = (payload.password || "").trim();
 
-          const isValidUser = ADMIN_CREDENTIALS.users.includes(u);
-          const isValidPass = ADMIN_CREDENTIALS.passwords.includes(p);
+          const validUsers = ["trungchau", "admin", "dinhthaonguyen1992@gmail.com", "thao", "nguyendinhthao"];
+          const validPass = ["trungchau@123", "admin123"];
+
+          const isValidUser = validUsers.includes(u);
+          const isValidPass = validPass.includes(p);
 
           if (isValidUser && isValidPass) {
             let responses = [];
