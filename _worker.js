@@ -235,27 +235,67 @@ export default {
           if (db) {
             try {
               const { results } = await db.prepare("SELECT raw_json FROM surveys ORDER BY created_at DESC").all();
-              const responses = (results || []).map(r => {
+              let responses = (results || []).map(r => {
                 try { return JSON.parse(r.raw_json); } catch(e) { return null; }
               }).filter(Boolean);
 
-              return jsonResponse({
-                success: true,
-                count: responses.length,
-                responses: responses,
-                source: "cloudflare_d1"
-              });
+              // Nếu D1 đã có dữ liệu -> trả về siêu tốc (< 15ms)
+              if (responses.length > 0) {
+                return jsonResponse({
+                  success: true,
+                  count: responses.length,
+                  responses: responses,
+                  source: "cloudflare_d1"
+                });
+              }
             } catch (d1Err) {
               console.warn("Lỗi đọc D1, fallback sang Google Apps Script:", d1Err);
             }
           }
 
-          // Fallback Google Apps Script
-          return fetch(targetGoogleUrl, {
-            method: "POST",
-            headers: { "Content-Type": "text/plain;charset=utf-8" },
-            body: JSON.stringify(payload)
-          });
+          // Fallback hoặc khi D1 chưa có dữ liệu: Lấy từ Google Apps Script
+          try {
+            const googleRes = await fetch(targetGoogleUrl, {
+              method: "POST",
+              headers: { "Content-Type": "text/plain;charset=utf-8" },
+              body: JSON.stringify(payload)
+            });
+            const data = await googleRes.json();
+
+            // Tự động nạp (Backfill) dữ liệu từ Google Sheets sang D1 ở luồng ngầm
+            if (db && data && data.success && Array.isArray(data.responses) && data.responses.length > 0) {
+              ctx.waitUntil((async () => {
+                for (const r of data.responses) {
+                  try {
+                    const rawStr = JSON.stringify(r);
+                    const scoresStr = JSON.stringify(r.scores || {});
+                    const reasonsStr = JSON.stringify(r.reasons || {});
+                    const isAnon = r.isAnonymous ? 1 : 0;
+                    await db.prepare(`
+                      INSERT INTO surveys (
+                        id, timestamp, name, phone, is_anonymous, role, unit, grad_level,
+                        tenure, region, avg_score, scores_json, reasons_json, diet, practice,
+                        service_status, challenge, advantages, disadvantages, reality, suggestions,
+                        raw_json, created_at
+                      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                      ON CONFLICT(id) DO UPDATE SET raw_json = excluded.raw_json
+                    `).bind(
+                      r.id, r.timestamp || "", r.name || "", r.phone || "", isAnon, r.role || "", r.unit || "",
+                      r.gradLevel || "", r.tenure || "", r.region || "", r.avgScore || 0,
+                      scoresStr, reasonsStr, r.diet || "", r.practice || "", r.serviceStatus || "",
+                      r.challenge || "", r.advantages || "", r.disadvantages || "", r.reality || "", r.suggestions || "",
+                      rawStr, Date.now()
+                    ).run();
+                  } catch(e){}
+                }
+                console.log("Đã tự động nạp thành công dữ liệu từ Google Sheets vào D1!");
+              })());
+            }
+
+            return jsonResponse(data);
+          } catch (fetchErr) {
+            return jsonResponse({ success: false, error: fetchErr.message }, 500);
+          }
         }
 
         // C. XÁC THỰC QUẢN TRỊ (LOGIN)
@@ -347,3 +387,4 @@ export default {
     });
   }
 };
+

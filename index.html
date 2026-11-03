@@ -5169,11 +5169,25 @@
             }
             showToast("Đang cập nhật dữ liệu mới nhất từ máy chủ...", "info");
             try {
-                const response = await fetch(targetUrl, {
-                    method: "POST",
-                    headers: { "Content-Type": "text/plain;charset=utf-8" },
-                    body: JSON.stringify({ action: "getResponses" })
-                });
+                let response;
+                try {
+                    response = await fetch(targetUrl, {
+                        method: "POST",
+                        headers: { "Content-Type": "text/plain;charset=utf-8" },
+                        body: JSON.stringify({ action: "getResponses" })
+                    });
+                    if (!response.ok && targetUrl !== DEFAULT_SERVER_API_URL) {
+                        throw new Error("HTTP status " + response.status);
+                    }
+                } catch (proxyErr) {
+                    console.warn("Kênh chính gặp cảnh báo, chuyển sang kênh dự phòng Google Apps Script:", proxyErr);
+                    response = await fetch(DEFAULT_SERVER_API_URL, {
+                        method: "POST",
+                        headers: { "Content-Type": "text/plain;charset=utf-8" },
+                        body: JSON.stringify({ action: "getResponses" })
+                    });
+                }
+
                 const result = await response.json();
                 if (result && result.success && Array.isArray(result.responses)) {
                     surveyResponses = result.responses;
