@@ -19,7 +19,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body {
-            font-family: 'Be Vietnam Pro', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             background-color: #f7f5f0;
             font-size: 15px;
             -webkit-font-smoothing: antialiased;
@@ -27,21 +27,18 @@
             text-rendering: optimizeLegibility;
         }
 
-        /* Tối ưu căn chỉnh dòng & chống nhảy chữ (Text balance, pretty & natural wrapping) */
-        h1, h2, h3, h4, h5, .text-balance {
-            text-wrap: balance;
+        /* Ổn định dòng chữ, chống nhảy chữ & rơi rớt chữ bất thường khi gõ tiếng Việt */
+        h1, h2, h3, h4, h5, p, label, span {
             word-break: normal;
-        }
-        p, label, span, .text-pretty {
-            text-wrap: pretty;
-            word-break: normal;
+            overflow-wrap: break-word;
         }
 
-        /* Chống lỗi nhảy chữ, giãn chữ bất thường trên textarea & ô nhập liệu */
+        /* Chống lỗi nhảy chữ, nhảy con trỏ khi gõ Tiếng Việt trên ô nhập liệu */
         textarea, input, select {
             text-align: left !important;
             word-spacing: normal !important;
             letter-spacing: normal !important;
+            font-family: inherit !important;
         }
 
         /* Căn đều tự nhiên trên màn hình lớn, tự động căn trái an toàn trên di động */
@@ -1390,13 +1387,13 @@
                         <!-- 1. HỌ VÀ TÊN -->
                         <div>
                             <label id="respNameLabel" class="block text-sm sm:text-base font-bold text-slate-800 mb-1.5">Họ và Tên *</label>
-                            <input type="text" required id="respName" oninput="saveSurveyDraft()" placeholder="Nhập họ tên đầy đủ" class="w-full px-3.5 py-2.5 text-sm sm:text-base rounded-xl border border-[#e2d8c7] focus:outline-none focus:border-[#3b4982] transition bg-white">
+                            <input type="text" required id="respName" oninput="saveSurveyDraftDebounced()" onblur="saveSurveyDraft()" spellcheck="false" autocomplete="off" placeholder="Nhập họ tên đầy đủ" class="w-full px-3.5 py-2.5 text-sm sm:text-base rounded-xl border border-[#e2d8c7] focus:outline-none focus:border-[#3b4982] transition bg-white">
                         </div>
 
                         <!-- 2. SỐ ĐIỆN THOẠI -->
                         <div>
                             <label id="respPhoneLabel" class="block text-sm sm:text-base font-bold text-slate-800 mb-1.5">Số Điện Thoại *</label>
-                            <input type="tel" required id="respPhone" oninput="saveSurveyDraft()" placeholder="Nhập số điện thoại (Zalo)" class="w-full px-3.5 py-2.5 text-sm sm:text-base rounded-xl border border-[#e2d8c7] focus:outline-none focus:border-[#3b4982] transition bg-white">
+                            <input type="tel" required id="respPhone" oninput="saveSurveyDraftDebounced()" onblur="saveSurveyDraft()" spellcheck="false" autocomplete="off" placeholder="Nhập số điện thoại (Zalo)" class="w-full px-3.5 py-2.5 text-sm sm:text-base rounded-xl border border-[#e2d8c7] focus:outline-none focus:border-[#3b4982] transition bg-white">
                         </div>
 
                         <!-- 3. VAI TRÒ HIỆN NAY  -->
@@ -1415,7 +1412,7 @@
                         <!-- 4. ĐƠN VỊ SINH HOẠT: HỌ ĐẠO \ GĐHĐ -->
                         <div>
                             <label class="block text-sm sm:text-base font-bold text-slate-800 mb-1.5">Đơn Vị Sinh Hoạt*</label>
-                            <input type="text" id="respUnit" required oninput="saveSurveyDraft()" placeholder="Nhập Họ đạo hoặc GĐHĐ..." class="w-full px-3.5 py-2.5 text-sm sm:text-base rounded-xl border border-[#e2d8c7] focus:outline-none focus:border-[#3b4982] transition bg-white">
+                            <input type="text" id="respUnit" required oninput="saveSurveyDraftDebounced()" onblur="saveSurveyDraft()" spellcheck="false" autocomplete="off" placeholder="Nhập Họ đạo hoặc GĐHĐ..." class="w-full px-3.5 py-2.5 text-sm sm:text-base rounded-xl border border-[#e2d8c7] focus:outline-none focus:border-[#3b4982] transition bg-white">
                         </div>
                     </div>
 
@@ -1525,11 +1522,11 @@
                             <label class="block text-sm sm:text-base font-black text-slate-900 mb-2 leading-snug">
                                 21. Tình trạng tham gia phụng sự tại Họ đạo / GĐHĐ hiện nay <span class="text-rose-600 font-black">*</span>
                             </label>
-                            <select id="respServiceStatus" required onchange="saveSurveyDraft(); updateSurveyProgress();" class="w-full px-3 py-2 text-xs sm:text-sm rounded-xl border border-[#e2d8c7] focus:outline-none focus:border-[#3b4982] bg-white transition">
+                            <select id="respServiceStatus" required onchange="saveSurveyDraft(); updateSurveyProgress();" class="w-full px-3.5 py-2.5 text-sm sm:text-base rounded-xl border border-[#e2d8c7] focus:outline-none focus:border-[#3b4982] bg-white transition">
                                 <option value="">-- Chọn tình trạng phụng sự --</option>
-                                <option value="Trực tiếp phụ trách thường xuyên">Đang trực tiếp phụ trách, hướng dẫn sinh hoạt con em nhà Đạo thường xuyên</option>
-                                <option value="Hỗ trợ các kỳ trại, đại lễ">Tham gia hỗ trợ các kỳ trại huấn luyện hoặc đại lễ khi được phân công</option>
-                                <option value="Tạm ngưng do hoàn cảnh">Tạm ngưng sinh hoạt vì lý do công việc, học tập hoặc gia đình</option>
+                                <option value="Trực tiếp phụ trách thường xuyên">Trực tiếp phụ trách, hướng dẫn sinh hoạt thường xuyên</option>
+                                <option value="Hỗ trợ các kỳ trại, đại lễ">Hỗ trợ các kỳ trại huấn luyện hoặc đại lễ khi được phân công</option>
+                                <option value="Tạm ngưng do hoàn cảnh">Tạm ngưng sinh hoạt vì lý do công việc / gia đình</option>
                                 <option value="Đã ngưng hẳn hoặc chuyển đơn vị">Đã chuyển nơi cư trú hoặc không còn tham gia</option>
                             </select>
                         </div>
@@ -1540,10 +1537,10 @@
                             </label>
                             <select id="respChallenge" required onchange="saveSurveyDraft(); updateSurveyProgress();" class="w-full px-3.5 py-2.5 text-sm sm:text-base rounded-xl border border-[#e2d8c7] focus:outline-none focus:border-[#3b4982] bg-white transition">
                                 <option value="">-- Chọn khó khăn lớn nhất --</option>
-                                <option value="Áp lực mưu sinh & quỹ thời gian hạn hẹp">Áp lực công việc mưu sinh, học tập và quỹ thời gian gia đình</option>
-                                <option value="Khoảng cách địa lý / đi lại xa xôi">Khoảng cách địa lý xa xôi, di chuyển sinh hoạt khó khăn</option>
-                                <option value="Thiếu môi trường thực hành tại Họ đạo">Họ đạo địa phương chưa có môi trường hoặc chưa tạo điều kiện hoạt động cho PTV</option>
-                                <option value="Nội dung đào tạo chưa sát với giới trẻ">Nội dung sinh hoạt và đào tạo chưa thật sự bắt nhịp với tâm lý thanh thiếu niên hiện đại</option>
+                                <option value="Áp lực mưu sinh & quỹ thời gian hạn hẹp">Áp lực mưu sinh, học tập & quỹ thời gian gia đình</option>
+                                <option value="Khoảng cách địa lý / đi lại xa xôi">Khoảng cách địa lý xa xôi, di chuyển khó khăn</option>
+                                <option value="Thiếu môi trường thực hành tại Họ đạo">Họ đạo chưa có môi trường hoặc chưa tạo điều kiện cho PTV</option>
+                                <option value="Nội dung đào tạo chưa sát với giới trẻ">Nội dung sinh hoạt chưa sát tâm lý thanh thiếu niên</option>
                                 <option value="Khác">Khó khăn khác</option>
                             </select>
                         </div>
@@ -1573,7 +1570,7 @@
                                 <span>23. Những mặt LÀM ĐƯỢC (Ưu điểm nổi bật của chương trình đào tạo & PTV):</span>
                                 <span class="text-rose-600 font-black text-base ml-1">*</span>
                             </label>
-                            <textarea id="respAdvantages" oninput="handleTextareaInput('respAdvantages')" rows="2" class="w-full text-sm sm:text-base p-3.5 rounded-xl border border-[#e2d8c7] focus:outline-none focus:border-[#3b4982] bg-[#fbf9f5] placeholder-slate-400 leading-relaxed transition text-left" placeholder="Ví dụ: Giúp củng cố đức tin, trang bị lễ nghi bài bản, tinh thần kỷ luật trại huấn luyện tốt..."></textarea>
+                            <textarea id="respAdvantages" oninput="handleTextareaInput('respAdvantages')" onblur="saveSurveyDraft()" spellcheck="false" rows="2" class="w-full text-sm sm:text-base p-3.5 rounded-xl border border-[#e2d8c7] focus:outline-none focus:border-[#3b4982] bg-[#fbf9f5] placeholder-slate-400 leading-relaxed transition text-left" placeholder="Ví dụ: Giúp củng cố đức tin, trang bị lễ nghi bài bản, tinh thần kỷ luật trại huấn luyện tốt..."></textarea>
                         </div>
 
                         <!-- 24. MẶT CHƯA ĐƯỢC -->
@@ -1583,7 +1580,7 @@
                                 <span>24. Những mặt CHƯA LÀM ĐƯỢC (Hạn chế, bất cập hoặc nội dung chưa thực tế):</span>
                                 <span class="text-rose-600 font-black text-base ml-1">*</span>
                             </label>
-                            <textarea id="respDisadvantages" oninput="handleTextareaInput('respDisadvantages')" rows="2" class="w-full text-sm sm:text-base p-3.5 rounded-xl border border-[#e2d8c7] focus:outline-none focus:border-[#3b4982] bg-[#fbf9f5] placeholder-slate-400 leading-relaxed transition text-left" placeholder="Ví dụ: Nặng lý thuyết, thiếu kỹ năng sư phạm hiện đại, thời gian hàm thụ quá gấp, thiếu công nghệ số..."></textarea>
+                            <textarea id="respDisadvantages" oninput="handleTextareaInput('respDisadvantages')" onblur="saveSurveyDraft()" spellcheck="false" rows="2" class="w-full text-sm sm:text-base p-3.5 rounded-xl border border-[#e2d8c7] focus:outline-none focus:border-[#3b4982] bg-[#fbf9f5] placeholder-slate-400 leading-relaxed transition text-left" placeholder="Ví dụ: Nặng lý thuyết, thiếu kỹ năng sư phạm hiện đại, thời gian hàm thụ quá gấp, thiếu công nghệ số..."></textarea>
                         </div>
 
                         <!-- 25. THỰC TRẠNG PTV HIỆN NAY -->
@@ -1593,7 +1590,7 @@
                                 <span>25. THỰC TRẠNG của Phổ Tế Viên sau khi tốt nghiệp hiện nay:</span>
                                 <span class="text-rose-600 font-black text-base ml-1">*</span>
                             </label>
-                            <textarea id="respReality" oninput="handleTextareaInput('respReality')" rows="2" class="w-full text-sm sm:text-base p-3.5 rounded-xl border border-[#e2d8c7] focus:outline-none focus:border-[#3b4982] bg-[#fbf9f5] placeholder-slate-400 leading-relaxed transition text-left" placeholder="Ví dụ: Tỷ lệ tiếp tục gắn bó phụng sự tại Họ đạo, sự nhiệt huyết, khó khăn khi hòa nhập với việc đạo..."></textarea>
+                            <textarea id="respReality" oninput="handleTextareaInput('respReality')" onblur="saveSurveyDraft()" spellcheck="false" rows="2" class="w-full text-sm sm:text-base p-3.5 rounded-xl border border-[#e2d8c7] focus:outline-none focus:border-[#3b4982] bg-[#fbf9f5] placeholder-slate-400 leading-relaxed transition text-left" placeholder="Ví dụ: Tỷ lệ tiếp tục gắn bó phụng sự tại Họ đạo, sự nhiệt huyết, khó khăn khi hòa nhập với việc đạo..."></textarea>
                         </div>
 
                         <!-- 26. ĐỀ XUẤT CẢI TIẾN -->
@@ -1603,7 +1600,7 @@
                                 <span>26. Quý vị có ĐỀ XUẤT, KIẾN NGHỊ GÌ để cải tiến và phát triển chương trình?</span>
                                 <span class="text-rose-600 font-black text-base ml-1">*</span>
                             </label>
-                            <textarea id="respSuggestions" oninput="handleTextareaInput('respSuggestions')" rows="3" class="w-full text-sm sm:text-base p-3.5 rounded-xl border border-[#e2d8c7] focus:outline-none focus:border-[#3b4982] bg-[#fbf9f5] placeholder-slate-400 leading-relaxed transition text-left" placeholder="Kính xin quý vị nêu những sáng kiến, đề xuất cụ thể gửi đến Hội Thánh và Ban Phụ trách GĐHĐ..."></textarea>
+                            <textarea id="respSuggestions" oninput="handleTextareaInput('respSuggestions')" onblur="saveSurveyDraft()" spellcheck="false" rows="3" class="w-full text-sm sm:text-base p-3.5 rounded-xl border border-[#e2d8c7] focus:outline-none focus:border-[#3b4982] bg-[#fbf9f5] placeholder-slate-400 leading-relaxed transition text-left" placeholder="Kính xin quý vị nêu những sáng kiến, đề xuất cụ thể gửi đến Hội Thánh và Ban Phụ trách GĐHĐ..."></textarea>
                         </div>
                     </div>
                 </div>
@@ -1930,7 +1927,7 @@
             </div>
 
             <!-- 1. BẢNG DANH SÁCH CHI TIẾT CÁC PHIẾU KHẢO SÁT (DẠNG NGĂN XẾP: NGƯỜI MỚI NHẤT TRÊN CÙNG, ĐÁNH SỐ TỪ DƯỚI LÊN) -->
-            <div class="bg-white p-4 sm:p-5 rounded-2xl border border-[#e2d8c7] shadow-sm space-y-3.5">
+            <div id="sec-admin-danhsach" class="bg-white p-4 sm:p-5 rounded-2xl border border-[#e2d8c7] shadow-sm space-y-3.5 scroll-mt-24">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#e2d8c7] pb-3">
                     <div class="flex items-center gap-2">
                         <span class="w-8 h-8 rounded-lg bg-[#3b4982] text-white flex items-center justify-center text-sm shadow">
@@ -1970,7 +1967,7 @@
             </div>
 
             <!-- 2. KHO Ý KIẾN TỰ LUẬN & ĐÓNG GÓP THEO CHỦ ĐỀ (PHẦN 4 - Ý MỚI NHẤT LÊN ĐẦU THEO NGĂN XẾP) -->
-            <div class="bg-white p-4 sm:p-5 rounded-2xl border border-[#e2d8c7] shadow-sm space-y-3.5">
+            <div id="sec-admin-ykien" class="bg-white p-4 sm:p-5 rounded-2xl border border-[#e2d8c7] shadow-sm space-y-3.5 scroll-mt-24">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#e2d8c7] pb-3">
                     <div>
                         <h3 class="font-black text-[#3b4982] text-base sm:text-lg flex items-center gap-2">
@@ -1987,7 +1984,7 @@
             </div>
 
             <!-- 3. BẢNG ĐÁNH GIÁ MA TRẬN KHUNG CHƯƠNG TRÌNH & PHÂN CẤP PTV (HEATMAP TÔ MÀU 1 -> 5 & HIGHLIGHTING CHÚ Ý) -->
-            <div class="bg-white p-4 sm:p-5 rounded-2xl border border-[#e2d8c7] shadow-sm space-y-4">
+            <div id="sec-admin-bando" class="bg-white p-4 sm:p-5 rounded-2xl border border-[#e2d8c7] shadow-sm space-y-4 scroll-mt-24">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#e2d8c7] pb-3">
                     <div class="flex items-center gap-2">
                         <span class="w-8 h-8 rounded-lg bg-[#3b4982] text-white flex items-center justify-center text-sm shadow">
@@ -2025,13 +2022,15 @@
                 </div>
 
                 <!-- KHỐI LIỆT KÊ NHỮNG PHẦN CHƯA PHÙ HỢP ĐỂ HIGHLIGHTING CHÚ Ý (&le; 3 ĐIỂM) -->
-                <div id="unsuitableAlertContainer" class="pt-2">
-                    <!-- Render dynamically by JS -->
+                <div id="sec-admin-caithien" class="scroll-mt-24">
+                    <div id="unsuitableAlertContainer" class="pt-2">
+                        <!-- Render dynamically by JS -->
+                    </div>
                 </div>
             </div>
 
             <!-- 4. CHARTS GRID (HIỂN THỊ RÕ RÀNG TỪNG CON SỐ DỮ LIỆU) -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+            <div id="sec-admin-bieudo" class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 scroll-mt-24">
                 <!-- BIỂU ĐỒ CỘT: 4 TRỤ CỘT CÓ SỐ LIỆU RÕ RÀNG -->
                 <div class="bg-white p-4 sm:p-5 rounded-2xl border border-[#e2d8c7] shadow-sm space-y-3">
                     <div class="flex items-center justify-between border-b border-[#e2d8c7] pb-2">
@@ -2217,6 +2216,47 @@
         </div>
     </div>
 
+
+    <!-- ADMIN FLOATING QUICK-NAV TOOLBAR (THANH ĐIỀU HƯỚNG NHANH CHUYÊN MÔN DỌC BÊN PHẢI MÀN HÌNH QUẢN TRỊ) -->
+    <div id="adminFloatingQuickNav" class="hidden fixed right-2 sm:right-3.5 top-1/2 -translate-y-1/2 z-40 flex flex-col items-center gap-1.5 sm:gap-2 bg-white/95 backdrop-blur-md p-1.5 sm:p-2 rounded-2xl shadow-2xl border border-[#3b4982]/20 transition-all duration-300">
+        <!-- Lên Đầu Trang Quản Trị -->
+        <button type="button" onclick="scrollToAdminTop()" class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-slate-100 hover:bg-[#3b4982] text-slate-700 hover:text-white flex items-center justify-center transition shadow-xs group relative cursor-pointer" title="Lên đầu trang Quản Trị">
+            <i class="fa-solid fa-arrow-up text-xs sm:text-sm"></i>
+            <span class="absolute right-full mr-2 px-2 py-1 bg-slate-900 text-white text-[11px] font-bold rounded-lg whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity shadow-lg">Lên Đầu Trang</span>
+        </button>
+
+        <div class="w-5 h-[1px] bg-slate-200"></div>
+
+        <!-- 1. Danh Sách Phiếu -->
+        <button type="button" onclick="scrollToAdminSection('sec-admin-danhsach')" class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-blue-50 hover:bg-[#3b4982] text-[#3b4982] hover:text-white flex items-center justify-center transition shadow-xs group relative cursor-pointer" title="Danh Sách Phiếu Khảo Sát">
+            <i class="fa-solid fa-table-list text-xs sm:text-sm"></i>
+            <span class="absolute right-full mr-2 px-2 py-1 bg-slate-900 text-white text-[11px] font-bold rounded-lg whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity shadow-lg">📋 Danh Sách Phiếu</span>
+        </button>
+
+        <!-- 2. Tổng Hợp Ý Kiến -->
+        <button type="button" onclick="scrollToAdminSection('sec-admin-ykien')" class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-amber-50 hover:bg-amber-600 text-amber-800 hover:text-white flex items-center justify-center transition shadow-xs group relative cursor-pointer" title="Tổng Hợp Ý Kiến (Phần 4)">
+            <i class="fa-solid fa-comments text-xs sm:text-sm"></i>
+            <span class="absolute right-full mr-2 px-2 py-1 bg-slate-900 text-white text-[11px] font-bold rounded-lg whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity shadow-lg">💬 Tổng Hợp Ý Kiến</span>
+        </button>
+
+        <!-- 3. Bản Đồ Đánh Giá -->
+        <button type="button" onclick="scrollToAdminSection('sec-admin-bando')" class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-indigo-50 hover:bg-indigo-600 text-[#3b4982] hover:text-white flex items-center justify-center transition shadow-xs group relative cursor-pointer" title="Bản Đồ Nhiệt Chương Trình">
+            <i class="fa-solid fa-table-cells-large text-xs sm:text-sm"></i>
+            <span class="absolute right-full mr-2 px-2 py-1 bg-slate-900 text-white text-[11px] font-bold rounded-lg whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity shadow-lg">🗺️ Bản Đồ Đánh Giá</span>
+        </button>
+
+        <!-- 4. Phần Cần Cải Thiện -->
+        <button type="button" onclick="scrollToAdminSection('sec-admin-caithien')" class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-rose-50 hover:bg-rose-600 text-rose-700 hover:text-white flex items-center justify-center transition shadow-xs group relative cursor-pointer" title="Phần Chưa Phù Hợp Cần Cải Thiện">
+            <i class="fa-solid fa-triangle-exclamation text-xs sm:text-sm"></i>
+            <span class="absolute right-full mr-2 px-2 py-1 bg-slate-900 text-white text-[11px] font-bold rounded-lg whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity shadow-lg">⚠️ Phần Cần Cải Thiện</span>
+        </button>
+
+        <!-- 5. Biểu Đồ Thống Kê -->
+        <button type="button" onclick="scrollToAdminSection('sec-admin-bieudo')" class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-emerald-50 hover:bg-emerald-600 text-emerald-800 hover:text-white flex items-center justify-center transition shadow-xs group relative cursor-pointer" title="Biểu Đồ Thống Kê 4 Trụ Cột & Vai Trò">
+            <i class="fa-solid fa-chart-column text-xs sm:text-sm"></i>
+            <span class="absolute right-full mr-2 px-2 py-1 bg-slate-900 text-white text-[11px] font-bold rounded-lg whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity shadow-lg">📊 Biểu Đồ Thống Kê</span>
+        </button>
+    </div>
 
     <!-- FLOATING SUBMIT SURVEY BUTTON (NỔI DỌC BÊN PHẢI KHI LÀM KHẢO SÁT) -->
     <button id="floatingSubmitSurveyBtn" onclick="handleFormSubmit(event)" class="hidden fixed right-3.5 sm:right-5 bottom-32 sm:bottom-36 z-40 px-3.5 py-2.5 sm:px-4 sm:py-3 rounded-full bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-teal-600 text-white shadow-2xl transition-all duration-300 hover:scale-105 active:scale-95 border-2 border-emerald-300/80 cursor-pointer flex items-center justify-center gap-2 group" title="Bấm để gửi phiếu khảo sát ngay bất kỳ lúc nào">
@@ -2690,12 +2730,14 @@
             const scanBtn = document.getElementById('floatingScanBtn');
             const progBtn = document.getElementById('floatingProgramBtn');
             const submitBtn = document.getElementById('floatingSubmitSurveyBtn');
+            const adminNav = document.getElementById('adminFloatingQuickNav');
 
             // 1. Khi ở trang Khảo sát: hiển thị nút floating gửi khảo sát & xem khung chương trình
             if (currentActiveTab === 'form') {
                 if (submitBtn) submitBtn.classList.remove('hidden');
                 if (progBtn) progBtn.classList.remove('hidden');
                 if (scanBtn) scanBtn.classList.add('hidden');
+                if (adminNav) adminNav.classList.add('hidden');
                 if (typeof updateSurveyProgress === 'function') {
                     updateSurveyProgress();
                 }
@@ -2707,6 +2749,7 @@
 
             // 2. Khi ở trang Khung chương trình: hiển thị nút xem bản scan
             if (currentActiveTab === 'docs') {
+                if (adminNav) adminNav.classList.add('hidden');
                 if (scanBtn) {
                     scanBtn.classList.remove('hidden');
                     if (currentSubDocTab === 'digitized') {
@@ -2728,9 +2771,39 @@
             } else {
                 if (scanBtn) scanBtn.classList.add('hidden');
             }
+
+            // 3. Khi ở màn hình Dashboard Quản trị: hiển thị thanh Quick-Nav chuyên môn dọc bên phải
+            if (adminNav) {
+                if (currentActiveTab === 'dashboard' && isAdminLoggedIn) {
+                    adminNav.classList.remove('hidden');
+                } else {
+                    adminNav.classList.add('hidden');
+                }
+            }
         }
         function updateFloatingScanBtn() {
             updateFloatingButtons();
+        }
+
+        // --- ADMIN QUICK-NAV SCROLLING HELPERS ---
+        function scrollToAdminSection(sectionId) {
+            const el = document.getElementById(sectionId);
+            if (el) {
+                const headerOffset = 90;
+                const elementPosition = el.getBoundingClientRect().top;
+                const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+                window.scrollTo({
+                    top: offsetPosition,
+                    behavior: "smooth"
+                });
+            }
+        }
+
+        function scrollToAdminTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: "smooth"
+            });
         }
 
         function switchTab(tabId) {
@@ -3360,7 +3433,7 @@
                                         <span id="reason_label_${q.id}">Lý do (${q.label}):</span>
                                         <span id="reason_badge_${q.id}" class="text-amber-700 font-bold text-xs sm:text-sm">* (Bắt buộc)</span>
                                     </div>
-                                    <textarea id="reason_${q.id}" name="reason_${q.id}" oninput="handleReasonInput('${q.id}')" rows="2" class="w-full text-sm sm:text-base p-3.5 rounded-xl outline-none leading-relaxed text-left transition" placeholder="Quý vị vui lòng nêu rõ lý do..."></textarea>
+                                    <textarea id="reason_${q.id}" name="reason_${q.id}" oninput="handleReasonInput('${q.id}')" onblur="saveSurveyDraft()" spellcheck="false" rows="2" class="w-full text-sm sm:text-base p-3.5 rounded-xl outline-none leading-relaxed text-left transition" placeholder="Quý vị vui lòng nêu rõ lý do..."></textarea>
                                 </div>
                             </div>
                         `).join('')}
@@ -3479,21 +3552,37 @@
             saveSurveyDraft();
         }
 
+        let _draftSaveTimer = null;
+        function saveSurveyDraftDebounced(delay = 400) {
+            clearTimeout(_draftSaveTimer);
+            _draftSaveTimer = setTimeout(() => {
+                saveSurveyDraft();
+            }, delay);
+        }
+
+        let _progressUpdateTimer = null;
+        function updateSurveyProgressDebounced(delay = 300) {
+            clearTimeout(_progressUpdateTimer);
+            _progressUpdateTimer = setTimeout(() => {
+                updateSurveyProgress();
+            }, delay);
+        }
+
         function handleReasonInput(qId) {
             const textarea = document.getElementById(`reason_${qId}`);
-            if (textarea && textarea.value.trim()) {
+            if (textarea && textarea.value.trim() && textarea.classList.contains('ring-4')) {
                 textarea.classList.remove('ring-4', 'ring-rose-500', 'animate-pulse');
             }
-            saveSurveyDraft();
+            saveSurveyDraftDebounced();
         }
 
         function handleTextareaInput(id) {
             const el = document.getElementById(id);
-            if (el && el.value.trim()) {
+            if (el && el.value.trim() && el.classList.contains('ring-4')) {
                 el.classList.remove('ring-4', 'ring-rose-500', 'animate-pulse');
             }
-            saveSurveyDraft();
-            updateSurveyProgress();
+            saveSurveyDraftDebounced();
+            updateSurveyProgressDebounced();
         }
 
         // --- SURVEY DRAFT PERSISTENCE (LƯU VÀ KHÔI PHỤC KHI CHUYỂN TAB) ---
@@ -6749,6 +6838,24 @@
                     closeConfirmClearModal();
                     closeDeleteSingleModal();
                 }
+            }
+        });
+
+        // Tự động làm mờ nút floating khi người dùng đang nhập liệu trên input/textarea để tránh che khuất chữ
+        document.addEventListener('focusin', function(e) {
+            if (e.target && (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT')) {
+                const submitBtn = document.getElementById('floatingSubmitSurveyBtn');
+                const progBtn = document.getElementById('floatingProgramBtn');
+                if (submitBtn) submitBtn.classList.add('opacity-25', 'pointer-events-none');
+                if (progBtn) progBtn.classList.add('opacity-25', 'pointer-events-none');
+            }
+        });
+        document.addEventListener('focusout', function(e) {
+            if (e.target && (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT')) {
+                const submitBtn = document.getElementById('floatingSubmitSurveyBtn');
+                const progBtn = document.getElementById('floatingProgramBtn');
+                if (submitBtn) submitBtn.classList.remove('opacity-25', 'pointer-events-none');
+                if (progBtn) progBtn.classList.remove('opacity-25', 'pointer-events-none');
             }
         });
 
