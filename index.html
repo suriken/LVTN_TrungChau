@@ -2066,12 +2066,23 @@
                         </tbody>
                     </table>
                 </div>
+            </div>
 
-                <!-- KHỐI LIỆT KÊ NHỮNG PHẦN CHƯA PHÙ HỢP ĐỂ HIGHLIGHTING CHÚ Ý (&le; 3 ĐIỂM) -->
-                <div id="sec-admin-caithien" class="scroll-mt-24">
-                    <div id="unsuitableAlertContainer" class="pt-2">
-                        <!-- Render dynamically by JS -->
+            <!-- 4. KHỐI LIỆT KÊ NHỮNG PHẦN CHƯA PHÙ HỢP ĐỂ HIGHLIGHTING CHÚ Ý (&le; 3 ĐIỂM) - PHẦN CẦN CẢI THIỆN -->
+            <div id="sec-admin-caithien" class="bg-white p-4 sm:p-5 rounded-2xl border border-[#e2d8c7] shadow-sm space-y-3.5 scroll-mt-24">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#e2d8c7] pb-3">
+                    <div class="flex items-center gap-2">
+                        <span class="w-8 h-8 rounded-lg bg-rose-600 text-white flex items-center justify-center text-sm shadow">
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                        </span>
+                        <div>
+                            <h3 class="font-black text-rose-800 text-base sm:text-lg">Phần Chưa Phù Hợp Cần Cải Thiện</h3>
+                            <p class="text-xs text-slate-500">Tổng hợp các nội dung đào tạo & phân cấp có phản hồi &le; 3 điểm để tập trung hoàn thiện</p>
+                        </div>
                     </div>
+                </div>
+                <div id="unsuitableAlertContainer" class="pt-1">
+                    <!-- Render dynamically by JS -->
                 </div>
             </div>
 
