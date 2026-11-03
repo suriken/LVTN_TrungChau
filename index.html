@@ -5236,7 +5236,7 @@
                     } catch(e) {}
 
                     if (result && result.success && Array.isArray(result.responses)) {
-                        surveyResponses = result.responses;
+                        surveyResponses = filterValidSurveyResponses(result.responses);
                         try {
                             localStorage.setItem("ptv_survey_responses", JSON.stringify(surveyResponses));
                         } catch(e){}
@@ -5646,6 +5646,19 @@
             return isNaN(parsed) ? 0 : parsed;
         }
 
+        // LỌC BỎ CÁC BẢN GHI RÁC / TRỐNG KHÔNG CÓ DỮ LIỆU ĐÁNH GIÁ THỰC TẾ
+        function filterValidSurveyResponses(list) {
+            if (!Array.isArray(list)) return [];
+            return list.filter(r => {
+                if (!r) return false;
+                const hasScores = r.scores && typeof r.scores === 'object' && Object.keys(r.scores).length > 0;
+                const hasAvg = r.avgScore && Number(r.avgScore) > 0;
+                const hasRole = r.role && r.role.trim() !== '' && r.role.trim() !== '--';
+                const hasName = r.name && r.name.trim() !== '' && r.name.trim() !== '--';
+                return (hasScores || hasAvg) && (hasRole || hasName);
+            });
+        }
+
         // GÁN SỐ THỨ TỰ GỐC THEO THỜI GIAN NỘP (TỪ DƯỚI LÊN: NGƯỜI ĐẦU TIÊN LÀ 1, NGƯỜI MỚI NHẤT LÀ N)
         function assignResponsesSTT(list) {
             if (!Array.isArray(list)) return [];
@@ -5674,8 +5687,9 @@
             const practiceFilter = document.getElementById('adminPracticeFilter')?.value || 'ALL';
             const serviceFilter = document.getElementById('adminServiceFilter')?.value || 'ALL';
 
-            // Đảm bảo mọi bản ghi đều có số thứ tự nộp _stt
-            assignResponsesSTT(surveyResponses || []);
+            // Đảm bảo chỉ làm việc với các bản ghi hợp lệ và gán số thứ tự nộp _stt chuẩn xác
+            surveyResponses = filterValidSurveyResponses(surveyResponses || []);
+            assignResponsesSTT(surveyResponses);
 
             return (surveyResponses || []).filter(r => {
                 if (!r) return false;
@@ -6801,7 +6815,7 @@
             try {
                 const stored = localStorage.getItem("ptv_survey_responses");
                 if (stored) {
-                    surveyResponses = JSON.parse(stored);
+                    surveyResponses = filterValidSurveyResponses(JSON.parse(stored));
                 }
             } catch (e) {
                 surveyResponses = [];

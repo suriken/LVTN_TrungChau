@@ -112,10 +112,16 @@ export default {
         const action = url.searchParams.get("action") || "getResponses";
         if (action === "getResponses" && db) {
           try {
-            const { results } = await db.prepare("SELECT raw_json FROM surveys ORDER BY created_at ASC").all();
+            const { results } = await db.prepare("SELECT raw_json FROM surveys WHERE (role IS NOT NULL AND role != '' AND role != '--') OR (avg_score IS NOT NULL AND avg_score > 0) ORDER BY created_at ASC").all();
             const responses = (results || []).map(r => {
               try { return JSON.parse(r.raw_json); } catch(e) { return null; }
-            }).filter(Boolean);
+            }).filter(r => {
+              if (!r) return false;
+              const hasScores = r.scores && typeof r.scores === "object" && Object.keys(r.scores).length > 0;
+              const hasAvg = r.avgScore && Number(r.avgScore) > 0;
+              const hasIdentity = (r.name && r.name.trim() !== "") || (r.role && r.role.trim() !== "" && r.role.trim() !== "--");
+              return (hasScores || hasAvg) && hasIdentity;
+            });
             return jsonResponse({ success: true, count: responses.length, responses: responses, source: "cloudflare_d1" });
           } catch (err) {
             console.warn("D1 get error, fallback Google Script:", err.message);
@@ -133,11 +139,27 @@ export default {
           return jsonResponse({ success: false, error: "Dữ liệu JSON không hợp lệ" }, 400);
         }
 
-        const action = payload.action || "submit";
+        const action = payload.action;
+        if (!action) {
+          return jsonResponse({ success: false, error: "Thiếu trường action trong yêu cầu" }, 400);
+        }
 
         // A. NỘP PHIẾU KHẢO SÁT (SUBMIT) -> LƯU D1 SIÊU TỐC + SYNC GOOGLE SHEETS
         if (action === "submit") {
           const respObj = payload;
+
+          // Xác thực dữ liệu hợp lệ: Bắt buộc phải có điểm đánh giá hoặc thông tin phản hồi
+          const hasScores = respObj.scores && typeof respObj.scores === "object" && Object.keys(respObj.scores).length > 0;
+          const hasAvg = respObj.avgScore && Number(respObj.avgScore) > 0;
+          const hasIdentity = respObj.name || respObj.isAnonymous || respObj.role;
+
+          if (!hasIdentity || (!hasScores && !hasAvg)) {
+            return jsonResponse({
+              success: false,
+              error: "Phiếu khảo sát không hợp lệ: Thiếu thông tin người trả lời hoặc điểm đánh giá"
+            }, 400);
+          }
+
           const id = respObj.id || ("PTV-" + Date.now().toString().slice(-6));
           respObj.id = id;
 
@@ -234,10 +256,16 @@ export default {
         if (action === "getResponses") {
           if (db) {
             try {
-              const { results } = await db.prepare("SELECT raw_json FROM surveys ORDER BY created_at ASC").all();
+              const { results } = await db.prepare("SELECT raw_json FROM surveys WHERE (role IS NOT NULL AND role != '' AND role != '--') OR (avg_score IS NOT NULL AND avg_score > 0) ORDER BY created_at ASC").all();
               let responses = (results || []).map(r => {
                 try { return JSON.parse(r.raw_json); } catch(e) { return null; }
-              }).filter(Boolean);
+              }).filter(r => {
+                if (!r) return false;
+                const hasScores = r.scores && typeof r.scores === "object" && Object.keys(r.scores).length > 0;
+                const hasAvg = r.avgScore && Number(r.avgScore) > 0;
+                const hasIdentity = (r.name && r.name.trim() !== "") || (r.role && r.role.trim() !== "" && r.role.trim() !== "--");
+                return (hasScores || hasAvg) && hasIdentity;
+              });
 
               // Nếu D1 đã có dữ liệu -> trả về siêu tốc (< 15ms)
               if (responses.length > 0) {

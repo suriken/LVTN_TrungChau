@@ -13,3 +13,4 @@ Mỗi khi Agent hoàn thành việc tạo mới hoặc chỉnh sửa mã nguồn
 - Tệp `index.html` là SPA All-in-One (~7000 dòng). Tra cứu vị trí hàm và cấu trúc tại `.gemini/skills/lvtn-trungchau-app/SKILL.md` để chỉnh sửa chính xác, tránh đọc lại toàn bộ tệp gây lãng phí token.
 - Luôn giữ cơ chế chống giật/nhảy con trỏ Tiếng Việt (Debounce, font stack Be Vietnam Pro, inline style).
 - Đảm bảo tính tương thích đồng thời giữa Cloudflare D1 Database và Google Sheets fallback.
+

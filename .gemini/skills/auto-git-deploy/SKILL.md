@@ -108,3 +108,4 @@ Trong phản hồi cuối cùng tới người dùng, Agent luôn cung cấp b�
 2. **Kho lưu trữ:** `https://github.com/suriken/LVTN_TrungChau.git` (nhánh `main`)
 3. **Trạng thái Cloudflare:** Xác nhận bản build Cloudflare Workers / Pages tự động được kích hoạt.
 4. **Hướng dẫn người dùng:** Gợi ý người dùng bấm **`Ctrl + F5`** trên trình duyệt để kiểm tra kết quả mới nhất.
+
