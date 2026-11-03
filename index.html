@@ -226,9 +226,14 @@
                     BÁO CÁO & DASHBOARD
                 </div>
 
-                <button onclick="switchTab('dashboard'); onNavClickMobile();" id="tabDashBtn" class="w-full px-3 py-2.5 rounded-xl transition flex items-center gap-3 text-slate-700 hover:bg-[#ede7da] text-xs sm:text-sm font-medium">
-                    <i class="fa-solid fa-chart-pie w-5 text-center text-[#3b4982] text-sm"></i>
-                    <span>4. Dashboard Quản Trị</span>
+                <button onclick="switchTab('dashboard'); onNavClickMobile();" id="tabDashBtn" class="w-full px-3 py-2.5 rounded-xl transition flex items-center justify-between gap-2 text-slate-700 hover:bg-[#ede7da] text-xs sm:text-sm font-medium">
+                    <div class="flex items-center gap-3">
+                        <i class="fa-solid fa-chart-pie w-5 text-center text-[#3b4982] text-sm"></i>
+                        <span>4. Dashboard Quản Trị</span>
+                    </div>
+                    <span class="text-[10px] font-black text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded border border-amber-300 flex items-center gap-1">
+                        <i class="fa-solid fa-lock text-[9px]"></i> Mật Khẩu
+                    </span>
                 </button>
             </div>
         </div>
@@ -1804,6 +1809,45 @@
                 </div>
             </div>
 
+            <!-- ADMIN SUB-TABS NAVIGATION BAR (CHIA CÁC CHUYÊN MỤC QUẢN TRỊ THÀNH CÁC TAB CON) -->
+            <div class="bg-white p-2 sm:p-2.5 rounded-2xl border border-[#e2d8c7] shadow-sm flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+                <!-- Tab Con 1: Tổng Quan (Tất Cả) -->
+                <button type="button" id="adminSubTabBtn_all" onclick="switchAdminSubTab('all')" class="px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl text-xs sm:text-sm font-black bg-[#3b4982] text-white shadow-md transition flex items-center gap-1.5 cursor-pointer whitespace-nowrap active:scale-98">
+                    <i class="fa-solid fa-border-all text-xs"></i>
+                    <span>Tất Cả Mục</span>
+                </button>
+
+                <!-- Tab Con 2: Danh Sách Phiếu -->
+                <button type="button" id="adminSubTabBtn_danhsach" onclick="switchAdminSubTab('danhsach')" class="px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl text-xs sm:text-sm font-bold bg-white hover:bg-[#ede7da] text-slate-700 border border-[#e2d8c7] transition flex items-center gap-1.5 cursor-pointer whitespace-nowrap">
+                    <i class="fa-solid fa-table-list text-[#3b4982] text-xs"></i>
+                    <span>Danh Sách Phiếu</span>
+                </button>
+
+                <!-- Tab Con 3: Tổng Hợp Ý Kiến -->
+                <button type="button" id="adminSubTabBtn_ykien" onclick="switchAdminSubTab('ykien')" class="px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl text-xs sm:text-sm font-bold bg-white hover:bg-[#ede7da] text-slate-700 border border-[#e2d8c7] transition flex items-center gap-1.5 cursor-pointer whitespace-nowrap">
+                    <i class="fa-solid fa-comments text-amber-600 text-xs"></i>
+                    <span>Ý Kiến Định Tính (P4)</span>
+                </button>
+
+                <!-- Tab Con 4: Bản Đồ Đánh Giá -->
+                <button type="button" id="adminSubTabBtn_bando" onclick="switchAdminSubTab('bando')" class="px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl text-xs sm:text-sm font-bold bg-white hover:bg-[#ede7da] text-slate-700 border border-[#e2d8c7] transition flex items-center gap-1.5 cursor-pointer whitespace-nowrap">
+                    <i class="fa-solid fa-table-cells-large text-indigo-600 text-xs"></i>
+                    <span>Bản Đồ Đánh Giá 18 Mục</span>
+                </button>
+
+                <!-- Tab Con 5: Phần Cần Cải Thiện -->
+                <button type="button" id="adminSubTabBtn_caithien" onclick="switchAdminSubTab('caithien')" class="px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl text-xs sm:text-sm font-bold bg-white hover:bg-[#ede7da] text-slate-700 border border-[#e2d8c7] transition flex items-center gap-1.5 cursor-pointer whitespace-nowrap">
+                    <i class="fa-solid fa-triangle-exclamation text-rose-600 text-xs"></i>
+                    <span>Phần Cần Cải Thiện</span>
+                </button>
+
+                <!-- Tab Con 6: Biểu Đồ Thống Kê -->
+                <button type="button" id="adminSubTabBtn_bieudo" onclick="switchAdminSubTab('bieudo')" class="px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl text-xs sm:text-sm font-bold bg-white hover:bg-[#ede7da] text-slate-700 border border-[#e2d8c7] transition flex items-center gap-1.5 cursor-pointer whitespace-nowrap">
+                    <i class="fa-solid fa-chart-column text-emerald-600 text-xs"></i>
+                    <span>Biểu Đồ Thống Kê</span>
+                </button>
+            </div>
+
             <!-- BỘ LỌC ĐA TIÊU CHÍ (ÁP DỤNG ĐỒNG BỘ TOÀN BỘ DASHBOARD, BIỂU ĐỒ & BẢNG) -->
             <div class="bg-white p-3.5 sm:p-4 rounded-2xl border border-[#e2d8c7] shadow-sm space-y-3">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#e2d8c7] pb-2.5">
@@ -2785,8 +2829,68 @@
             updateFloatingButtons();
         }
 
+        let currentAdminSubTab = 'all';
+
+        function switchAdminSubTab(subTabId) {
+            currentAdminSubTab = subTabId;
+
+            const tabs = ['all', 'danhsach', 'ykien', 'bando', 'caithien', 'bieudo'];
+            tabs.forEach(id => {
+                const btn = document.getElementById(`adminSubTabBtn_${id}`);
+                if (btn) {
+                    if (id === subTabId) {
+                        btn.className = "px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl text-xs sm:text-sm font-black bg-[#3b4982] text-white shadow-md transition flex items-center gap-1.5 cursor-pointer whitespace-nowrap active:scale-98";
+                    } else {
+                        btn.className = "px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl text-xs sm:text-sm font-bold bg-white hover:bg-[#ede7da] text-slate-700 border border-[#e2d8c7] transition flex items-center gap-1.5 cursor-pointer whitespace-nowrap";
+                    }
+                }
+            });
+
+            const secDanhSach = document.getElementById('sec-admin-danhsach');
+            const secYKien = document.getElementById('sec-admin-ykien');
+            const secBanDo = document.getElementById('sec-admin-bando');
+            const secCaiThien = document.getElementById('sec-admin-caithien');
+            const secBieuDo = document.getElementById('sec-admin-bieudo');
+
+            if (subTabId === 'all') {
+                if (secDanhSach) secDanhSach.classList.remove('hidden');
+                if (secYKien) secYKien.classList.remove('hidden');
+                if (secBanDo) secBanDo.classList.remove('hidden');
+                if (secCaiThien) secCaiThien.classList.remove('hidden');
+                if (secBieuDo) secBieuDo.classList.remove('hidden');
+            } else {
+                if (secDanhSach) secDanhSach.classList.toggle('hidden', subTabId !== 'danhsach');
+                if (secYKien) secYKien.classList.toggle('hidden', subTabId !== 'ykien');
+                if (secBanDo) secBanDo.classList.toggle('hidden', subTabId !== 'bando');
+                if (secCaiThien) secCaiThien.classList.toggle('hidden', subTabId !== 'caithien');
+                if (secBieuDo) secBieuDo.classList.toggle('hidden', subTabId !== 'bieudo');
+            }
+
+            // Trigger chart resize if charts are displayed
+            if (subTabId === 'all' || subTabId === 'bieudo') {
+                setTimeout(() => {
+                    if (window.adminPillarChart && typeof window.adminPillarChart.resize === 'function') {
+                        window.adminPillarChart.resize();
+                    }
+                    if (window.adminRoleChart && typeof window.adminRoleChart.resize === 'function') {
+                        window.adminRoleChart.resize();
+                    }
+                }, 60);
+            }
+        }
+
         // --- ADMIN QUICK-NAV SCROLLING HELPERS ---
         function scrollToAdminSection(sectionId) {
+            const map = {
+                'sec-admin-danhsach': 'danhsach',
+                'sec-admin-ykien': 'ykien',
+                'sec-admin-bando': 'bando',
+                'sec-admin-caithien': 'caithien',
+                'sec-admin-bieudo': 'bieudo'
+            };
+            if (currentAdminSubTab !== 'all' && map[sectionId]) {
+                switchAdminSubTab(map[sectionId]);
+            }
             const el = document.getElementById(sectionId);
             if (el) {
                 const headerOffset = 90;
@@ -2812,13 +2916,13 @@
                 saveSurveyDraft();
             }
 
-            currentActiveTab = tabId;
-            updateFloatingButtons();
-
             if (tabId === 'dashboard' && !isAdminLoggedIn) {
                 document.getElementById('loginModal').classList.remove('hidden');
                 return;
             }
+
+            currentActiveTab = tabId;
+            updateFloatingButtons();
 
             // Tiến trình khảo sát: Nếu bấm sang phần 2 (Bảng Khảo Sát) mà chưa xác nhận ở phần 1
             if (tabId === 'form') {
@@ -5023,6 +5127,7 @@
                 sessionStorage.removeItem("ptv_admin_logged");
                 sessionStorage.removeItem("ptv_admin_token");
             } catch(e){}
+            switchAdminSubTab('all');
             switchTab('welcome');
             showToast("Đã đăng xuất khỏi trang Quản trị thành công!", "success");
         }
