@@ -2345,6 +2345,55 @@
         <i class="fa-solid fa-arrow-up text-sm sm:text-base"></i>
     </button>
 
+    <!-- SURVEY INACTIVITY / ABANDONMENT REMINDER BANNER (NHẮC NHỞ NGƯỜI DÙNG CHƯA HOÀN THÀNH KHẢO SÁT) -->
+    <div id="surveyInactivityReminder" class="fixed bottom-5 left-4 right-4 sm:left-auto sm:right-6 sm:bottom-6 z-50 max-w-md w-auto hidden transform transition-all duration-500 ease-out translate-y-8 opacity-0">
+        <div class="bg-white/95 backdrop-blur-md rounded-2xl sm:rounded-3xl p-4 sm:p-5 shadow-2xl border-2 border-amber-300 ring-4 ring-amber-100/60 space-y-3">
+            <div class="flex items-start justify-between gap-3">
+                <div class="flex items-center gap-2.5">
+                    <span class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-amber-500 via-rose-500 to-amber-500 text-white flex items-center justify-center text-lg shadow-md flex-shrink-0 animate-bounce">
+                        👋
+                    </span>
+                    <div>
+                        <h4 class="font-black text-slate-800 text-xs sm:text-sm flex items-center gap-1.5">
+                            <span>Lời Nhắn Từ Tác Giả Đề Tài</span>
+                            <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        </h4>
+                        <p class="text-[11px] text-slate-500 font-medium">Khóa đào tạo PTV Cấp III - Trung Châu 1</p>
+                    </div>
+                </div>
+                <button type="button" onclick="dismissSurveyReminder(5)" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg transition cursor-pointer" title="Đóng nhắc nhở">
+                    <i class="fa-solid fa-xmark text-sm"></i>
+                </button>
+            </div>
+
+            <div class="p-3 bg-amber-50/90 rounded-xl border border-amber-200 text-xs sm:text-sm text-slate-800 leading-relaxed font-semibold">
+                &ldquo;Bạn ơi! Hình như bạn quên chưa nhập xong khảo sát đúng không? Cố gắng hỗ trợ mình nhé 🙏&rdquo;
+            </div>
+
+            <!-- THANH TIẾN ĐỘ THỰC TẾ -->
+            <div class="space-y-1">
+                <div class="flex items-center justify-between text-[11px] font-bold text-slate-600">
+                    <span>Tiến độ của bạn:</span>
+                    <span id="reminderProgressText" class="text-[#3b4982] font-black">0 / 26 mục (0%)</span>
+                </div>
+                <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden border border-slate-200">
+                    <div id="reminderProgressBar" class="bg-gradient-to-r from-amber-500 via-teal-500 to-emerald-500 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <!-- CÁC NÚT HÀNH ĐỘNG -->
+            <div class="flex items-center gap-2 pt-1">
+                <button type="button" onclick="continueSurveyFromReminder()" class="flex-1 py-2.5 px-3 rounded-xl bg-gradient-to-r from-[#3b4982] to-[#252f54] hover:from-[#2e3a68] hover:to-[#1a223f] text-white text-xs sm:text-sm font-extrabold shadow-md transition flex items-center justify-center gap-1.5 cursor-pointer active:scale-98">
+                    <i class="fa-solid fa-pen-to-square text-xs"></i>
+                    <span>Tiếp Tục Làm Ngay</span>
+                </button>
+                <button type="button" onclick="dismissSurveyReminder(5)" class="py-2.5 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold transition cursor-pointer active:scale-98">
+                    Nhắc lại sau
+                </button>
+            </div>
+        </div>
+    </div>
+
         <!-- MODAL CHI TIẾT PHIẾU KHẢO SÁT (ADMIN DETAIL MODAL) -->
     <div id="responseDetailModal" class="fixed inset-0 z-50 bg-slate-950/75 backdrop-blur-sm hidden flex items-center justify-center p-3 sm:p-5" onclick="if(event.target === this) closeResponseDetailModal()">
         <div class="bg-white w-full max-w-2xl sm:max-w-3xl rounded-3xl shadow-2xl border border-[#e2d8c7] overflow-hidden flex flex-col max-h-[90vh]">
@@ -4246,10 +4295,14 @@
                 }
                 try {
                     localStorage.setItem("ptv_survey_responses", JSON.stringify(surveyResponses));
+                    localStorage.setItem("ptv_last_submitted_id", newResponse.id);
                     localStorage.removeItem("ptv_survey_draft");
                 } catch(e) {
                     console.warn("LocalStorage save warning:", e);
                 }
+
+                currentSurveyId = newResponse.id;
+                hideSurveyInactivityReminder();
 
                 // Sync survey response to backend
                 syncToServerDatabase(newResponse);
@@ -7080,6 +7133,181 @@
             }
         });
 
+        // ==================== HỆ THỐNG NHẮC NHỞ KHẢO SÁT CHƯA HOÀN THÀNH ====================
+        let inactivityReminderTimer = null;
+        let reminderSnoozeUntil = 0;
+        let tabHiddenTimestamp = 0;
+        const INACTIVITY_IDLE_DELAY = 75000; // 75 giây không thao tác
+
+        function checkSurveyCompletionStatus() {
+            // 1. Nếu đang ở trang Quản trị Admin -> không cần nhắc
+            if (currentActiveTab === 'dashboard' && isAdminLoggedIn) return { completed: true };
+
+            // 2. Nếu đã hoàn thành gửi phiếu thành công trước đó
+            const lastSubmittedId = localStorage.getItem("ptv_last_submitted_id");
+            if (lastSubmittedId && surveyResponses && surveyResponses.some(r => r && r.id === lastSubmittedId)) {
+                return { completed: true };
+            }
+            if (currentSurveyId && surveyResponses && surveyResponses.some(r => r && r.id === currentSurveyId)) {
+                return { completed: true };
+            }
+
+            // 3. Đếm số mục bắt buộc đã hoàn thành (tối đa 26 mục)
+            let answered = 0;
+            const totalMandatory = 26;
+            if (allLikertQuestions && allLikertQuestions.length > 0) {
+                allLikertQuestions.forEach(q => {
+                    if (document.querySelector(`input[name="${q.id}"]:checked`)) answered++;
+                });
+            }
+            const diet = document.getElementById('respDiet');
+            if (diet && diet.value) answered++;
+            const practice = document.getElementById('respPractice');
+            if (practice && practice.value) answered++;
+            const service = document.getElementById('respServiceStatus');
+            if (service && service.value) answered++;
+            const challenge = document.getElementById('respChallenge');
+            if (challenge && challenge.value) answered++;
+
+            const adv = document.getElementById('respAdvantages');
+            if (adv && adv.value.trim()) answered++;
+            const disadv = document.getElementById('respDisadvantages');
+            if (disadv && disadv.value.trim()) answered++;
+            const reality = document.getElementById('respReality');
+            if (reality && reality.value.trim()) answered++;
+            const suggestions = document.getElementById('respSuggestions');
+            if (suggestions && suggestions.value.trim()) answered++;
+
+            const hasDraft = !!localStorage.getItem("ptv_survey_draft");
+
+            return {
+                completed: answered >= totalMandatory,
+                answered: answered,
+                total: totalMandatory,
+                percent: Math.min(100, Math.round((answered / totalMandatory) * 100)),
+                hasStarted: answered > 0 || hasDraft
+            };
+        }
+
+        function showSurveyInactivityReminder() {
+            if (Date.now() < reminderSnoozeUntil) return;
+
+            const status = checkSurveyCompletionStatus();
+            if (status.completed) return;
+
+            const reminderEl = document.getElementById('surveyInactivityReminder');
+            if (!reminderEl) return;
+
+            const textEl = document.getElementById('reminderProgressText');
+            const barEl = document.getElementById('reminderProgressBar');
+            if (textEl) textEl.innerText = `${status.answered} / ${status.total} mục (${status.percent}%)`;
+            if (barEl) barEl.style.width = `${status.percent}%`;
+
+            reminderEl.classList.remove('hidden');
+            setTimeout(() => {
+                reminderEl.classList.remove('translate-y-8', 'opacity-0');
+                reminderEl.classList.add('translate-y-0', 'opacity-100');
+            }, 30);
+        }
+
+        function hideSurveyInactivityReminder() {
+            const reminderEl = document.getElementById('surveyInactivityReminder');
+            if (!reminderEl) return;
+            reminderEl.classList.remove('translate-y-0', 'opacity-100');
+            reminderEl.classList.add('translate-y-8', 'opacity-0');
+            setTimeout(() => {
+                reminderEl.classList.add('hidden');
+            }, 500);
+        }
+
+        function dismissSurveyReminder(minutes = 5) {
+            hideSurveyInactivityReminder();
+            reminderSnoozeUntil = Date.now() + (minutes * 60 * 1000);
+        }
+
+        function continueSurveyFromReminder() {
+            hideSurveyInactivityReminder();
+            switchTab('form');
+            setTimeout(() => {
+                scrollToFirstUnansweredQuestion();
+            }, 300);
+        }
+
+        function scrollToFirstUnansweredQuestion() {
+            // 1. Tìm câu hỏi Likert chưa điền
+            if (allLikertQuestions && allLikertQuestions.length > 0) {
+                for (const q of allLikertQuestions) {
+                    if (!document.querySelector(`input[name="${q.id}"]:checked`)) {
+                        const el = document.getElementById(`q_${q.id}`) || document.getElementById(`reason_container_${q.id}`)?.parentElement;
+                        if (el) {
+                            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            el.classList.add('ring-4', 'ring-amber-300', 'rounded-2xl', 'transition-all');
+                            setTimeout(() => el.classList.remove('ring-4', 'ring-amber-300'), 2500);
+                            return;
+                        }
+                    }
+                }
+            }
+
+            // 2. Tìm các câu hỏi Phần 3 & 4 chưa điền
+            const pendingFields = ['respDiet', 'respPractice', 'respServiceStatus', 'respChallenge', 'respAdvantages', 'respDisadvantages', 'respReality', 'respSuggestions'];
+            for (const fId of pendingFields) {
+                const el = document.getElementById(fId);
+                if (el && !el.value.trim()) {
+                    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    el.focus();
+                    el.classList.add('ring-4', 'ring-amber-300');
+                    setTimeout(() => el.classList.remove('ring-4', 'ring-amber-300'), 2500);
+                    return;
+                }
+            }
+        }
+
+        function initSurveyInactivityTracker() {
+            const resetInactivityTimer = () => {
+                if (inactivityReminderTimer) clearTimeout(inactivityReminderTimer);
+                inactivityReminderTimer = setTimeout(() => {
+                    const status = checkSurveyCompletionStatus();
+                    if (!status.completed && (currentActiveTab === 'form' || status.hasStarted)) {
+                        showSurveyInactivityReminder();
+                    }
+                }, INACTIVITY_IDLE_DELAY);
+            };
+
+            // Lắng nghe tương tác người dùng để reset đồng hồ
+            ['mousemove', 'keydown', 'scroll', 'touchstart', 'click'].forEach(evt => {
+                window.addEventListener(evt, resetInactivityTimer, { passive: true });
+            });
+
+            // Lắng nghe khi người dùng chuyển sang tab khác rồi quay lại (Tab visibility return)
+            document.addEventListener('visibilitychange', () => {
+                if (document.visibilityState === 'hidden') {
+                    tabHiddenTimestamp = Date.now();
+                } else if (document.visibilityState === 'visible') {
+                    const awayDuration = tabHiddenTimestamp > 0 ? (Date.now() - tabHiddenTimestamp) : 0;
+                    if (awayDuration > 35000) { // Đã rời đi hơn 35 giây rồi quay lại
+                        const status = checkSurveyCompletionStatus();
+                        if (!status.completed) {
+                            showSurveyInactivityReminder();
+                        }
+                    }
+                    resetInactivityTimer();
+                }
+            });
+
+            // Cảnh báo trình duyệt trước khi đóng tab nếu phiếu đang làm dở
+            window.addEventListener('beforeunload', (e) => {
+                const status = checkSurveyCompletionStatus();
+                if (!status.completed && status.hasStarted) {
+                    e.preventDefault();
+                    e.returnValue = 'Bạn ơi! Bạn chưa hoàn thành nộp phiếu khảo sát. Bạn có chắc chắn muốn rời đi?';
+                    return e.returnValue;
+                }
+            });
+
+            resetInactivityTimer();
+        }
+
         window.onload = function() {
             toggleSidebar(false);
             initBannerCarousel();
@@ -7088,6 +7316,7 @@
             renderCurrentDateHeader();
             initLightboxEvents();
             loadStoredData();
+            initSurveyInactivityTracker();
         };
     </script>
 </body>
