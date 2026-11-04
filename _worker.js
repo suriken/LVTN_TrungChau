@@ -554,7 +554,19 @@ export default {
 
     // 3. NẾU LÀ YÊU CẦU TRUY CẬP TRANG WEB TĨNH (HTML, CSS, JS) -> PHỤC VỤ QUA STATIC ASSETS
     if (env.ASSETS && typeof env.ASSETS.fetch === "function") {
-      return env.ASSETS.fetch(request);
+      const assetRes = await env.ASSETS.fetch(request);
+      if (url.pathname === "/" || url.pathname.endsWith(".html") || url.pathname.endsWith("/")) {
+        const newHeaders = new Headers(assetRes.headers);
+        newHeaders.set("Cache-Control", "no-cache, no-store, must-revalidate");
+        newHeaders.set("Pragma", "no-cache");
+        newHeaders.set("Expires", "0");
+        return new Response(assetRes.body, {
+          status: assetRes.status,
+          statusText: assetRes.statusText,
+          headers: newHeaders
+        });
+      }
+      return assetRes;
     }
 
     // Nếu gọi root mà không có ASSETS

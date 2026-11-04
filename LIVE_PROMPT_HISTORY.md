@@ -33,6 +33,16 @@ He thong san sang!
 
 ---
 
+### ⏱️ [04/11/2026 13:03:00] Prompt: "Đổi tên thành Khóa đào tạo khác và cấu hình no-cache ngăn cache trình duyệt"
+- **Nội dung:** Đổi tên hiển thị chính xác thành 'Khóa đào tạo khác', không kèm chú thích 'trước đây / đặc thù' và không có ô nhập thêm; bổ sung header No-Cache để trình duyệt luôn tải giao diện mới nhất.
+- **Giải pháp:**
+  - `<option value="Khóa đào tạo khác">Khóa đào tạo khác</option>`.
+  - Bổ sung `<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">` trong `index.html`.
+  - Cấu hình Worker Asset fetch gửi header `Cache-Control: no-cache, no-store, must-revalidate` đối với file HTML.
+- **Trạng thái:** 🟢 Hoàn thành & Kiểm thử cú pháp 100% OK!
+
+---
+
 ### ⏱️ [04/11/2026 12:58:00] Prompt: "Kiểm tra và củng cố cơ chế tự động lưu bản nháp khảo sát dở dang"
 - **Nội dung:** Đảm bảo khi người dùng đang nhập lỡ dở mà chuyển sang trang tra cứu chương trình đào tạo hoặc tắt/mở lại trình duyệt thì toàn bộ câu trả lời trước đó vẫn được lưu 100% không bị mất.
 - **Giải pháp:**

@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>Khóa đào tạo PTV cấp III - Trung Châu 1 | Phiếu khảo sát Luận văn tốt nghiệp</title>
     <!-- Favicon -->
     <link id="dynamicFavicon" rel="icon" type="image/jpeg" href="https://i.postimg.cc/jdZBPB5c/IMG-3726.jpg">
@@ -1433,7 +1436,7 @@
                                 <option value="Cấp I">PTV Cấp I (Khóa Gò Kén)</option>
                                 <option value="Cấp II">PTV Cấp II (Khóa Cửu Long)</option>
                                 <option value="Cấp III">PTV Cấp III (Khóa Trung Châu)</option>
-                                <option value="Cấp đào tạo khác">Cấp đào tạo khác</option>
+                                <option value="Khóa đào tạo khác">Khóa đào tạo khác</option>
                             </select>
                         </div>
                         <div>
@@ -1903,7 +1906,7 @@
                             <option value="Cấp I">PTV Cấp I (Gò Kén)</option>
                             <option value="Dự bị">PTV Dự Bị (Dương Đông)</option>
                             <option value="Chưa tốt nghiệp">Chưa tốt nghiệp</option>
-                            <option value="Khác">Cấp đào tạo khác</option>
+                            <option value="Khác">Khóa đào tạo khác</option>
                         </select>
                     </div>
 
@@ -4386,10 +4389,10 @@
             if (unitEl) unitEl.value = targetResp.unit || '';
             if (gradEl) {
                 const gVal = targetResp.gradLevel || '';
-                if (['Chưa tốt nghiệp', 'Dự bị', 'Cấp I', 'Cấp II', 'Cấp III', 'Cấp đào tạo khác'].includes(gVal)) {
-                    gradEl.value = gVal;
+                if (['Chưa tốt nghiệp', 'Dự bị', 'Cấp I', 'Cấp II', 'Cấp III', 'Khóa đào tạo khác', 'Cấp đào tạo khác'].includes(gVal)) {
+                    gradEl.value = (gVal === 'Cấp đào tạo khác') ? 'Khóa đào tạo khác' : gVal;
                 } else if (gVal) {
-                    gradEl.value = 'Cấp đào tạo khác';
+                    gradEl.value = 'Khóa đào tạo khác';
                 } else {
                     gradEl.value = 'Chưa tốt nghiệp';
                 }
