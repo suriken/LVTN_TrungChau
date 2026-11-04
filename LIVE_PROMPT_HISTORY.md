@@ -33,6 +33,16 @@ He thong san sang!
 
 ---
 
+### ⏱️ [04/11/2026 12:45:00] Prompt: "Đơn giản hóa cấp đào tạo khác: chỉ chọn là đủ, không cần nhập thêm"
+- **Nội dung:** Gỡ bỏ hoàn toàn ô nhập liệu chi tiết khi chọn 'Cấp đào tạo khác', người dùng chỉ cần chọn giá trị 'Cấp đào tạo khác' trực tiếp trong dropdown.
+- **Giải pháp:**
+  - Cập nhật `<select id="respGradLevel">` có sẵn tùy chọn `<option value="Cấp đào tạo khác">Cấp đào tạo khác</option>`.
+  - Loại bỏ hoàn toàn khối `otherGradLevelWrap` và input `respOtherGradLevel`.
+  - Tối giản hóa logic lưu draft, submit và prefill dữ liệu.
+- **Trạng thái:** 🟢 Hoàn thành & Kiểm thử cú pháp 100% OK!
+
+---
+
 ### ⏱️ [04/11/2026 12:35:00] Prompt: "Đồng bộ cấp đào tạo khác từ D1 và Google Sheets khi nhấn Làm Mới"
 - **Nội dung:** Khắc phục tình trạng khi sửa cấp đào tạo trực tiếp trên D1 hoặc Google Sheets (Huynh trưởng Bửu Phiệt & Hoài Nhân sang 'Cấp đào tạo khác') nhưng web chưa cập nhật.
 - **Nguyên nhân:** D1 API Worker trước đây chỉ đọc cột `raw_json` vốn không tự động cập nhật khi người dùng chỉnh sửa cột trên giao diện Cloudflare D1 Console, và D1 không chủ động kéo dữ liệu mới nhất từ Google Sheets khi đã có sẵn bản ghi.

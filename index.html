@@ -1427,17 +1427,14 @@
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 pt-2 border-t border-[#f0eae1]">
                         <div>
                             <label class="block text-xs font-bold text-slate-700 mb-1">Cấp PTV cao nhất đã hoàn thành</label>
-                            <select id="respGradLevel" onchange="handleGradLevelChange(); saveSurveyDraft();" class="w-full px-3 py-2 text-xs sm:text-sm rounded-xl border border-[#e2d8c7] focus:outline-none focus:border-[#3b4982] bg-white transition">
+                            <select id="respGradLevel" onchange="saveSurveyDraft();" class="w-full px-3 py-2 text-xs sm:text-sm rounded-xl border border-[#e2d8c7] focus:outline-none focus:border-[#3b4982] bg-white transition">
                                 <option value="Chưa tốt nghiệp">Chưa tốt nghiệp cấp nào</option>
                                 <option value="Dự bị">PTV Dự Bị (Khóa Dương Đông)</option>
                                 <option value="Cấp I">PTV Cấp I (Khóa Gò Kén)</option>
                                 <option value="Cấp II">PTV Cấp II (Khóa Cửu Long)</option>
                                 <option value="Cấp III">PTV Cấp III (Khóa Trung Châu)</option>
-                                <option value="Khác">Cấp đào tạo khác (trước đây / đặc thù)...</option>
+                                <option value="Cấp đào tạo khác">Cấp đào tạo khác</option>
                             </select>
-                            <div id="otherGradLevelWrap" class="hidden mt-1.5">
-                                <input type="text" id="respOtherGradLevel" placeholder="Vui lòng ghi rõ cấp đào tạo khác..." oninput="saveSurveyDraft()" class="w-full px-3 py-1.5 text-xs rounded-lg border border-amber-300 bg-amber-50/60 focus:bg-white focus:outline-none focus:border-[#3b4982] transition placeholder-slate-400">
-                            </div>
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-700 mb-1">Thâm niên sinh hoạt / Phụng sự</label>
@@ -3708,17 +3705,7 @@
         }
 
         function handleGradLevelChange() {
-            const sel = document.getElementById('respGradLevel');
-            const wrap = document.getElementById('otherGradLevelWrap');
-            const inp = document.getElementById('respOtherGradLevel');
-            if (!sel || !wrap) return;
-            if (sel.value === 'Khác') {
-                wrap.classList.remove('hidden');
-                if (inp) inp.focus();
-            } else {
-                wrap.classList.add('hidden');
-                if (inp) inp.value = '';
-            }
+            // Đã đơn giản hóa: chỉ cần chọn Cấp đào tạo khác là đủ, không cần nhập thêm
         }
 
         // --- SURVEY DRAFT PERSISTENCE (LƯU VÀ KHÔI PHỤC KHI CHUYỂN TAB) ---
@@ -3731,7 +3718,6 @@
                     role: document.getElementById('respRole') ? document.getElementById('respRole').value : '',
                     unit: document.getElementById('respUnit') ? document.getElementById('respUnit').value : '',
                     gradLevel: document.getElementById('respGradLevel') ? document.getElementById('respGradLevel').value : '',
-                    otherGradLevel: document.getElementById('respOtherGradLevel') ? document.getElementById('respOtherGradLevel').value : '',
                     tenure: document.getElementById('respTenure') ? document.getElementById('respTenure').value : '',
                     region: document.getElementById('respRegion') ? document.getElementById('respRegion').value : '',
                     scores: {},
@@ -3784,13 +3770,6 @@
                 if (draft.unit && document.getElementById('respUnit')) document.getElementById('respUnit').value = draft.unit;
                 if (draft.gradLevel && document.getElementById('respGradLevel')) {
                     document.getElementById('respGradLevel').value = draft.gradLevel;
-                    if (draft.gradLevel === 'Khác') {
-                        const wrap = document.getElementById('otherGradLevelWrap');
-                        if (wrap) wrap.classList.remove('hidden');
-                        if (draft.otherGradLevel && document.getElementById('respOtherGradLevel')) {
-                            document.getElementById('respOtherGradLevel').value = draft.otherGradLevel;
-                        }
-                    }
                 }
                 if (draft.tenure && document.getElementById('respTenure')) document.getElementById('respTenure').value = draft.tenure;
                 if (draft.region && document.getElementById('respRegion')) document.getElementById('respRegion').value = draft.region;
@@ -4215,11 +4194,7 @@
                 const phone = isAnon ? "Ẩn danh" : phoneInput.value.trim();
                 const role = roleSelect.value;
                 const unit = unitInput.value.trim();
-                let gradLevel = document.getElementById('respGradLevel') ? document.getElementById('respGradLevel').value : "";
-                if (gradLevel === "Khác") {
-                    const otherVal = document.getElementById('respOtherGradLevel') ? document.getElementById('respOtherGradLevel').value.trim() : "";
-                    gradLevel = otherVal ? `Khác (${otherVal})` : "Cấp khác";
-                }
+                const gradLevel = document.getElementById('respGradLevel') ? document.getElementById('respGradLevel').value : "";
                 const tenure = document.getElementById('respTenure') ? document.getElementById('respTenure').value : "";
                 const region = document.getElementById('respRegion') ? document.getElementById('respRegion').value : "";
 
@@ -4382,21 +4357,12 @@
             if (unitEl) unitEl.value = targetResp.unit || '';
             if (gradEl) {
                 const gVal = targetResp.gradLevel || '';
-                if (['Chưa tốt nghiệp', 'Dự bị', 'Cấp I', 'Cấp II', 'Cấp III'].includes(gVal)) {
+                if (['Chưa tốt nghiệp', 'Dự bị', 'Cấp I', 'Cấp II', 'Cấp III', 'Cấp đào tạo khác'].includes(gVal)) {
                     gradEl.value = gVal;
-                    if (document.getElementById('otherGradLevelWrap')) document.getElementById('otherGradLevelWrap').classList.add('hidden');
                 } else if (gVal) {
-                    gradEl.value = 'Khác';
-                    const wrap = document.getElementById('otherGradLevelWrap');
-                    const inp = document.getElementById('respOtherGradLevel');
-                    if (wrap) wrap.classList.remove('hidden');
-                    if (inp) {
-                        const m = gVal.match(/^Khác\s*\((.*)\)$/);
-                        inp.value = m ? m[1] : (gVal === 'Cấp khác' ? '' : gVal);
-                    }
+                    gradEl.value = 'Cấp đào tạo khác';
                 } else {
-                    gradEl.value = '';
-                    if (document.getElementById('otherGradLevelWrap')) document.getElementById('otherGradLevelWrap').classList.add('hidden');
+                    gradEl.value = 'Chưa tốt nghiệp';
                 }
             }
             if (tenureEl) tenureEl.value = targetResp.tenure || '';
