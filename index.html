@@ -2942,6 +2942,17 @@
             // Tiến trình khảo sát: Nếu bấm sang phần 2 (Bảng Khảo Sát) mà chưa xác nhận ở phần 1
             if (tabId === 'form') {
                 const confirmCheckbox = document.getElementById('readDocConfirm');
+                const hasDraft = !!localStorage.getItem('ptv_survey_draft');
+                const isDocConfirmed = localStorage.getItem('ptv_doc_confirmed') === 'true';
+
+                // Tự động duy trì xác nhận nếu đã từng xác nhận hoặc đang có bản nháp làm dở
+                if ((hasDraft || isDocConfirmed) && confirmCheckbox && !confirmCheckbox.checked) {
+                    confirmCheckbox.checked = true;
+                    if (typeof toggleSurveyStartBtn === 'function') {
+                        toggleSurveyStartBtn();
+                    }
+                }
+
                 const isConfirmed = confirmCheckbox && confirmCheckbox.checked;
                 if (!isConfirmed) {
                     switchTab('docs');
@@ -3120,7 +3131,13 @@
         }
 
         function toggleSurveyStartBtn() {
-            const isChecked = document.getElementById('readDocConfirm').checked;
+            const confirmEl = document.getElementById('readDocConfirm');
+            const isChecked = confirmEl && confirmEl.checked;
+            if (isChecked) {
+                try { localStorage.setItem('ptv_doc_confirmed', 'true'); } catch(e){}
+            } else {
+                try { localStorage.removeItem('ptv_doc_confirmed'); } catch(e){}
+            }
             const btn = document.getElementById('startSurveyBtn');
             if (!btn) return;
             if (isChecked) {
@@ -3804,6 +3821,16 @@
                 if (draft.reality && document.getElementById('respReality')) document.getElementById('respReality').value = draft.reality;
                 if (draft.suggestions && document.getElementById('respSuggestions')) document.getElementById('respSuggestions').value = draft.suggestions;
                 updateSurveyProgress();
+
+                const hadData = draft && (
+                    (draft.scores && Object.keys(draft.scores).length > 0) ||
+                    (draft.name && draft.name !== 'Ẩn danh') ||
+                    draft.unit || draft.advantages || draft.suggestions
+                );
+                if (hadData && currentActiveTab === 'form' && !window._hasNotifiedDraftRestored) {
+                    window._hasNotifiedDraftRestored = true;
+                    showToast("Đã tự động khôi phục toàn bộ câu trả lời đang làm dở của Quý vị!", "info");
+                }
             } catch (e) {
                 console.error("Lỗi khi khôi phục draft khảo sát:", e);
             }
@@ -4256,6 +4283,8 @@
                     localStorage.setItem("ptv_survey_responses", JSON.stringify(surveyResponses));
                     localStorage.setItem("ptv_last_submitted_id", newResponse.id);
                     localStorage.removeItem("ptv_survey_draft");
+                    localStorage.removeItem("ptv_doc_confirmed");
+                    window._hasNotifiedDraftRestored = false;
                     if (typeof clearTabNotificationBadge === "function") clearTabNotificationBadge();
                 } catch(e) {
                     console.warn("LocalStorage save warning:", e);
@@ -6852,6 +6881,21 @@
                     isAdminLoggedIn = true;
                 }
             } catch(e){}
+
+            // Tự động duy trì trạng thái xác nhận tài liệu nếu người dùng đang làm dở khảo sát
+            try {
+                const hasDraft = !!localStorage.getItem("ptv_survey_draft");
+                const isDocConfirmed = localStorage.getItem("ptv_doc_confirmed") === "true";
+                if (hasDraft || isDocConfirmed) {
+                    const confirmCheckbox = document.getElementById('readDocConfirm');
+                    if (confirmCheckbox) {
+                        confirmCheckbox.checked = true;
+                        if (typeof toggleSurveyStartBtn === 'function') {
+                            toggleSurveyStartBtn();
+                        }
+                    }
+                }
+            } catch(e){}
         }
 
         // --- FLOATING TEXT VIEW MODAL LOGIC (FIXED SPACING & NO LOWERCASE) ---
@@ -7290,11 +7334,26 @@
         // 3. Khi người dùng click quay lại tab -> Trở về tiêu đề bình thường
         document.addEventListener('visibilitychange', () => {
             if (document.visibilityState === 'hidden') {
+                if (typeof saveSurveyDraft === 'function') {
+                    saveSurveyDraft();
+                }
                 if (isSurveyUnfinished()) {
                     showTabNotificationBadge();
                 }
             } else if (document.visibilityState === 'visible') {
                 clearTabNotificationBadge();
+            }
+        });
+
+        window.addEventListener('beforeunload', () => {
+            if (typeof saveSurveyDraft === 'function') {
+                saveSurveyDraft();
+            }
+        });
+
+        window.addEventListener('pagehide', () => {
+            if (typeof saveSurveyDraft === 'function') {
+                saveSurveyDraft();
             }
         });
 

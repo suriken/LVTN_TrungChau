@@ -33,6 +33,17 @@ He thong san sang!
 
 ---
 
+### ⏱️ [04/11/2026 12:58:00] Prompt: "Kiểm tra và củng cố cơ chế tự động lưu bản nháp khảo sát dở dang"
+- **Nội dung:** Đảm bảo khi người dùng đang nhập lỡ dở mà chuyển sang trang tra cứu chương trình đào tạo hoặc tắt/mở lại trình duyệt thì toàn bộ câu trả lời trước đó vẫn được lưu 100% không bị mất.
+- **Giải pháp:**
+  - `saveSurveyDraft()` tự động lưu realtime vào `localStorage.ptv_survey_draft` mỗi khi gõ phím (`oninput`), chọn radio Likert, hoặc chọn dropdown.
+  - Bổ sung `beforeunload`, `pagehide`, `visibilitychange` để đảm bảo lưu tức thì khi tắt tab hoặc chuyển đổi ứng dụng.
+  - Tự động duy trì trạng thái xác nhận tài liệu (`ptv_doc_confirmed`) để khi người dùng mở lại trang không bị chặn hay phải tích chọn lại từ đầu.
+  - Tự động hiển thị thông báo khôi phục nhẹ nhàng khi người dùng quay lại làm tiếp khảo sát.
+- **Trạng thái:** 🟢 Hoàn thành & Kiểm thử cú pháp 100% OK!
+
+---
+
 ### ⏱️ [04/11/2026 12:45:00] Prompt: "Đơn giản hóa cấp đào tạo khác: chỉ chọn là đủ, không cần nhập thêm"
 - **Nội dung:** Gỡ bỏ hoàn toàn ô nhập liệu chi tiết khi chọn 'Cấp đào tạo khác', người dùng chỉ cần chọn giá trị 'Cấp đào tạo khác' trực tiếp trong dropdown.
 - **Giải pháp:**
