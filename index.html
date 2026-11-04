@@ -5246,21 +5246,22 @@
             }
         }
 
-        async function fetchResponsesFromBackend(silent = false) {
+        async function fetchResponsesFromBackend(silent = false, forceSync = true) {
             const targetUrl = getEffectiveBackendUrl();
             if (!targetUrl || targetUrl.trim() === '') {
                 return;
             }
             if (!silent) {
-                showToast("Đang cập nhật dữ liệu mới nhất từ máy chủ...", "info");
+                showToast("Đang đồng bộ dữ liệu mới nhất từ Cloudflare D1 & Google Sheets...", "info");
             }
             try {
                 let response = null;
+                const reqPayload = JSON.stringify({ action: "getResponses", forceSync: !!forceSync, _t: Date.now() });
                 try {
                     response = await fetch(targetUrl, {
                         method: "POST",
                         headers: { "Content-Type": "text/plain;charset=utf-8" },
-                        body: JSON.stringify({ action: "getResponses" })
+                        body: reqPayload
                     });
                     if (!response.ok && targetUrl !== DEFAULT_SERVER_API_URL) {
                         response = null;
@@ -5274,7 +5275,7 @@
                         response = await fetch(DEFAULT_SERVER_API_URL, {
                             method: "POST",
                             headers: { "Content-Type": "text/plain;charset=utf-8" },
-                            body: JSON.stringify({ action: "getResponses" })
+                            body: reqPayload
                         });
                     } catch (e) {
                         response = null;
@@ -5294,7 +5295,7 @@
                             localStorage.setItem("ptv_survey_responses", JSON.stringify(surveyResponses));
                         } catch(e){}
                         renderGlobalDashboard();
-                        showToast(`Đã tải dữ liệu mới nhất (${surveyResponses.length} phiếu)!`, "success");
+                        showToast(`Đã đồng bộ và cập nhật dữ liệu mới nhất (${surveyResponses.length} phiếu)!`, "success");
                         return;
                     }
                 }

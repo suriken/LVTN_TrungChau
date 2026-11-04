@@ -30,4 +30,14 @@ Da kiem tra xong Live Console.
 ```
 He thong san sang!
 ```
+
 ---
+
+### ⏱️ [04/11/2026 12:35:00] Prompt: "Đồng bộ cấp đào tạo khác từ D1 và Google Sheets khi nhấn Làm Mới"
+- **Nội dung:** Khắc phục tình trạng khi sửa cấp đào tạo trực tiếp trên D1 hoặc Google Sheets (Huynh trưởng Bửu Phiệt & Hoài Nhân sang 'Cấp đào tạo khác') nhưng web chưa cập nhật.
+- **Nguyên nhân:** D1 API Worker trước đây chỉ đọc cột `raw_json` vốn không tự động cập nhật khi người dùng chỉnh sửa cột trên giao diện Cloudflare D1 Console, và D1 không chủ động kéo dữ liệu mới nhất từ Google Sheets khi đã có sẵn bản ghi.
+- **Giải pháp:** 
+  - Bổ sung hàm `mapD1RowToResponse(row)` để ưu tiên các cột cấu trúc trong D1 (đặc biệt là `grad_level`) ghi đè lên `raw_json`.
+  - Hỗ trợ `forceSync: true` tự động kéo và đồng bộ 2 chiều dữ liệu mới nhất từ Google Sheets sang D1 khi bấm nút "Làm Mới".
+  - Cập nhật hàm `fetchResponsesFromBackend` trên web tự động gửi `forceSync: true` kèm timestamp chống cache.
+- **Trạng thái:** 🟢 Hoàn thành & Kiểm thử cú pháp 100% OK!
