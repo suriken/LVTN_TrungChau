@@ -7086,9 +7086,11 @@
         const originalFaviconHref = "https://i.postimg.cc/jdZBPB5c/IMG-3726.jpg";
         let faviconWithBadgeDataUri = null;
         let isTabBadgeActive = false;
-        let titleNotificationInterval = null;
+        let periodicBlinkTimer = null;
+        let activeBurstInterval = null;
         const pageLoadTimestamp = Date.now();
         const baseDocumentTitle = document.title || "Khóa đào tạo PTV cấp III - Trung Châu 1 | Phiếu khảo sát Luận văn tốt nghiệp";
+        const BLINK_CYCLE_MS = 12 * 60 * 1000; // 12 phút nhấp nháy 1 lần (khoảng 10 - 15 phút)
 
         function isSurveyUnfinished() {
             // 1. Nếu đang ở trang Quản trị Admin -> không cần nhắc
@@ -7191,6 +7193,35 @@
             link.href = href;
         }
 
+        // Thực hiện đợt nhấp nháy ngắn (khoảng 5-6 giây rồi nghỉ tĩnh)
+        function triggerGentleBlinkBurst() {
+            if (!isSurveyUnfinished() || document.visibilityState !== 'hidden') return;
+
+            if (activeBurstInterval) clearInterval(activeBurstInterval);
+            let blinkCount = 0;
+            const maxBlinks = 6; // Đảo qua lại 6 lần (~7 giây) rồi dừng lại ở tiêu đề tĩnh
+            let toggle = false;
+
+            activeBurstInterval = setInterval(() => {
+                if (!isTabBadgeActive || document.visibilityState !== 'hidden') {
+                    clearInterval(activeBurstInterval);
+                    activeBurstInterval = null;
+                    return;
+                }
+
+                blinkCount++;
+                document.title = toggle ? "(1) 🔴 Bạn còn phiếu khảo sát dở dang..." : "(1) " + baseDocumentTitle;
+                toggle = !toggle;
+
+                if (blinkCount >= maxBlinks) {
+                    clearInterval(activeBurstInterval);
+                    activeBurstInterval = null;
+                    // Sau khi nhấp nháy xong, trả về tiêu đề tĩnh lịch sự (1)
+                    document.title = "(1) " + baseDocumentTitle;
+                }
+            }, 1200);
+        }
+
         function showTabNotificationBadge() {
             if (!isSurveyUnfinished()) return;
             if (isTabBadgeActive) return;
@@ -7200,31 +7231,39 @@
                 applyFaviconHref(faviconWithBadgeDataUri);
             }
 
-            // Tiêu đề tab kèm số thông báo (1) và nhắc nhở giống Facebook
-            if (titleNotificationInterval) clearInterval(titleNotificationInterval);
-            let toggle = false;
-            titleNotificationInterval = setInterval(() => {
-                if (!isTabBadgeActive) return;
-                document.title = toggle ? "(1) 🔴 Bạn còn phiếu khảo sát dở dang..." : "(1) " + baseDocumentTitle;
-                toggle = !toggle;
-            }, 1800);
+            // Đặt tiêu đề tĩnh ban đầu kèm số thông báo (1) giống Facebook
             document.title = "(1) " + baseDocumentTitle;
+
+            // Kích hoạt một đợt nhấp nháy nhẹ đầu tiên
+            triggerGentleBlinkBurst();
+
+            // Thiết lập chu kỳ 10 - 15 phút (mặc định 12 phút) mới nhấp nháy lại 1 lần thay vì liên tục
+            if (periodicBlinkTimer) clearInterval(periodicBlinkTimer);
+            periodicBlinkTimer = setInterval(() => {
+                if (isTabBadgeActive && document.visibilityState === 'hidden') {
+                    triggerGentleBlinkBurst();
+                }
+            }, BLINK_CYCLE_MS);
         }
 
         function clearTabNotificationBadge() {
             isTabBadgeActive = false;
-            if (titleNotificationInterval) {
-                clearInterval(titleNotificationInterval);
-                titleNotificationInterval = null;
+            if (periodicBlinkTimer) {
+                clearInterval(periodicBlinkTimer);
+                periodicBlinkTimer = null;
+            }
+            if (activeBurstInterval) {
+                clearInterval(activeBurstInterval);
+                activeBurstInterval = null;
             }
             document.title = baseDocumentTitle;
             applyFaviconHref(originalFaviconHref);
         }
 
         // Tự động kiểm tra và bật/tắt dấu chấm đỏ trên tab:
-        // 1. Khi người dùng chuyển sang tab khác mà chưa nộp bài -> Hiện dấu chấm đỏ trên tab để nhắc nhớ quay lại
-        // 2. Khi người dùng click quay lại tab -> Trở về tiêu đề bình thường
-        // 3. Khung giờ 19h và 21h tối -> Kích hoạt dấu chấm đỏ nếu chưa xong
+        // 1. Khi người dùng chuyển sang tab khác mà chưa nộp bài -> Hiện dấu chấm đỏ trên tab
+        // 2. Cứ mỗi 10 - 15 phút (chu kỳ 12 phút) nhấp nháy 1 đợt nhẹ nhàng thay vì nhấp nháy liên tục
+        // 3. Khi người dùng click quay lại tab -> Trở về tiêu đề bình thường
         document.addEventListener('visibilitychange', () => {
             if (document.visibilityState === 'hidden') {
                 if (isSurveyUnfinished()) {
@@ -7239,8 +7278,9 @@
         setInterval(() => {
             const now = new Date();
             const hour = now.getHours();
-            if ((hour === 19 || hour === 21) && isSurveyUnfinished()) {
+            if ((hour === 19 || hour === 21) && isSurveyUnfinished() && document.visibilityState === 'hidden') {
                 showTabNotificationBadge();
+                triggerGentleBlinkBurst();
             }
         }, 60000);
 
