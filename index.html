@@ -1427,13 +1427,17 @@
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 pt-2 border-t border-[#f0eae1]">
                         <div>
                             <label class="block text-xs font-bold text-slate-700 mb-1">Cấp PTV cao nhất đã hoàn thành</label>
-                            <select id="respGradLevel" onchange="saveSurveyDraft()" class="w-full px-3 py-2 text-xs sm:text-sm rounded-xl border border-[#e2d8c7] focus:outline-none focus:border-[#3b4982] bg-white transition">
+                            <select id="respGradLevel" onchange="handleGradLevelChange(); saveSurveyDraft();" class="w-full px-3 py-2 text-xs sm:text-sm rounded-xl border border-[#e2d8c7] focus:outline-none focus:border-[#3b4982] bg-white transition">
                                 <option value="Chưa tốt nghiệp">Chưa tốt nghiệp cấp nào</option>
                                 <option value="Dự bị">PTV Dự Bị (Khóa Dương Đông)</option>
                                 <option value="Cấp I">PTV Cấp I (Khóa Gò Kén)</option>
                                 <option value="Cấp II">PTV Cấp II (Khóa Cửu Long)</option>
                                 <option value="Cấp III">PTV Cấp III (Khóa Trung Châu)</option>
+                                <option value="Khác">Cấp đào tạo khác (trước đây / đặc thù)...</option>
                             </select>
+                            <div id="otherGradLevelWrap" class="hidden mt-1.5">
+                                <input type="text" id="respOtherGradLevel" placeholder="Vui lòng ghi rõ cấp đào tạo khác..." oninput="saveSurveyDraft()" class="w-full px-3 py-1.5 text-xs rounded-lg border border-amber-300 bg-amber-50/60 focus:bg-white focus:outline-none focus:border-[#3b4982] transition placeholder-slate-400">
+                            </div>
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-700 mb-1">Thâm niên sinh hoạt / Phụng sự</label>
@@ -1489,23 +1493,23 @@
                     <!-- Questions dynamically rendered via JS with 5 distinct colors & auto-expand reason on score < 3 -->
                 </div>
 
-                <!-- PHẦN 3: TÌNH TRẠNG SINH HOẠT TU HỌC & PHỤNG SỰ THỰC TẾ -->
+                <!-- PHẦN 3: TÌNH TRẠNG SINH HOẠT TU HỌC & PHỤNG SỰ THỰC TẾ CỦA BẢN THÂN -->
                 <div class="bg-white p-4 sm:p-6 rounded-2xl border border-[#e2d8c7] shadow-sm space-y-4">
                     <div class="border-b border-[#e2d8c7] pb-3">
                         <span class="text-[11px] font-bold uppercase tracking-wider text-[#3b4982] bg-amber-50 px-2 py-0.5 rounded border border-amber-200">Phần 3</span>
                         <h3 class="font-bold text-[#3b4982] text-sm sm:text-base inline-block ml-2">
-                            <i class="fa-solid fa-hands-praying"></i> Tình Trạng Sinh Hoạt Tu Học & Phụng Sự Thực Tế Của PTV
+                            <i class="fa-solid fa-hands-praying"></i> Tình Trạng Sinh Hoạt Tu Học & Phụng Sự Thực Tế Của Bản Thân Quý Vị
                         </h3>
-                        <p class="text-xs text-slate-500 mt-1">Khảo sát mức độ duy trì hành trì và cống hiến thực tế sau quá trình đào tạo.</p>
+                        <p class="text-xs text-slate-500 mt-1">Khảo sát tình trạng tu học, công phu, hành trì và mức độ tham gia phụng sự thực tế của chính bản thân Quý Huynh Tỷ / Đệ Muội hiện nay.</p>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm sm:text-base font-black text-slate-900 mb-2 leading-snug">
-                                19. Mức độ thực hành trai kỳ hiện nay <span class="text-rose-600 font-black">*</span>
+                                19. Mức độ thực hành trai kỳ của bản thân hiện nay <span class="text-rose-600 font-black">*</span>
                             </label>
                             <select id="respDiet" required onchange="saveSurveyDraft(); updateSurveyProgress();" class="w-full px-3 py-2 text-xs sm:text-sm rounded-xl border border-[#e2d8c7] focus:outline-none focus:border-[#3b4982] bg-white transition">
-                                <option value="">-- Chọn mức độ trai kỳ --</option>
+                                <option value="">-- Chọn mức độ trai kỳ của bản thân --</option>
                                 <option value="Lục trai">Lục trai</option>
                                 <option value="Thập trai">Thập trai</option>
                                 <option value="Trường trai">Trường trai</option>
@@ -1514,10 +1518,10 @@
 
                         <div>
                             <label class="block text-sm sm:text-base font-black text-slate-900 mb-2 leading-snug">
-                                20. Duy trì thời cúng & công phu hằng ngày <span class="text-rose-600 font-black">*</span>
+                                20. Duy trì thời cúng & công phu hằng ngày của bản thân <span class="text-rose-600 font-black">*</span>
                             </label>
                             <select id="respPractice" required onchange="saveSurveyDraft(); updateSurveyProgress();" class="w-full px-3 py-2 text-xs sm:text-sm rounded-xl border border-[#e2d8c7] focus:outline-none focus:border-[#3b4982] bg-white transition">
-                                <option value="">-- Chọn tình trạng cúng kính --</option>
+                                <option value="">-- Chọn tình trạng cúng kính của bản thân --</option>
                                 <option value="Đều đặn mỗi ngày">Đều đặn hằng ngày tại Thánh thất hoặc Thiên bàn tư gia</option>
                                 <option value="2 - 3 thời/tuần">Thường xuyên 2 đến 3 thời mỗi tuần</option>
                                 <option value="Chỉ ngày Sóc Vọng / Lễ Vía">Chỉ tham gia cúng vào ngày Sóc, Vọng (mùng 1, rằm) hoặc Lễ Vía lớn</option>
@@ -1527,10 +1531,10 @@
 
                         <div>
                             <label class="block text-sm sm:text-base font-black text-slate-900 mb-2 leading-snug">
-                                21. Tình trạng tham gia phụng sự tại Họ đạo / GĐHĐ hiện nay <span class="text-rose-600 font-black">*</span>
+                                21. Tình trạng tham gia phụng sự tại Họ đạo / GĐHĐ của bản thân hiện nay <span class="text-rose-600 font-black">*</span>
                             </label>
                             <select id="respServiceStatus" required onchange="saveSurveyDraft(); updateSurveyProgress();" class="w-full px-3.5 py-2.5 text-sm sm:text-base rounded-xl border border-[#e2d8c7] focus:outline-none focus:border-[#3b4982] bg-white transition">
-                                <option value="">-- Chọn tình trạng phụng sự --</option>
+                                <option value="">-- Chọn tình trạng phụng sự của bản thân --</option>
                                 <option value="Trực tiếp phụ trách thường xuyên">Trực tiếp phụ trách, hướng dẫn sinh hoạt thường xuyên</option>
                                 <option value="Hỗ trợ các kỳ trại, đại lễ">Hỗ trợ các kỳ trại huấn luyện hoặc đại lễ khi được phân công</option>
                                 <option value="Tạm ngưng do hoàn cảnh">Tạm ngưng sinh hoạt vì lý do công việc / gia đình</option>
@@ -1540,10 +1544,10 @@
 
                         <div>
                             <label class="block text-sm sm:text-base font-black text-slate-900 mb-2 leading-snug">
-                                22. Khó khăn / Rào cản lớn nhất gặp phải trong tu học & phụng sự <span class="text-rose-600 font-black">*</span>
+                                22. Khó khăn / Rào cản lớn nhất của bản thân gặp phải trong tu học & phụng sự <span class="text-rose-600 font-black">*</span>
                             </label>
                             <select id="respChallenge" required onchange="saveSurveyDraft(); updateSurveyProgress();" class="w-full px-3.5 py-2.5 text-sm sm:text-base rounded-xl border border-[#e2d8c7] focus:outline-none focus:border-[#3b4982] bg-white transition">
-                                <option value="">-- Chọn khó khăn lớn nhất --</option>
+                                <option value="">-- Chọn khó khăn lớn nhất của bản thân --</option>
                                 <option value="Áp lực mưu sinh & quỹ thời gian hạn hẹp">Áp lực mưu sinh, học tập & quỹ thời gian gia đình</option>
                                 <option value="Khoảng cách địa lý / đi lại xa xôi">Khoảng cách địa lý xa xôi, di chuyển khó khăn</option>
                                 <option value="Thiếu môi trường thực hành tại Họ đạo">Họ đạo chưa có môi trường hoặc chưa tạo điều kiện cho PTV</option>
@@ -1902,6 +1906,7 @@
                             <option value="Cấp I">PTV Cấp I (Gò Kén)</option>
                             <option value="Dự bị">PTV Dự Bị (Dương Đông)</option>
                             <option value="Chưa tốt nghiệp">Chưa tốt nghiệp</option>
+                            <option value="Khác">Cấp đào tạo khác</option>
                         </select>
                     </div>
 
@@ -3432,7 +3437,7 @@
                 icon: "fa-user-graduate",
                 questions: [
                     { id: "q13_competence", label: "13. Mức độ đáp ứng năng lực đầu ra theo mục tiêu từng cấp", desc: "Phổ Tế Viên sau tốt nghiệp tự tin đảm nhiệm tốt vai trò được phân công (từ Phụ tá, Trưởng phụ trách ngành Đồng/Thiếu/Thanh, đến Ban Điều hành Tu tập sinh và Ban Hướng dẫn GĐHĐ)." },
-                    { id: "q14_application", label: "14. Khả năng vận dụng vào thực tế cơ sở Họ đạo", desc: "Kiến thức đạo lý và kỹ năng huấn luyện có tính khả thi cao, dễ dàng áp dụng linh hoạt vào điều kiện sinh hoạt cụ thể tại Thánh thất và các Họ đạo địa phương." },
+                    { id: "q14_application", label: "14. Khả năng vận dụng vào thực tế cơ sở Họ đạo", desc: "Kiến thức giáo lý và kỹ năng huấn luyện có tính khả thi cao, dễ dàng áp dụng linh hoạt vào điều kiện sinh hoạt cụ thể tại Thánh thất và các Họ đạo địa phương." },
                     { id: "q15_commitment", label: "15. Tinh thần dấn thân & Gắn bó phụng sự lâu dài", desc: "Chương trình đào tạo hun đúc được nhiệt huyết, tinh thần trách nhiệm và lòng trung kiên để người Phổ Tế Viên bền bỉ dấn thân phụng sự Giáo hội, không nản lòng trước khó khăn thử thách." }
                 ]
             },
@@ -3702,6 +3707,20 @@
             updateSurveyProgressDebounced();
         }
 
+        function handleGradLevelChange() {
+            const sel = document.getElementById('respGradLevel');
+            const wrap = document.getElementById('otherGradLevelWrap');
+            const inp = document.getElementById('respOtherGradLevel');
+            if (!sel || !wrap) return;
+            if (sel.value === 'Khác') {
+                wrap.classList.remove('hidden');
+                if (inp) inp.focus();
+            } else {
+                wrap.classList.add('hidden');
+                if (inp) inp.value = '';
+            }
+        }
+
         // --- SURVEY DRAFT PERSISTENCE (LƯU VÀ KHÔI PHỤC KHI CHUYỂN TAB) ---
         function saveSurveyDraft() {
             try {
@@ -3712,6 +3731,7 @@
                     role: document.getElementById('respRole') ? document.getElementById('respRole').value : '',
                     unit: document.getElementById('respUnit') ? document.getElementById('respUnit').value : '',
                     gradLevel: document.getElementById('respGradLevel') ? document.getElementById('respGradLevel').value : '',
+                    otherGradLevel: document.getElementById('respOtherGradLevel') ? document.getElementById('respOtherGradLevel').value : '',
                     tenure: document.getElementById('respTenure') ? document.getElementById('respTenure').value : '',
                     region: document.getElementById('respRegion') ? document.getElementById('respRegion').value : '',
                     scores: {},
@@ -3762,7 +3782,16 @@
 
                 if (draft.role && document.getElementById('respRole')) document.getElementById('respRole').value = draft.role;
                 if (draft.unit && document.getElementById('respUnit')) document.getElementById('respUnit').value = draft.unit;
-                if (draft.gradLevel && document.getElementById('respGradLevel')) document.getElementById('respGradLevel').value = draft.gradLevel;
+                if (draft.gradLevel && document.getElementById('respGradLevel')) {
+                    document.getElementById('respGradLevel').value = draft.gradLevel;
+                    if (draft.gradLevel === 'Khác') {
+                        const wrap = document.getElementById('otherGradLevelWrap');
+                        if (wrap) wrap.classList.remove('hidden');
+                        if (draft.otherGradLevel && document.getElementById('respOtherGradLevel')) {
+                            document.getElementById('respOtherGradLevel').value = draft.otherGradLevel;
+                        }
+                    }
+                }
                 if (draft.tenure && document.getElementById('respTenure')) document.getElementById('respTenure').value = draft.tenure;
                 if (draft.region && document.getElementById('respRegion')) document.getElementById('respRegion').value = draft.region;
 
@@ -4186,7 +4215,11 @@
                 const phone = isAnon ? "Ẩn danh" : phoneInput.value.trim();
                 const role = roleSelect.value;
                 const unit = unitInput.value.trim();
-                const gradLevel = document.getElementById('respGradLevel') ? document.getElementById('respGradLevel').value : "";
+                let gradLevel = document.getElementById('respGradLevel') ? document.getElementById('respGradLevel').value : "";
+                if (gradLevel === "Khác") {
+                    const otherVal = document.getElementById('respOtherGradLevel') ? document.getElementById('respOtherGradLevel').value.trim() : "";
+                    gradLevel = otherVal ? `Khác (${otherVal})` : "Cấp khác";
+                }
                 const tenure = document.getElementById('respTenure') ? document.getElementById('respTenure').value : "";
                 const region = document.getElementById('respRegion') ? document.getElementById('respRegion').value : "";
 
@@ -4347,7 +4380,25 @@
             if (phoneEl) phoneEl.value = targetResp.phone || '';
             if (roleEl) roleEl.value = targetResp.role || '';
             if (unitEl) unitEl.value = targetResp.unit || '';
-            if (gradEl) gradEl.value = targetResp.gradLevel || '';
+            if (gradEl) {
+                const gVal = targetResp.gradLevel || '';
+                if (['Chưa tốt nghiệp', 'Dự bị', 'Cấp I', 'Cấp II', 'Cấp III'].includes(gVal)) {
+                    gradEl.value = gVal;
+                    if (document.getElementById('otherGradLevelWrap')) document.getElementById('otherGradLevelWrap').classList.add('hidden');
+                } else if (gVal) {
+                    gradEl.value = 'Khác';
+                    const wrap = document.getElementById('otherGradLevelWrap');
+                    const inp = document.getElementById('respOtherGradLevel');
+                    if (wrap) wrap.classList.remove('hidden');
+                    if (inp) {
+                        const m = gVal.match(/^Khác\s*\((.*)\)$/);
+                        inp.value = m ? m[1] : (gVal === 'Cấp khác' ? '' : gVal);
+                    }
+                } else {
+                    gradEl.value = '';
+                    if (document.getElementById('otherGradLevelWrap')) document.getElementById('otherGradLevelWrap').classList.add('hidden');
+                }
+            }
             if (tenureEl) tenureEl.value = targetResp.tenure || '';
             if (regionEl) regionEl.value = targetResp.region || '';
 
@@ -5716,7 +5767,13 @@
                 // 3. Lọc cấp đào tạo cao nhất
                 if (gradFilter !== 'ALL') {
                     const grad = (r.gradLevel || '').toLowerCase();
-                    if (!grad.includes(gradFilter.toLowerCase())) return false;
+                    if (gradFilter === 'Khác') {
+                        const standardGrads = ['cấp iii', 'cấp ii', 'cấp i', 'dự bị', 'chưa tốt nghiệp'];
+                        const isStandard = standardGrads.some(sg => grad.includes(sg));
+                        if (isStandard && !grad.includes('khác')) return false;
+                    } else {
+                        if (!grad.includes(gradFilter.toLowerCase())) return false;
+                    }
                 }
 
                 // 4. Lọc thâm niên sinh hoạt
