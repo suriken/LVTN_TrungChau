@@ -263,7 +263,7 @@ export default {
         const forceSync = url.searchParams.get("forceSync") === "true" || url.searchParams.get("forceSync") === "1";
         if ((action === "getResponses" || action === "syncFromGoogleSheets") && db) {
           try {
-            if (forceSync || action === "syncFromGoogleSheets") {
+            if (action === "syncFromGoogleSheets") {
               await syncFromGoogleSheetsToD1(db, targetGoogleUrl);
             }
             const { results } = await db.prepare("SELECT * FROM surveys WHERE (role IS NOT NULL AND role != '' AND role != '--') OR (avg_score IS NOT NULL AND avg_score > 0) ORDER BY created_at ASC").all();
@@ -275,8 +275,16 @@ export default {
               return (hasScores || hasAvg) && hasIdentity;
             });
 
-            // Nếu D1 chưa có dữ liệu và chưa forceSync, tự động nạp từ Google Sheets
-            if (responses.length === 0 && !forceSync) {
+            // Nếu D1 đã có dữ liệu -> trả về siêu tốc (< 15ms)
+            if (responses.length > 0) {
+              if (forceSync && action !== "syncFromGoogleSheets") {
+                ctx.waitUntil(syncFromGoogleSheetsToD1(db, targetGoogleUrl));
+              }
+              return jsonResponse({ success: true, count: responses.length, responses: responses, source: "cloudflare_d1" });
+            }
+
+            // Nếu D1 chưa có dữ liệu, tự động nạp từ Google Sheets
+            if (responses.length === 0) {
               const sheetsData = await syncFromGoogleSheetsToD1(db, targetGoogleUrl);
               if (sheetsData && sheetsData.length > 0) {
                 const { results: updatedResults } = await db.prepare("SELECT * FROM surveys WHERE (role IS NOT NULL AND role != '' AND role != '--') OR (avg_score IS NOT NULL AND avg_score > 0) ORDER BY created_at ASC").all();
@@ -425,8 +433,8 @@ export default {
           const forceSync = payload.forceSync === true || action === "syncFromGoogleSheets";
           if (db) {
             try {
-              if (forceSync) {
-                // Buộc đồng bộ dữ liệu mới nhất từ Google Sheets về D1
+              if (action === "syncFromGoogleSheets") {
+                // Chỉ chặn đồng bộ khi người dùng chỉ định rõ hành động đồng bộ 2 chiều
                 await syncFromGoogleSheetsToD1(db, targetGoogleUrl);
               }
 
@@ -441,6 +449,9 @@ export default {
 
               // Nếu D1 đã có dữ liệu -> trả về siêu tốc (< 15ms)
               if (responses.length > 0) {
+                if (forceSync && action !== "syncFromGoogleSheets") {
+                  ctx.waitUntil(syncFromGoogleSheetsToD1(db, targetGoogleUrl));
+                }
                 return jsonResponse({
                   success: true,
                   count: responses.length,

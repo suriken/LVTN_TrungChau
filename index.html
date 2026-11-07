@@ -1755,7 +1755,7 @@
                         <i class="fa-solid fa-file-excel"></i>
                         <span>Xuất Excel</span>
                     </button>
-                    <button type="button" onclick="fetchResponsesFromBackend()" class="px-2.5 py-1.5 sm:px-3 sm:py-2 bg-[#3b4982] hover:bg-[#2c3765] text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-xs cursor-pointer active:scale-98" title="Tải dữ liệu mới nhất từ máy chủ hệ thống">
+                    <button type="button" id="btnRefreshDashboard" onclick="handleManualRefresh(this)" class="px-2.5 py-1.5 sm:px-3 sm:py-2 bg-[#3b4982] hover:bg-[#2c3765] text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-xs cursor-pointer active:scale-98" title="Tải dữ liệu mới nhất từ máy chủ hệ thống">
                         <i class="fa-solid fa-arrows-rotate"></i>
                         <span>Làm Mới</span>
                     </button>
@@ -3028,7 +3028,7 @@
             }
             if (tabId === 'dashboard') {
                 renderGlobalDashboard();
-                fetchResponsesFromBackend();
+                fetchResponsesFromBackend(true, false);
             }
 
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -3896,9 +3896,21 @@
                 document.body.appendChild(toast);
             }
 
-            const isSuccess = (type === 'success');
-            const bgClass = isSuccess ? 'bg-emerald-600 text-white border-emerald-500' : 'bg-rose-600 text-white border-rose-500';
-            const iconClass = isSuccess ? 'fa-circle-check' : 'fa-triangle-exclamation';
+            let bgClass = 'bg-[#1b254b] text-white border-[#2c3b75]';
+            let iconClass = 'fa-circle-info';
+            if (type === 'success') {
+                bgClass = 'bg-emerald-600 text-white border-emerald-500';
+                iconClass = 'fa-circle-check';
+            } else if (type === 'error') {
+                bgClass = 'bg-rose-600 text-white border-rose-500';
+                iconClass = 'fa-circle-xmark';
+            } else if (type === 'warning') {
+                bgClass = 'bg-amber-600 text-white border-amber-500';
+                iconClass = 'fa-triangle-exclamation';
+            } else if (type === 'info') {
+                bgClass = 'bg-[#1b254b] text-white border-[#2c3b75]';
+                iconClass = 'fa-circle-info';
+            }
 
             toast.className = `fixed top-4 left-1/2 -translate-x-1/2 z-50 max-w-[92vw] sm:max-w-md w-full p-3.5 sm:p-4 rounded-2xl shadow-2xl transition-all duration-300 transform translate-y-0 opacity-100 flex items-start gap-3 text-xs sm:text-sm font-semibold border ${bgClass}`;
             toast.innerHTML = `
@@ -3910,7 +3922,7 @@
             `;
 
             if (window.toastTimeout) clearTimeout(window.toastTimeout);
-            window.toastTimeout = setTimeout(() => hideToast(), 4500);
+            window.toastTimeout = setTimeout(() => hideToast(), 4000);
         }
 
         function hideToast() {
@@ -5092,9 +5104,6 @@
                 pInput.value = '';
                 switchTab('dashboard');
                 showToast("Đăng nhập Quản trị thành công tức thì!", "success");
-
-                // Cập nhật dữ liệu ngầm từ D1 / Backend
-                fetchResponsesFromBackend();
                 return;
             }
 
@@ -5244,13 +5253,20 @@
             }
         }
 
-        async function fetchResponsesFromBackend(silent = false, forceSync = true) {
+        async function handleManualRefresh(btn) {
+            const icon = btn ? btn.querySelector('i') : null;
+            if (icon) icon.classList.add('fa-spin');
+            try {
+                await fetchResponsesFromBackend(false, false);
+            } finally {
+                if (icon) icon.classList.remove('fa-spin');
+            }
+        }
+
+        async function fetchResponsesFromBackend(silent = true, forceSync = false) {
             const targetUrl = getEffectiveBackendUrl();
             if (!targetUrl || targetUrl.trim() === '') {
                 return;
-            }
-            if (!silent) {
-                showToast("Đang đồng bộ dữ liệu mới nhất từ Cloudflare D1 & Google Sheets...", "info");
             }
             try {
                 let response = null;
@@ -5293,7 +5309,9 @@
                             localStorage.setItem("ptv_survey_responses", JSON.stringify(surveyResponses));
                         } catch(e){}
                         renderGlobalDashboard();
-                        showToast(`Đã đồng bộ và cập nhật dữ liệu mới nhất (${surveyResponses.length} phiếu)!`, "success");
+                        if (!silent) {
+                            showToast(`Đã làm mới dữ liệu mới nhất (${surveyResponses.length} phiếu)!`, "success");
+                        }
                         return;
                     }
                 }
@@ -7378,6 +7396,7 @@
             renderCurrentDateHeader();
             initLightboxEvents();
             loadStoredData();
+            fetchResponsesFromBackend(true, false);
             generateFaviconWithBadge();
         };
     </script>
